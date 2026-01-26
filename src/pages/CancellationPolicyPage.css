@@ -1,0 +1,167 @@
+/* CancellationPolicyPage Styles */
+
+.cancellation-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+}
+
+.cancellation-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.cancellation-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.cancellation-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.cancellation-updated {
+  color: #6b7280;
+  font-size: 0.9375rem;
+}
+
+.cancellation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.cancellation-section {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cancellation-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cancellation-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.cancellation-text {
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.cancellation-text:last-child {
+  margin-bottom: 0;
+}
+
+.cancellation-list {
+  list-style: disc;
+  padding-left: 1.75rem;
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.cancellation-list li {
+  margin-bottom: 0.5rem;
+}
+
+.cancellation-list li:last-child {
+  margin-bottom: 0;
+}
+
+.cancellation-table {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.cancellation-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cancellation-table-row:last-child {
+  border-bottom: none;
+}
+
+.cancellation-table-header {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.cancellation-table-cell {
+  padding: 1rem;
+  color: #374151;
+}
+
+@media (max-width: 640px) {
+  .cancellation-table-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .cancellation-table-cell:first-child {
+    background-color: #f9fafb;
+    font-weight: 500;
+  }
+  
+  .cancellation-table-row:not(.cancellation-table-header) .cancellation-table-cell:first-child {
+    border-bottom: 1px solid #f3f4f6;
+  }
+}
+
+.cancellation-example {
+  background-color: #fef3c7;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border-left: 4px solid #d97706;
+  margin: 1rem 0;
+}
+
+.cancellation-example-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.75rem;
+}
+
+.cancellation-example .cancellation-text {
+  color: #78350f;
+  margin-bottom: 0.5rem;
+}
+
+.cancellation-contact-box {
+  background-color: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  margin-top: 1rem;
+  line-height: 1.75;
+}
+
+.cancellation-contact-box p {
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.cancellation-contact-box p:last-child {
+  margin-bottom: 0;
+}
+
+.cancellation-contact-box strong {
+  color: #111827;
+}

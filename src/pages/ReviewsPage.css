@@ -1,0 +1,13 @@
+/* ReviewsPage Styles */
+
+.reviews-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-top: 7rem;
+}
+
+.reviews-page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}

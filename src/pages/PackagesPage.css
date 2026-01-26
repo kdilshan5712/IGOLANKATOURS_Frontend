@@ -1,0 +1,256 @@
+/* PackagesPage Styles */
+
+.packages-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+}
+
+.packages-page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.packages-page-header {
+  margin-bottom: 3rem;
+}
+
+.packages-page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .packages-page-title {
+    font-size: 2.25rem;
+  }
+}
+
+.packages-page-subtitle {
+  color: #4b5563;
+}
+
+.packages-page-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .packages-page-layout {
+    flex-direction: row;
+  }
+}
+
+.packages-page-filters {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .packages-page-filters {
+    width: 20rem;
+  }
+}
+
+.packages-page-results {
+  flex: 1;
+}
+
+.packages-page-count {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.packages-page-count-number {
+  font-weight: 600;
+  color: #111827;
+}
+
+.packages-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .packages-page-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.packages-page-empty {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 3rem;
+  text-align: center;
+}
+
+.packages-page-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.packages-page-empty-text {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.packages-page-empty-button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.packages-page-empty-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Search Bar Styles */
+.packages-search-wrapper {
+  margin-bottom: 2rem;
+}
+
+.packages-search-bar {
+  position: relative;
+  max-width: 36rem;
+}
+
+.packages-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.packages-search-input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s;
+  background-color: #ffffff;
+}
+
+.packages-search-input:focus {
+  outline: none;
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.packages-search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #d97706;
+  color: #d97706;
+}
+
+.pagination-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination-arrow {
+  padding: 0.5rem 1rem;
+}
+
+.pagination-number {
+  min-width: 2.5rem;
+  justify-content: center;
+}
+
+.pagination-number.active {
+  background-color: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.pagination-number.active:hover {
+  background-color: #b45309;
+  border-color: #b45309;
+  color: #ffffff;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-dots {
+  padding: 0 0.5rem;
+  color: #9ca3af;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 3-column grid for larger screens */
+@media (min-width: 1280px) {
+  .packages-page-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Loading and Error States */
+.packages-loading,
+.packages-error {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.packages-loading p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.packages-error p {
+  font-size: 1.125rem;
+  color: #dc2626;
+  margin-bottom: 1rem;
+}

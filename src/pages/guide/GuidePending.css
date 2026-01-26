@@ -1,0 +1,311 @@
+/* Guide Pending Page Styles */
+.guide-pending-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-top: 7rem;
+}
+
+.guide-pending-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.guide-pending-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.guide-pending-header {
+  margin-bottom: 40px;
+}
+
+.guide-pending-icon {
+  width: 80px;
+  height: 80px;
+  background-color: #fff3e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: #ff9800;
+}
+
+.guide-pending-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.guide-pending-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #111827;
+}
+
+.guide-pending-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Email Display */
+.guide-pending-email-section {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 30px 0;
+}
+
+.guide-pending-email-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.guide-pending-email {
+  font-size: 16px;
+  color: #111827;
+  margin: 0;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* Timeline */
+.guide-pending-timeline {
+  text-align: left;
+  margin: 40px 0 30px 0;
+}
+
+.guide-pending-timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.guide-pending-timeline-steps {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 24px;
+}
+
+.guide-pending-timeline-steps::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #e5e7eb;
+}
+
+.guide-pending-timeline-step {
+  display: flex;
+  gap: 20px;
+  position: relative;
+  padding-left: 0;
+}
+
+.guide-pending-timeline-step-dot {
+  width: 28px;
+  height: 28px;
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  border: 3px solid #fff;
+  box-sizing: border-box;
+}
+
+.guide-pending-timeline-step.completed .guide-pending-timeline-step-dot {
+  background-color: #4caf50;
+}
+
+.guide-pending-timeline-step.active .guide-pending-timeline-step-dot {
+  background-color: #ff9800;
+  border-color: #fff;
+}
+
+.guide-pending-timeline-step.pending .guide-pending-timeline-step-dot {
+  background-color: #e0e0e0;
+}
+
+.guide-pending-timeline-step-content {
+  flex: 1;
+  padding-top: 4px;
+}
+
+.guide-pending-timeline-step-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.guide-pending-timeline-step-description {
+  font-size: 12px;
+  color: #999;
+  margin: 4px 0 0 0;
+}
+
+/* Info Box */
+.guide-pending-info {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 30px 0;
+  text-align: left;
+}
+
+.guide-pending-info-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1565c0;
+  margin: 0 0 8px 0;
+}
+
+.guide-pending-info-text {
+  font-size: 13px;
+  color: #0d47a1;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Actions */
+.guide-pending-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.guide-pending-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guide-pending-button.logout {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.guide-pending-button.logout:hover {
+  background-color: #e0e0e0;
+}
+
+.guide-pending-button.back {
+  background-color: transparent;
+  color: #2196f3;
+  border: 1px solid #2196f3;
+}
+
+.guide-pending-button.back:hover {
+  background-color: #e3f2fd;
+}
+
+/* Support Text */
+.guide-pending-support {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  font-size: 12px;
+  color: #999;
+}
+
+.guide-pending-support-text {
+  margin: 0;
+}
+
+.guide-pending-support-link {
+  color: #2196f3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.guide-pending-support-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .guide-pending-page {
+    padding: 10px;
+  }
+
+  .guide-pending-card {
+    padding: 40px 24px;
+  }
+
+  .guide-pending-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .guide-pending-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .guide-pending-title {
+    font-size: 22px;
+  }
+
+  .guide-pending-subtitle {
+    font-size: 14px;
+  }
+
+  .guide-pending-email-section {
+    padding: 16px;
+  }
+
+  .guide-pending-actions {
+    gap: 10px;
+  }
+
+  .guide-pending-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .guide-pending-timeline-steps::before {
+    left: 10px;
+  }
+
+  .guide-pending-timeline-step-dot {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .guide-pending-timeline-step {
+    gap: 16px;
+  }
+}

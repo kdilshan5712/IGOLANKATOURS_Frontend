@@ -1,0 +1,408 @@
+/* Guide Bookings Page Styles */
+.guide-bookings-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 40px 20px;
+  padding-top: 7rem;
+}
+
+.guide-bookings-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.guide-bookings-header {
+  margin-bottom: 40px;
+}
+
+.guide-bookings-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #111827;
+}
+
+.guide-bookings-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Empty State */
+.guide-bookings-empty {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 16px -4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.guide-bookings-empty svg {
+  color: #d1d5db;
+  margin-bottom: 20px;
+}
+
+.guide-bookings-empty h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 10px 0;
+}
+
+.guide-bookings-empty p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+}
+
+.guide-bookings-empty-btn {
+  padding: 12px 24px;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guide-bookings-empty-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Bookings List */
+.guide-bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.guide-booking-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 16px -4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.guide-booking-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.guide-booking-card:hover {
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.08), 0 20px 30px -8px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.guide-booking-card:hover::before {
+  left: 100%;
+}
+
+.guide-booking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.guide-booking-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.guide-booking-status {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.guide-booking-status.pending {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  color: #ff9800;
+  border-color: rgba(255, 152, 0, 0.2);
+}
+
+.guide-booking-status.assigned {
+  background: linear-gradient(135deg, #e0f2f1, #b2dfdb);
+  color: #009688;
+  border-color: rgba(0, 150, 136, 0.2);
+}
+
+.guide-booking-status.confirmed {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #9c27b0;
+  border-color: rgba(156, 39, 176, 0.2);
+}
+
+.guide-booking-status.in_progress {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #2196f3;
+  border-color: rgba(33, 150, 243, 0.2);
+}
+
+.guide-booking-status.completed {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.guide-booking-status.cancelled {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.2);
+}
+
+.guide-booking-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.guide-booking-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.guide-booking-detail-item svg {
+  color: #e74c3c;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Tourist Info Section */
+.tourist-info-section {
+  background: linear-gradient(135deg, rgba(243, 244, 246, 0.5), rgba(249, 250, 251, 0.5));
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.tourist-info-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.tourist-info-section p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.tourist-info-section strong {
+  color: #111827;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.guide-booking-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.guide-booking-action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guide-booking-action-btn.accept-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.guide-booking-action-btn.accept-btn:hover {
+  background-color: #c0392b;
+}
+
+.guide-booking-action-btn.cancel-btn {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.guide-booking-action-btn.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.guide-booking-action-btn.complete-btn {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.guide-booking-action-btn.complete-btn:hover {
+  background-color: #45a049;
+}
+
+.guide-booking-completed {
+  padding: 10px 20px;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+/* Loading State */
+.guide-bookings-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 16px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .guide-bookings-page {
+    padding: 20px 10px;
+  }
+
+  .guide-bookings-title {
+    font-size: 24px;
+  }
+
+  .guide-booking-card {
+    padding: 16px;
+  }
+
+  .guide-booking-card-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .guide-booking-details {
+    gap: 12px;
+  }
+
+  .guide-booking-actions {
+    flex-direction: column;
+  }
+
+  .guide-booking-action-btn {
+    width: 100%;
+  }
+
+  .guide-bookings-empty {
+    padding: 40px 20px;
+  }
+}
+
+/* Status Filter Tabs */
+.guide-bookings-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.guide-filter-tab {
+  padding: 10px 20px;
+  background-color: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guide-filter-tab:hover {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.guide-filter-tab.active {
+  background-color: #e74c3c;
+  color: #ffffff;
+  border-color: #e74c3c;
+}
+
+/* Itinerary Actions */
+.guide-booking-itinerary-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  width: 100%;
+}
+
+.guide-booking-action-btn.view-btn,
+.guide-booking-action-btn.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.guide-booking-action-btn.view-btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.guide-booking-action-btn.download-btn:hover {
+  background-color: #059669;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .guide-bookings-filters {
+    flex-direction: column;
+  }
+
+  .guide-filter-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .guide-booking-itinerary-actions {
+    flex-direction: column;
+  }
+
+  .guide-booking-action-btn.view-btn,
+  .guide-booking-action-btn.download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

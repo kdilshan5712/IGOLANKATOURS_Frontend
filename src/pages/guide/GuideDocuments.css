@@ -1,0 +1,365 @@
+/* Guide Documents Page Styles */
+.guide-documents-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 40px 20px;
+  padding-top: 7rem;
+}
+
+.guide-documents-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.guide-documents-header {
+  margin-bottom: 40px;
+}
+
+.guide-documents-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #111827;
+}
+
+.guide-documents-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.guide-documents-progress {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.guide-documents-progress-step {
+  flex: 1;
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.guide-documents-progress-step.completed {
+  background-color: #e74c3c;
+}
+
+.guide-documents-progress-step.active {
+  background-color: #e74c3c;
+}
+
+/* Document Form */
+.guide-documents-form {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.guide-documents-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.guide-documents-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.guide-documents-select {
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.guide-documents-select:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+/* File Upload */
+.guide-documents-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.guide-documents-dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9fafb;
+}
+
+.guide-documents-dropzone:hover {
+  border-color: #e74c3c;
+  background-color: #ffe8e8;
+}
+
+.guide-documents-dropzone.drag-over {
+  border-color: #e74c3c;
+  background-color: #ffe8e8;
+}
+
+.guide-documents-dropzone-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  color: #e74c3c;
+}
+
+.guide-documents-dropzone-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.guide-documents-dropzone-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.guide-documents-input {
+  display: none;
+}
+
+/* Uploaded Documents */
+.guide-documents-uploaded {
+  margin-bottom: 24px;
+}
+
+.guide-documents-uploaded-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.guide-documents-uploaded-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guide-documents-uploaded-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #e8f5e9;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.guide-documents-uploaded-item-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #4caf50;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.guide-documents-uploaded-item-info {
+  flex: 1;
+}
+
+.guide-documents-uploaded-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.guide-documents-uploaded-item-type {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.guide-documents-uploaded-item-remove {
+  background: none;
+  border: none;
+  color: #4caf50;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.guide-documents-uploaded-item-remove:hover {
+  transform: scale(1.2);
+}
+
+/* Error Message */
+.guide-documents-error {
+  padding: 12px 15px;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  color: #c62828;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.guide-documents-error svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Success Message */
+.guide-documents-success {
+  padding: 12px 15px;
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.guide-documents-success svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Info Box */
+.guide-documents-info {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.guide-documents-info-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1565c0;
+  margin: 0 0 8px 0;
+}
+
+.guide-documents-info-text {
+  font-size: 13px;
+  color: #0d47a1;
+  margin: 0;
+}
+
+.guide-documents-info-list {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
+.guide-documents-info-list li {
+  font-size: 12px;
+  color: #0d47a1;
+  margin-bottom: 4px;
+}
+
+/* Actions */
+.guide-documents-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.guide-documents-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guide-documents-button.primary {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.guide-documents-button.primary:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.guide-documents-button.secondary {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.guide-documents-button.secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.guide-documents-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.guide-documents-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  font-size: 16px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .guide-documents-page {
+    padding: 20px 10px;
+  }
+
+  .guide-documents-title {
+    font-size: 24px;
+  }
+
+  .guide-documents-form {
+    padding: 24px;
+  }
+
+  .guide-documents-dropzone {
+    padding: 30px 20px;
+  }
+
+  .guide-documents-actions {
+    flex-direction: column;
+  }
+
+  .guide-documents-button {
+    width: 100%;
+  }
+}

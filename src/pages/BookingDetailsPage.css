@@ -1,0 +1,258 @@
+/* BookingDetailsPage Styles */
+
+.booking-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+}
+
+.booking-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.booking-header {
+  margin-bottom: 3rem;
+}
+
+.booking-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2rem;
+}
+
+.booking-steps {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.booking-step {
+  padding: 0.75rem 1.5rem;
+  background-color: #e5e7eb;
+  color: #6b7280;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.booking-step.active {
+  background-color: #d97706;
+  color: #ffffff;
+}
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .booking-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.booking-form-section {
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .booking-form-section {
+    order: 1;
+  }
+}
+
+.booking-summary-section {
+  order: 1;
+}
+
+@media (min-width: 1024px) {
+  .booking-summary-section {
+    order: 2;
+  }
+}
+
+.booking-form-card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.booking-form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.booking-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.booking-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.booking-label svg {
+  color: #d97706;
+}
+
+.booking-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.booking-input:focus {
+  outline: none;
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.booking-continue-btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #d97706;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.booking-continue-btn:hover {
+  background-color: #b45309;
+  transform: translateY(-2px);
+}
+
+.booking-summary-card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  position: sticky;
+  top: 8rem;
+}
+
+.booking-summary-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.booking-summary-image {
+  width: 100%;
+  height: 12rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.booking-summary-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-summary-package-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.booking-summary-duration {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.booking-summary-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+.booking-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+}
+
+.booking-summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.booking-summary-total {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 1rem;
+}
+
+.booking-summary-amount {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Loading and Error States */
+.booking-loading,
+.booking-error {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.booking-loading p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.booking-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.booking-error p {
+  font-size: 1.125rem;
+  color: #dc2626;
+}
+
+.booking-error button {
+  padding: 0.75rem 1.5rem;
+  background-color: #d97706;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.booking-error button:hover {
+  background-color: #b45309;
+}
