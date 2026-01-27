@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upload, AlertCircle, CheckCircle, FileText } from "lucide-react";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { guideAPI } from "../../services/api";
 import "./GuideDocuments.css";
 
@@ -74,8 +76,10 @@ const GuideDocumentsPage = () => {
   };
 
   return (
-    <main className="guide-documents-page">
-      <div className="guide-documents-container">
+    <>
+      <Navbar />
+      <main className="guide-documents-page">
+        <div className="guide-documents-container">
         <div className="guide-documents-card">
           <div className="guide-documents-header">
             <h1 className="guide-documents-title">Upload Verification Documents</h1>
@@ -161,7 +165,9 @@ const GuideDocumentsPage = () => {
           )}
         </div>
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 };
 

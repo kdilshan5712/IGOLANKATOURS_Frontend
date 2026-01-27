@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock, LogOut } from "lucide-react";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import "./GuidePending.css";
 
 const GuidePendingPage = () => {
@@ -24,8 +26,10 @@ const GuidePendingPage = () => {
   }, [navigate]);
 
   return (
-    <main className="guide-pending-page">
-      <div className="guide-pending-container">
+    <>
+      <Navbar />
+      <main className="guide-pending-page">
+        <div className="guide-pending-container">
         <div className="guide-pending-card">
           <div className="guide-pending-icon">
             <Clock size={64} />
@@ -95,6 +99,8 @@ const GuidePendingPage = () => {
         </div>
       </div>
     </main>
+      <Footer />
+    </>
   );
 };
 

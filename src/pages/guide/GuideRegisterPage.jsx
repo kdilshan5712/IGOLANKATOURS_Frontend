@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { User, Mail, Lock, Phone, AlertCircle } from "lucide-react";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { guideAPI } from "../../services/api";
 import { validatePassword } from "../../utils/passwordValidation";
 import "./GuideRegister.css";
@@ -73,8 +75,10 @@ const GuideRegisterPage = () => {
   };
 
   return (
-    <main className="guide-register-page">
-      <div className="guide-register-container">
+    <>
+      <Navbar />
+      <main className="guide-register-page">
+        <div className="guide-register-container">
         <div className="guide-register-card">
           <div className="guide-register-header">
             <h1 className="guide-register-title">Become a Tour Guide</h1>
@@ -182,7 +186,9 @@ const GuideRegisterPage = () => {
           </div>
         </div>
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 };
 

@@ -12,6 +12,9 @@ function AdminBookingsPage() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [assignGuideBooking, setAssignGuideBooking] = useState(null);
   const [toast, setToast] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -80,27 +83,30 @@ function AdminBookingsPage() {
   };
 
   const handleConfirmBooking = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to confirm this booking?")) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const result = await adminAPI.updateBookingStatus(bookingId, "confirmed", token);
-      
-      if (result.success) {
-        setToast({ type: "success", message: "Booking confirmed successfully!" });
-        await fetchBookings(); // Refresh bookings
-        setTimeout(() => setToast(null), 3000);
-      } else {
-        setToast({ type: "error", message: result.message || "Failed to confirm booking" });
+    setConfirmMessage("Are you sure you want to confirm this booking? The customer will receive a confirmation notification.");
+    setConfirmAction(() => async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const result = await adminAPI.updateBookingStatus(bookingId, "confirmed", token);
+        
+        if (result.success) {
+          setToast({ type: "success", message: "Booking confirmed successfully! A notification has been sent to the customer." });
+          await fetchBookings();
+          setShowConfirmModal(false);
+          setTimeout(() => setToast(null), 3000);
+        } else {
+          setToast({ type: "error", message: result.message || "Failed to confirm booking" });
+          setShowConfirmModal(false);
+          setTimeout(() => setToast(null), 3000);
+        }
+      } catch (error) {
+        console.error("Error confirming booking:", error);
+        setToast({ type: "error", message: "An error occurred while confirming the booking" });
+        setShowConfirmModal(false);
         setTimeout(() => setToast(null), 3000);
       }
-    } catch (error) {
-      console.error("Error confirming booking:", error);
-      setToast({ type: "error", message: "An error occurred" });
-      setTimeout(() => setToast(null), 3000);
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   const filteredBookings = bookings.filter((booking) => {
@@ -370,6 +376,32 @@ function AdminBookingsPage() {
       {toast && (
         <div className={`toast toast-${toast.type}`}>
           {toast.message}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Action</h3>
+            <p>{confirmMessage}</p>
+            <div className="modal-footer-confirm">
+              <button
+                className="btn-confirm-yes"
+                onClick={() => {
+                  if (confirmAction) confirmAction();
+                }}
+              >
+                Yes, Confirm
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

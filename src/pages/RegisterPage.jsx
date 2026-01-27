@@ -58,16 +58,14 @@ const RegisterPage = () => {
         phone: formData.phone
       });
 
-      if (data.success && data.token) {
-        // Auto-login after successful registration
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", data.user.email);
-        localStorage.setItem("userName", data.user.name || data.user.email);
-
-        // Redirect to original page or home
-        navigate(from);
+      if (data.success) {
+        // Store email for verification page
+        localStorage.setItem("userEmail", data.email || formData.email);
+        
+        // Redirect to email verification page instead of auto-login
+        navigate("/check-email", {
+          state: { email: data.email || formData.email }
+        });
       } else {
         setError(data.message || "Registration failed. Please try again.");
       }

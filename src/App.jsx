@@ -21,6 +21,7 @@ import BookingPaymentPage from "./pages/BookingPaymentPage";
 import BookingSuccessPage from "./pages/BookingSuccessPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CheckEmailPage from "./pages/CheckEmailPage";
 import MyBookingsPage from "./pages/MyBookingsPage";
 import GalleryPage from "./pages/GalleryPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -119,6 +120,7 @@ function App() {
                   <Route path="/booking/:id/success" element={<BookingSuccessPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/check-email" element={<CheckEmailPage />} />
                   <Route path="/verify-email" element={<VerifyEmailPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />

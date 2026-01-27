@@ -804,6 +804,10 @@ export const adminAPI = {
   // Reject guide application (NEW ENDPOINT - -action variant)
   rejectGuideAction: async (guideId, reason, token) => {
     try {
+      console.log('🔴 Rejecting guide:', guideId);
+      console.log('🔴 Token:', token ? 'Present' : 'Missing');
+      console.log('🔴 Reason:', reason);
+      
       const res = await fetch(`${API_BASE_URL}/admin/guides/${guideId}/reject-action`, {
         method: 'PATCH',
         headers: {
@@ -812,7 +816,11 @@ export const adminAPI = {
         },
         body: JSON.stringify({ reason })
       });
+      
+      console.log('🔴 Response status:', res.status);
       const data = await res.json();
+      console.log('🔴 Response data:', data);
+      
       return data;
     } catch (error) {
       console.error("Error rejecting guide:", error);

@@ -9,6 +9,12 @@ function AdminPackagesPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("success");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -104,34 +110,61 @@ function AdminPackagesPage() {
       }
 
       if (result.success) {
+        setNotificationMessage(editingPackage ? "Package updated successfully!" : "Package created successfully!");
+        setNotificationType("success");
+        setShowNotification(true);
         await fetchPackages();
-        handleCloseModal();
+        setTimeout(() => {
+          setShowNotification(false);
+          handleCloseModal();
+        }, 1500);
       } else {
-        alert(result.message || "Operation failed");
+        setNotificationMessage(result.message || "Operation failed");
+        setNotificationType("error");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000);
       }
     } catch (error) {
       console.error("Error saving package:", error);
-      alert("Failed to save package");
+      setNotificationMessage("Failed to save package");
+      setNotificationType("error");
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 3000);
     }
   };
 
   const handleDelete = async (packageId) => {
-    if (!window.confirm("Are you sure you want to delete this package?")) {
-      return;
-    }
-
     const token = localStorage.getItem("token");
-    try {
-      const result = await adminAPI.deletePackage(packageId, token);
-      if (result.success) {
-        await fetchPackages();
-      } else {
-        alert(result.message || "Failed to delete package");
+    setConfirmMessage("Are you sure you want to delete this package? This action cannot be undone.");
+    setConfirmAction(() => async () => {
+      try {
+        const result = await adminAPI.deletePackage(packageId, token);
+        if (result.success) {
+          setNotificationMessage("Package deleted successfully!");
+          setNotificationType("success");
+          setShowNotification(true);
+          setShowConfirmModal(false);
+          setTimeout(() => {
+            setShowNotification(false);
+            fetchPackages();
+          }, 1500);
+        } else {
+          setNotificationMessage(result.message || "Failed to delete package");
+          setNotificationType("error");
+          setShowNotification(true);
+          setShowConfirmModal(false);
+          setTimeout(() => setShowNotification(false), 3000);
+        }
+      } catch (error) {
+        console.error("Error deleting package:", error);
+        setNotificationMessage("Failed to delete package");
+        setNotificationType("error");
+        setShowNotification(true);
+        setShowConfirmModal(false);
+        setTimeout(() => setShowNotification(false), 3000);
       }
-    } catch (error) {
-      console.error("Error deleting package:", error);
-      alert("Failed to delete package");
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   const handleToggleStatus = async (packageId, currentStatus) => {
@@ -361,6 +394,51 @@ function AdminPackagesPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Modal */}
+      {showNotification && (
+        <div className="notification-modal-overlay" onClick={() => setShowNotification(false)}>
+          <div className={`notification-modal notification-${notificationType}`}>
+            <div className="notification-icon">
+              {notificationType === "success" && "✓"}
+              {notificationType === "error" && "!"}
+            </div>
+            <p className="notification-message">{notificationMessage}</p>
+            <button
+              className="notification-close-btn"
+              onClick={() => setShowNotification(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Delete</h3>
+            <p>{confirmMessage}</p>
+            <div className="modal-footer-confirm">
+              <button
+                className="btn-confirm-yes"
+                onClick={() => {
+                  if (confirmAction) confirmAction();
+                }}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

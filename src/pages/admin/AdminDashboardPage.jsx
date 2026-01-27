@@ -25,6 +25,14 @@ function AdminDashboardPage() {
   const [reportMessage, setReportMessage] = useState("");
   const [reportMessageType, setReportMessageType] = useState("");
 
+  // Notification states
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("success"); // success, error, warning
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -114,7 +122,9 @@ function AdminDashboardPage() {
     }, 2000);
 
     console.log("⬇️ Downloading report:", reportName);
-    alert(`Report download started: ${reportName}\n\nBackend will provide actual file.`);
+    setNotificationMessage(`Report "${reportName}" is being generated. It will be downloaded shortly.`);
+    setNotificationType("success");
+    setShowNotification(true);
   };
 
   const openAssignModal = (booking) => {
@@ -133,39 +143,55 @@ function AdminDashboardPage() {
       const result = await adminAPI.assignGuideToBooking(bookingId, guideId, token, adminNotes);
       
       if (result.success) {
-        alert("Tour guide assigned successfully!");
-        fetchDashboardData(); // Refresh bookings
+        setNotificationMessage("Tour guide assigned successfully! The guide has been notified.");
+        setNotificationType("success");
+        setShowNotification(true);
+        closeAssignModal();
+        setTimeout(() => fetchDashboardData(), 1500);
         return true;
       } else {
-        alert(result.message || "Failed to assign guide");
+        setNotificationMessage(result.message || "Failed to assign guide. Please try again.");
+        setNotificationType("error");
+        setShowNotification(true);
         return false;
       }
     } catch (error) {
       console.error("Error assigning guide:", error);
-      alert("An error occurred while assigning guide");
+      setNotificationMessage("An error occurred while assigning the guide. Please try again.");
+      setNotificationType("error");
+      setShowNotification(true);
       return false;
     }
   };
 
   const handleConfirmBooking = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to confirm this booking?")) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const result = await adminAPI.updateBookingStatus(bookingId, "confirmed", token);
-      
-      if (result.success) {
-        alert("Booking confirmed successfully!");
-        fetchDashboardData(); // Refresh bookings
-      } else {
-        alert(result.message || "Failed to confirm booking");
+    setConfirmMessage("Are you sure you want to confirm this booking? The customer will receive a confirmation notification.");
+    setConfirmAction(() => async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const result = await adminAPI.updateBookingStatus(bookingId, "confirmed", token);
+        
+        if (result.success) {
+          setNotificationMessage("Booking confirmed successfully! A notification has been sent to the customer.");
+          setNotificationType("success");
+          setShowNotification(true);
+          setShowConfirmModal(false);
+          setTimeout(() => fetchDashboardData(), 1500);
+        } else {
+          setNotificationMessage(result.message || "Failed to confirm booking. Please try again.");
+          setNotificationType("error");
+          setShowNotification(true);
+          setShowConfirmModal(false);
+        }
+      } catch (error) {
+        console.error("Error confirming booking:", error);
+        setNotificationMessage("An error occurred while confirming the booking.");
+        setNotificationType("error");
+        setShowNotification(true);
+        setShowConfirmModal(false);
       }
-    } catch (error) {
-      console.error("Error confirming booking:", error);
-      alert("An error occurred");
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   if (loading) {
@@ -574,6 +600,52 @@ function AdminDashboardPage() {
           onClose={closeAssignModal}
           onAssign={handleAssignGuide}
         />
+      )}
+
+      {/* Notification Modal */}
+      {showNotification && (
+        <div className="notification-modal-overlay" onClick={() => setShowNotification(false)}>
+          <div className={`notification-modal notification-${notificationType}`}>
+            <div className="notification-icon">
+              {notificationType === "success" && "✓"}
+              {notificationType === "error" && "!"}
+              {notificationType === "warning" && "⚠"}
+            </div>
+            <p className="notification-message">{notificationMessage}</p>
+            <button
+              className="notification-close-btn"
+              onClick={() => setShowNotification(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Action</h3>
+            <p>{confirmMessage}</p>
+            <div className="modal-footer-confirm">
+              <button
+                className="btn-confirm-yes"
+                onClick={() => {
+                  if (confirmAction) confirmAction();
+                }}
+              >
+                Yes, Confirm
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

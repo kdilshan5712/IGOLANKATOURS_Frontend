@@ -70,6 +70,8 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Prevent layout shift when scrollbar appears/disappears (fixes blue bar vibration) */
+  scrollbar-gutter: stable;
 }
 
 /* ===============================

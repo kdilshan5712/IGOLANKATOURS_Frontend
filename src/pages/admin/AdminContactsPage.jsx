@@ -15,6 +15,9 @@ function AdminContactsPage() {
   const [notesEdit, setNotesEdit] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [statusCounts, setStatusCounts] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("userRole");
 
@@ -129,25 +132,30 @@ function AdminContactsPage() {
   };
 
   const handleDelete = async (contactId) => {
-    if (!window.confirm("Permanently delete this message? This action cannot be undone.")) return;
-
-    try {
-      const result = await contactAPI.delete(token, contactId);
-      if (result.success) {
-        setMessage("Message deleted successfully");
-        setMessageType("success");
-        setTimeout(() => setMessage(null), 3000);
-        setSelectedMessage(null);
-        await fetchMessages();
-      } else {
-        setMessage(result.message || "Failed to delete message");
+    setConfirmMessage("Permanently delete this message? This action cannot be undone.");
+    setConfirmAction(() => async () => {
+      try {
+        const result = await contactAPI.delete(token, contactId);
+        if (result.success) {
+          setMessage("Message deleted successfully");
+          setMessageType("success");
+          setShowConfirmModal(false);
+          setTimeout(() => setMessage(null), 3000);
+          setSelectedMessage(null);
+          await fetchMessages();
+        } else {
+          setMessage(result.message || "Failed to delete message");
+          setMessageType("error");
+          setShowConfirmModal(false);
+        }
+      } catch (error) {
+        console.error("Error deleting message:", error);
+        setMessage("Failed to delete message");
         setMessageType("error");
+        setShowConfirmModal(false);
       }
-    } catch (error) {
-      console.error("Error deleting message:", error);
-      setMessage("Failed to delete message");
-      setMessageType("error");
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   const handleCloseModal = () => {
@@ -331,6 +339,32 @@ function AdminContactsPage() {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Delete</h3>
+            <p>{confirmMessage}</p>
+            <div className="modal-footer-confirm">
+              <button
+                className="btn-confirm-yes"
+                onClick={() => {
+                  if (confirmAction) confirmAction();
+                }}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

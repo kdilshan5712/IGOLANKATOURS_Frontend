@@ -13,6 +13,7 @@ const MyBookingsPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [notification, setNotification] = useState({ type: null, message: '' });
 
   useEffect(() => {
     // Check if user is logged in
@@ -131,14 +132,29 @@ const MyBookingsPage = () => {
         setShowCancelModal(false);
         setBookingToCancel(null);
         
+        // Show success notification
+        setNotification({ 
+          type: 'success', 
+          message: 'Booking cancelled successfully' 
+        });
+        setTimeout(() => setNotification({ type: null, message: '' }), 3000);
+        
         // Refresh bookings from backend
         fetchBookings();
       } else {
-        alert(data.message || "Failed to cancel booking");
+        setNotification({ 
+          type: 'error', 
+          message: data.message || "Failed to cancel booking" 
+        });
+        setTimeout(() => setNotification({ type: null, message: '' }), 3000);
       }
     } catch (err) {
       console.error("Error cancelling booking:", err);
-      alert("Failed to cancel booking. Please try again.");
+      setNotification({ 
+        type: 'error', 
+        message: "Failed to cancel booking. Please try again." 
+      });
+      setTimeout(() => setNotification({ type: null, message: '' }), 3000);
     }
   };
 
@@ -196,6 +212,12 @@ const MyBookingsPage = () => {
             <NotificationBell token={localStorage.getItem("token")} />
           )}
         </div>
+
+        {notification.message && (
+          <div className={`notification-banner notification-${notification.type}`}>
+            <p>{notification.message}</p>
+          </div>
+        )}
 
         {/* Filter Tabs */}
         <div className="booking-filters">

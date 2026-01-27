@@ -14,6 +14,9 @@ function AdminReviewsPage() {
   const [statusCounts, setStatusCounts] = useState({});
   const [rejectingReviewId, setRejectingReviewId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("userRole");
 
@@ -53,29 +56,35 @@ function AdminReviewsPage() {
   };
 
   const handleApprove = async (reviewId) => {
-    if (!window.confirm("Approve this review?")) return;
-
-    try {
-      const result = await reviewAPI.approve(token, reviewId);
-      if (result.success) {
-        setMessage("Review approved successfully");
-        setMessageType("success");
-        setTimeout(() => setMessage(null), 3000);
-        await fetchReviews();
-      } else {
-        setMessage(result.message || "Failed to approve review");
+    setConfirmMessage("Approve this review? The review will be visible to all users.");
+    setConfirmAction(() => async () => {
+      try {
+        const result = await reviewAPI.approve(token, reviewId);
+        if (result.success) {
+          setMessage("Review approved successfully");
+          setMessageType("success");
+          setShowConfirmModal(false);
+          setTimeout(() => setMessage(null), 3000);
+          await fetchReviews();
+        } else {
+          setMessage(result.message || "Failed to approve review");
+          setMessageType("error");
+          setShowConfirmModal(false);
+        }
+      } catch (error) {
+        console.error("Error approving review:", error);
+        setMessage("Error approving review");
         setMessageType("error");
+        setShowConfirmModal(false);
       }
-    } catch (error) {
-      console.error("Error approving review:", error);
-      setMessage("Failed to approve review");
-      setMessageType("error");
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   const handleRejectSubmit = async (reviewId) => {
     if (!rejectReason.trim()) {
-      alert("Please enter a reason for rejection");
+      setMessage("Please enter a reason for rejection");
+      setMessageType("error");
       return;
     }
 
@@ -100,24 +109,29 @@ function AdminReviewsPage() {
   };
 
   const handleDelete = async (reviewId) => {
-    if (!window.confirm("Permanently delete this review? This action cannot be undone.")) return;
-
-    try {
-      const result = await reviewAPI.delete(token, reviewId);
-      if (result.success) {
-        setMessage("Review deleted successfully");
-        setMessageType("success");
-        setTimeout(() => setMessage(null), 3000);
-        await fetchReviews();
-      } else {
-        setMessage(result.message || "Failed to delete review");
+    setConfirmMessage("Permanently delete this review? This action cannot be undone.");
+    setConfirmAction(() => async () => {
+      try {
+        const result = await reviewAPI.delete(token, reviewId);
+        if (result.success) {
+          setMessage("Review deleted successfully");
+          setMessageType("success");
+          setShowConfirmModal(false);
+          setTimeout(() => setMessage(null), 3000);
+          await fetchReviews();
+        } else {
+          setMessage(result.message || "Failed to delete review");
+          setMessageType("error");
+          setShowConfirmModal(false);
+        }
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        setMessage("Failed to delete review");
         setMessageType("error");
+        setShowConfirmModal(false);
       }
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      setMessage("Failed to delete review");
-      setMessageType("error");
-    }
+    });
+    setShowConfirmModal(true);
   };
 
   const renderStars = (rating) => {
@@ -279,6 +293,32 @@ function AdminReviewsPage() {
               ))
             )}
           </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Action</h3>
+            <p>{confirmMessage}</p>
+            <div className="modal-footer-confirm">
+              <button
+                className="btn-confirm-yes"
+                onClick={() => {
+                  if (confirmAction) confirmAction();
+                }}
+              >
+                Yes, Confirm
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
   }

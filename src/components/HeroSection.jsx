@@ -8,7 +8,7 @@ const HeroSection = () => {
       {/* Background */}
       <div className="hero-background">
         <img
-          src="https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/hero/hero.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9oZXJvL2hlcm8ucG5nIiwiaWF0IjoxNzY4NTg3ODg3LCJleHAiOjE4MDAxMjM4ODd9.vuqIo1i8FyjfkNVAyhKciQehE6PFn2QO-zu7Otwto4E"
+          src="https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/hero/hero%20image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9oZXJvL2hlcm8gaW1hZ2UucG5nIiwiaWF0IjoxNzY5NTEzOTYyLCJleHAiOjE4MDEwNDk5NjJ9.Gk4tkmnz9yqSbqlnr2KSiDhPYcbUARemGZdapthaaYY"
           alt="Sri Lanka travel"
         />
         <div className="hero-overlay" />

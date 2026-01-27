@@ -12,6 +12,12 @@ function AdminGuidesPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [approvalGuideId, setApprovalGuideId] = useState(null);
+  const [showApprovalSuccess, setShowApprovalSuccess] = useState(false);
+  const [approvalMessage, setApprovalMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   useEffect(() => {
     fetchGuides();
@@ -67,33 +73,48 @@ function AdminGuidesPage() {
         setSelectedGuide(result.guide);
         setShowModal(true);
       } else {
-        alert("Failed to fetch guide details");
+        setErrorMessage("Failed to fetch guide details. Please try again.");
+        setShowErrorModal(true);
       }
     } catch (error) {
       console.error("Error fetching guide details:", error);
-      alert("Error loading guide details");
+      setErrorMessage("Error loading guide details. Please try again.");
+      setShowErrorModal(true);
     }
   };
 
   const handleApprove = async (guideId) => {
-    if (!confirm("Are you sure you want to approve this guide?")) return;
+    setApprovalGuideId(guideId);
+    setShowApproveConfirm(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!approvalGuideId) return;
 
     try {
       setActionLoading(true);
       const token = localStorage.getItem("token");
-      // Use new -action endpoint for approval
-      const result = await adminAPI.approveGuideAction(guideId, token);
+      const result = await adminAPI.approveGuideAction(approvalGuideId, token);
       
       if (result.success) {
-        alert("Guide approved successfully! An email has been sent to the guide.");
+        setShowApproveConfirm(false);
+        setApprovalMessage(
+          `${selectedGuide?.full_name || "Guide"} has been approved successfully! A confirmation email has been sent.`
+        );
+        setShowApprovalSuccess(true);
         setShowModal(false);
-        fetchGuides();
+        setTimeout(() => {
+          setShowApprovalSuccess(false);
+          fetchGuides();
+        }, 3000);
       } else {
-        alert(result.message || "Failed to approve guide");
+        setErrorMessage(result.message || "Failed to approve guide. Please try again.");
+        setShowErrorModal(true);
       }
     } catch (error) {
       console.error("Error approving guide:", error);
-      alert("Error approving guide");
+      setErrorMessage("An error occurred while approving the guide. Please try again.");
+      setShowErrorModal(true);
     } finally {
       setActionLoading(false);
     }
@@ -113,37 +134,47 @@ function AdminGuidesPage() {
       if (result.success && result.url) {
         window.open(result.url, "_blank");
       } else {
-        alert("Failed to load document URL");
+        setErrorMessage("Failed to load document. Please try again.");
+        setShowErrorModal(true);
       }
     } catch (error) {
       console.error("Error viewing document:", error);
-      alert("Error loading document");
+      setErrorMessage("Error loading document. Please try again.");
+      setShowErrorModal(true);
     }
   };
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      alert("Please provide a reason for rejection");
+      setErrorMessage("Please provide a reason for rejection before proceeding.");
+      setShowErrorModal(true);
       return;
     }
 
     try {
       setActionLoading(true);
       const token = localStorage.getItem("token");
-      // Use new -action endpoint for rejection
       const result = await adminAPI.rejectGuideAction(selectedGuide.guide_id, rejectReason, token);
       
       if (result.success) {
-        alert("Guide rejected successfully! An email has been sent with the reason.");
         setShowRejectModal(false);
         setShowModal(false);
-        fetchGuides();
+        setApprovalMessage(
+          `${selectedGuide?.full_name || "Guide"} application has been rejected. A notification email with the reason has been sent.`
+        );
+        setShowApprovalSuccess(true);
+        setTimeout(() => {
+          setShowApprovalSuccess(false);
+          fetchGuides();
+        }, 3000);
       } else {
-        alert(result.message || "Failed to reject guide");
+        setErrorMessage(result.message || "Failed to reject guide. Please try again.");
+        setShowErrorModal(true);
       }
     } catch (error) {
       console.error("Error rejecting guide:", error);
-      alert("Error rejecting guide");
+      setErrorMessage("An error occurred while rejecting the application. Please try again.");
+      setShowErrorModal(true);
     } finally {
       setActionLoading(false);
     }
@@ -269,7 +300,7 @@ function AdminGuidesPage() {
                     >
                       View
                     </button>
-                    {(guide.status === "pending" && !guide.approved) && (
+                    {!guide.approved && (
                       <>
                         <button
                           className="btn-approve"
@@ -394,7 +425,7 @@ function AdminGuidesPage() {
             </div>
 
             <div className="modal-footer">
-              {selectedGuide.status === "pending" && !selectedGuide.approved && (
+              {!selectedGuide.approved && (
                 <>
                   <button
                     className="btn-approve-modal"
@@ -460,6 +491,110 @@ function AdminGuidesPage() {
                 disabled={actionLoading}
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approve Confirmation Modal */}
+      {showApproveConfirm && selectedGuide && (
+        <div className="modal-overlay" onClick={() => !actionLoading && setShowApproveConfirm(false)}>
+          <div className="modal-content approve-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Confirm Approval</h2>
+              <button 
+                className="modal-close" 
+                onClick={() => !actionLoading && setShowApproveConfirm(false)}
+                disabled={actionLoading}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="approval-confirm-content">
+                <div className="confirm-icon">✓</div>
+                <p className="confirm-title">
+                  Approve <strong>{selectedGuide.full_name}</strong>?
+                </p>
+                <p className="confirm-description">
+                  This guide will be marked as approved and will receive a confirmation email with access details.
+                </p>
+                <div className="guide-preview">
+                  <div className="preview-item">
+                    <span className="preview-label">Name:</span>
+                    <span className="preview-value">{selectedGuide.full_name}</span>
+                  </div>
+                  <div className="preview-item">
+                    <span className="preview-label">Email:</span>
+                    <span className="preview-value">{selectedGuide.email}</span>
+                  </div>
+                  <div className="preview-item">
+                    <span className="preview-label">Experience:</span>
+                    <span className="preview-value">{selectedGuide.experience_years || "N/A"} years</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-approve-confirm"
+                onClick={confirmApprove}
+                disabled={actionLoading}
+              >
+                {actionLoading ? "Processing..." : "Yes, Approve Guide"}
+              </button>
+              <button
+                className="btn-cancel-confirm"
+                onClick={() => setShowApproveConfirm(false)}
+                disabled={actionLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approval Success Modal */}
+      {showApprovalSuccess && (
+        <div className="modal-overlay">
+          <div className="modal-content success-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="success-icon">✓</div>
+            <h2 className="success-title">Success!</h2>
+            <p className="success-message">{approvalMessage}</p>
+            <button
+              className="btn-success-close"
+              onClick={() => setShowApprovalSuccess(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="modal-overlay" onClick={() => setShowErrorModal(false)}>
+          <div className="modal-content error-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Error</h2>
+              <button className="modal-close" onClick={() => setShowErrorModal(false)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="error-icon">!</div>
+              <p className="error-message">{errorMessage}</p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-error-close"
+                onClick={() => setShowErrorModal(false)}
+              >
+                Okay
               </button>
             </div>
           </div>

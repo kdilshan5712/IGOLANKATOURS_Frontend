@@ -4,7 +4,10 @@ import { useState } from "react";
 
 function GuideLayout() {
   const navigate = useNavigate();
-  const [userName] = useState(() => localStorage.getItem("guideName") || "Guide");
+  const [userName] = useState(() => {
+    const stored = localStorage.getItem("guideName");
+    return stored && stored !== "undefined" ? stored : "Guide";
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("token");

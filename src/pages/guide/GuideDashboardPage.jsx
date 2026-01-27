@@ -32,12 +32,19 @@ const GuideDashboardPage = () => {
         ]);
         
         if (dashboardResponse.success && dashboardResponse.dashboard) {
+          // Extract guide data from dashboard response
+          const dashboardData = dashboardResponse.dashboard;
+          const guideName = dashboardData.guide?.full_name || dashboardData.full_name || "Guide";
+          
+          // Store guide name in localStorage for use in sidebar
+          localStorage.setItem("guideName", guideName);
+          
           setUser({
-            name: dashboardResponse.dashboard.full_name || "Guide",
+            name: guideName,
             role: userRole,
-            tours: dashboardResponse.dashboard.active_tours_count || 0,
-            availability: dashboardResponse.dashboard.availability_set ? "Set" : "Not Set",
-            rating: dashboardResponse.dashboard.rating || 4.5
+            tours: dashboardData.stats?.active_tours_count || 0,
+            availability: dashboardData.availability_set ? "Set" : "Not Set",
+            rating: dashboardData.guide?.rating || 4.5
           });
         } else {
           setError(dashboardResponse.message || "Failed to load dashboard");
@@ -86,7 +93,7 @@ const GuideDashboardPage = () => {
     <div className="guide-dashboard-page">
       <div className="guide-dashboard-header">
         <div>
-          <h1 className="guide-dashboard-title">Welcome, {user?.name}! 👋</h1>
+          <h1 className="guide-dashboard-title">Welcome, {user?.name} - Rating: {user?.rating} ⭐</h1>
           <p className="guide-dashboard-subtitle">Manage your tours and availability</p>
         </div>
         <NotificationBell token={localStorage.getItem("token")} />

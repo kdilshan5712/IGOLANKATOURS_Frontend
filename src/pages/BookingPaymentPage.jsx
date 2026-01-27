@@ -127,9 +127,22 @@ const BookingPaymentPage = () => {
         setError("Please enter a valid expiry date (MM/YY)");
         return false;
       }
-      const [month] = expiryDate.split("/");
-      if (parseInt(month) < 1 || parseInt(month) > 12) {
-        setError("Please enter a valid expiry month");
+      const [month, year] = expiryDate.split("/");
+      const expMonth = parseInt(month);
+      const expYear = parseInt(year);
+      
+      if (expMonth < 1 || expMonth > 12) {
+        setError("Please enter a valid expiry month (01-12)");
+        return false;
+      }
+      
+      // Check if card is expired
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1; // getMonth() is 0-indexed
+      const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2)); // Get last 2 digits of year
+      
+      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+        setError("Card has expired. Please use a valid card");
         return false;
       }
       if (cvv.length < 3 || cvv.length > 4) {
