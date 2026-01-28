@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star, Clock, MapPin, Calendar, Users, Mail, Download, Image as ImageIcon } from "lucide-react";
 import { packageAPI, authAPI } from "../services/api";
+import TourMap from "../components/TourMap";
 import "./PackageDetailsPage.css";
 
 // Mock/Dummy Package Data for demonstration
@@ -341,42 +342,48 @@ Thank you for choosing I GO LANKA TOURS!
 
           {/* Map Preview Section */}
           <section className="package-details-section">
-            <h2 className="package-details-section-title">Tour Locations</h2>
+            <h2 className="package-details-section-title">Tour Route & Locations</h2>
             <div className="map-preview-container">
-              <div className="map-placeholder">
-                <MapPin size={48} />
-                <p>Sri Lanka Tour Map</p>
-                <span>Interactive map preview</span>
-              </div>
+              <TourMap 
+                locations={[
+                  { name: 'Colombo', lat: 6.9271, lng: 79.8612, description: 'Starting point - Capital city', duration: 'Day 1' },
+                  { name: 'Sigiriya', lat: 7.9570, lng: 80.7603, description: 'Ancient rock fortress', duration: 'Day 2-3' },
+                  { name: 'Kandy', lat: 7.2906, lng: 80.6337, description: 'Cultural hub - Temple of the Tooth', duration: 'Day 4' },
+                  { name: 'Ella', lat: 6.8667, lng: 81.0467, description: 'Scenic mountains and tea plantations', duration: 'Day 5' },
+                  { name: 'Galle', lat: 6.0535, lng: 80.2210, description: 'Historic fort and coastal beauty', duration: 'Day 6-7' }
+                ]}
+                routePath={true}
+                height="450px"
+              />
               <div className="locations-list">
-                <h3 className="locations-title">Key Destinations</h3>
+                <h3 className="locations-title">Tour Itinerary Highlights</h3>
                 <div className="location-items">
                   <div className="location-item">
                     <MapPin size={20} />
                     <div>
-                      <strong>Colombo</strong>
-                      <p>Starting point - Capital city</p>
+                      <strong>Day 1-2: Colombo & Sigiriya</strong>
+                      <p>Arrival in capital city, transfer to Sigiriya Rock Fortress</p>
                     </div>
                   </div>
                   <div className="location-item">
                     <MapPin size={20} />
                     <div>
-                      <strong>Kandy</strong>
-                      <p>Cultural hub - Temple of the Tooth</p>
+                      <strong>Day 3-4: Kandy</strong>
+                      <p>Visit Temple of the Tooth, cultural dance performance</p>
                     </div>
                   </div>
                   <div className="location-item">
                     <MapPin size={20} />
                     <div>
-                      <strong>Ella</strong>
-                      <p>Scenic mountains and tea plantations</p>
+                      <strong>Day 5: Ella</strong>
+                      <p>Scenic train journey, tea plantations, Nine Arch Bridge</p>
                     </div>
                   </div>
                   <div className="location-item">
                     <MapPin size={20} />
                     <div>
-                      <strong>Galle</strong>
-                      <p>Historic fort and coastal beauty</p>
+                      <strong>Day 6-7: Galle</strong>
+                      <p>Dutch colonial fort, beach relaxation, departure</p>
                     </div>
                   </div>
                 </div>

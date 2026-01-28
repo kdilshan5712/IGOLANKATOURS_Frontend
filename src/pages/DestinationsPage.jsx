@@ -1,5 +1,6 @@
 import { MapPin, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import DestinationsMap from "../components/DestinationsMap";
 import "./DestinationsPage.css";
 
 const DestinationsPage = () => {
@@ -148,6 +149,9 @@ const DestinationsPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Interactive Map Section */}
+        <DestinationsMap />
 
         {/* CTA Section */}
         <div className="destinations-page-cta">

@@ -41,6 +41,8 @@ const GuideProfilePage = () => {
             status: response.guide.status || "pending",
             verified: response.guide.approved || false,
             photo: response.guide.profile_photo || null,
+            rejectionReason: response.guide.rejection_reason || null,
+            rejectedAt: response.guide.rejected_at || null,
           });
 
           // Set initial photo preview if exists
@@ -361,6 +363,51 @@ const GuideProfilePage = () => {
             </div>
           </div>
         </div>
+
+        {/* Rejection Reason Alert */}
+        {profile.status === 'rejected' && profile.rejectionReason && (
+          <div className="guide-profile-section">
+            <div className="guide-rejection-alert">
+              <div className="guide-rejection-header">
+                <AlertCircle size={24} />
+                <h3>Application Status: Rejected</h3>
+              </div>
+              <div className="guide-rejection-content">
+                <p className="guide-rejection-label">Reason for Rejection:</p>
+                <p className="guide-rejection-reason">{profile.rejectionReason}</p>
+                {profile.rejectedAt && (
+                  <p className="guide-rejection-date">
+                    Rejected on: {new Date(profile.rejectedAt).toLocaleString()}
+                  </p>
+                )}
+                <div className="guide-rejection-actions">
+                  <p className="guide-rejection-help">
+                    Please address the issues mentioned above and contact support at{' '}
+                    <a href="mailto:support@igolankatours.com">support@igolankatours.com</a> to reapply.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pending Approval Alert */}
+        {profile.status === 'pending' && !profile.verified && (
+          <div className="guide-profile-section">
+            <div className="guide-pending-alert">
+              <div className="guide-pending-header">
+                <AlertCircle size={24} />
+                <h3>Application Under Review</h3>
+              </div>
+              <div className="guide-pending-content">
+                <p>
+                  Your application is currently being reviewed by our admin team. 
+                  You will receive an email notification once your application is approved or if any additional information is needed.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Documents Section */}
         <div className="guide-profile-section">

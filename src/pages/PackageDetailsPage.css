@@ -281,45 +281,16 @@
 /* Map Preview Section */
 .map-preview-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: 2rem;
   margin-top: 1.5rem;
-}
-
-.map-placeholder {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  border-radius: 12px;
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border: 2px dashed #0284c7;
-  min-height: 300px;
-}
-
-.map-placeholder svg {
-  color: #0284c7;
-  margin-bottom: 1rem;
-}
-
-.map-placeholder p {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #0c4a6e;
-  margin: 0 0 0.5rem 0;
-}
-
-.map-placeholder span {
-  font-size: 0.875rem;
-  color: #075985;
 }
 
 .locations-list {
   background: #f9fafb;
   border-radius: 12px;
   padding: 1.5rem;
+  height: fit-content;
 }
 
 .locations-title {
