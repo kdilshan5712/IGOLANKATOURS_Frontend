@@ -1,0 +1,124 @@
+/* Admin Layout Structure */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: var(--admin-bg-gradient);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* Sidebar Container */
+.admin-sidebar-container {
+  width: 280px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 50;
+}
+
+/* --- MOBILE TOPBAR --- */
+.admin-mobile-topbar {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--admin-glass-bg);
+  backdrop-filter: var(--admin-glass-blur);
+  color: var(--admin-text-primary);
+  border-bottom: 1px solid var(--admin-glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 101;
+}
+
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  color: var(--admin-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- OVERLAY --- */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 110;
+  backdrop-filter: blur(4px);
+}
+
+/* Main Content Area */
+.admin-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Scrollable Content Wrapper */
+.admin-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2.5rem;
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for Main Content */
+.admin-content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-content-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-content-scroll::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.1);
+  border-radius: 10px;
+}
+
+.admin-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .admin-sidebar-container {
+        width: 240px;
+    }
+}
+
+@media (max-width: 768px) {
+  .admin-mobile-topbar {
+    display: flex;
+  }
+
+  .admin-sidebar-container {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    z-index: 120;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #0f172a; /* Solid dark for mobile sidebar */
+  }
+
+  .admin-sidebar-container.mobile-open {
+    left: 0;
+  }
+
+  .admin-content-scroll {
+    padding: 1.5rem;
+  }
+}

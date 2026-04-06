@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import PackageCard from "../components/PackageCard";
 import FilterPanel from "../components/FilterPanel";
 import { packageAPI, transformPackages } from "../services/api";
+import SEO from "../components/SEO";
 import "./PackagesPage.css";
 
 const PackagesPage = () => {
@@ -11,11 +13,13 @@ const PackagesPage = () => {
   const [selectedDuration, setSelectedDuration] = useState("all");
   const [selectedHotel, setSelectedHotel] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("recommended");
   const [currentPage, setCurrentPage] = useState(1);
   const [allPackages, setAllPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const packagesPerPage = 9;
+  const navigate = useNavigate();
 
   // Fetch packages from API on component mount
   useEffect(() => {
@@ -66,12 +70,31 @@ const PackagesPage = () => {
     return true;
   });
 
+  // Apply sorting
+  const sortedPackages = [...filteredPackages].sort((a, b) => {
+    switch (sortBy) {
+      case "price-asc":
+        return (a.currentPrice || a.price) - (b.currentPrice || b.price);
+      case "price-desc":
+        return (b.currentPrice || b.price) - (a.currentPrice || a.price);
+      case "duration-asc":
+        return parseInt(a.duration) - parseInt(b.duration);
+      case "duration-desc":
+        return parseInt(b.duration) - parseInt(a.duration);
+      case "rating-desc":
+        return (b.rating || 0) - (a.rating || 0);
+      case "recommended":
+      default:
+        return 0; // Keep original API order
+    }
+  });
+
   // Pagination calculations
-  const totalPages = Math.ceil(filteredPackages.length / packagesPerPage);
+  const totalPages = Math.ceil(sortedPackages.length / packagesPerPage);
   const effectiveCurrentPage = currentPage > totalPages ? 1 : currentPage;
   const indexOfLastPackage = effectiveCurrentPage * packagesPerPage;
   const indexOfFirstPackage = indexOfLastPackage - packagesPerPage;
-  const currentPackages = filteredPackages.slice(
+  const currentPackages = sortedPackages.slice(
     indexOfFirstPackage,
     indexOfLastPackage
   );
@@ -127,6 +150,11 @@ const PackagesPage = () => {
 
   return (
     <main className="packages-page">
+      <SEO 
+        title="Tour Packages in Sri Lanka"
+        description="Browse our wide selection of SRI Lanka tour packages. From cultural heritage to adventure and beach holidays, find your perfect Sri Lankan escape."
+        keywords="Sri Lanka tour packages, Sri Lanka vacation deals, best tours in Sri Lanka, affordable Sri Lanka tours"
+      />
       <div className="packages-page-container">
         {/* Page header */}
         <div className="packages-page-header">
@@ -182,91 +210,127 @@ const PackagesPage = () => {
               </div>
             ) : (
               <>
-                <p className="packages-page-count">
-                  Showing{" "}
-                  <span className="packages-page-count-number">
-                    {indexOfFirstPackage + 1}-
-                    {Math.min(indexOfLastPackage, filteredPackages.length)}
-                  </span>{" "}
-                  of{" "}
-                  <span className="packages-page-count-number">
-                    {filteredPackages.length}
-                  </span>{" "}
-                  packages
-                </p>
+                <div className="packages-page-results-header">
+                  <p className="packages-page-count">
+                    Showing{" "}
+                    <span className="packages-page-count-number">
+                      {indexOfFirstPackage + 1}-
+                      {Math.min(indexOfLastPackage, sortedPackages.length)}
+                    </span>{" "}
+                    of{" "}
+                    <span className="packages-page-count-number">
+                      {sortedPackages.length}
+                    </span>{" "}
+                    packages
+                  </p>
 
-                {currentPackages.length > 0 ? (
-              <>
-                <div className="packages-page-grid">
-                  {currentPackages.map((pkg) => (
-                    <PackageCard key={pkg.id} pkg={pkg} />
-                  ))}
+                  {sortedPackages.length > 0 && (
+                    <div className="packages-sort-wrapper">
+                      <label htmlFor="sort-packages" className="packages-sort-label">Sort by:</label>
+                      <select
+                        id="sort-packages"
+                        className="packages-sort-select"
+                        value={sortBy}
+                        onChange={(e) => {
+                          setSortBy(e.target.value);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <option value="recommended">Recommended</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="duration-asc">Duration: Short to Long</option>
+                        <option value="duration-desc">Duration: Long to Short</option>
+                        <option value="rating-desc">Highest Rated</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="pagination">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="pagination-btn pagination-arrow"
-                    >
-                      <ChevronLeft size={18} />
-                      <span>Previous</span>
-                    </button>
-
-                    <div className="pagination-numbers">
-                      {getPageNumbers().map((number, index) =>
-                        number === "..." ? (
-                          <span key={`ellipsis-${index}`} className="pagination-dots">
-                            ...
-                          </span>
-                        ) : (
-                          <button
-                            key={`page-${number}`}
-                            onClick={() => handlePageChange(number)}
-                            className={`pagination-btn pagination-number ${
-                              currentPage === number ? "active" : ""
-                            }`}
-                          >
-                            {number}
-                          </button>
-                        )
-                      )}
+                {currentPackages.length > 0 ? (
+                  <>
+                    <div className="packages-page-grid">
+                      {currentPackages.map((pkg) => (
+                        <PackageCard key={pkg.id} pkg={pkg} />
+                      ))}
                     </div>
 
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="pagination">
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="pagination-btn pagination-arrow"
+                        >
+                          <ChevronLeft size={18} />
+                          <span>Previous</span>
+                        </button>
+
+                        <div className="pagination-numbers">
+                          {getPageNumbers().map((number, index) =>
+                            number === "..." ? (
+                              <span key={`ellipsis-${index}`} className="pagination-dots">
+                                ...
+                              </span>
+                            ) : (
+                              <button
+                                key={`page-${number}`}
+                                onClick={() => handlePageChange(number)}
+                                className={`pagination-btn pagination-number ${currentPage === number ? "active" : ""
+                                  }`}
+                              >
+                                {number}
+                              </button>
+                            )
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="pagination-btn pagination-arrow"
+                        >
+                          <span>Next</span>
+                          <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="packages-page-empty">
+                    <h3 className="packages-page-empty-title">
+                      No packages found
+                    </h3>
+                    <p className="packages-page-empty-text">
+                      Try adjusting or resetting your filters.
+                    </p>
                     <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="pagination-btn pagination-arrow"
+                      onClick={handleReset}
+                      className="packages-page-empty-button"
                     >
-                      <span>Next</span>
-                      <ChevronRight size={18} />
+                      Reset filters
                     </button>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="packages-page-empty">
-                <h3 className="packages-page-empty-title">
-                  No packages found
-                </h3>
-                <p className="packages-page-empty-text">
-                  Try adjusting or resetting your filters.
-                </p>
-                <button
-                  onClick={handleReset}
-                  className="packages-page-empty-button"
-                >
-                  Reset filters
-                </button>
-              </div>
-            )}
               </>
             )}
           </section>
         </div>
       </div>
+
+      {/* Floating AI Agent Widget */}
+      <button
+        className="floating-ai-widget"
+        onClick={() => navigate('/custom-tour-chat')}
+        title="Chat with our AI Travel Expert"
+      >
+        <span className="floating-ai-icon-container">
+          <Sparkles size={24} color="#ffffff" />
+        </span>
+        <span className="floating-ai-text">Ask AI Agent</span>
+      </button>
+
     </main>
   );
 };

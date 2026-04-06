@@ -1,4 +1,5 @@
 import { MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 import "./DestinationsSection.css";
 
 const DestinationsSection = () => {
@@ -50,8 +51,9 @@ const DestinationsSection = () => {
         {/* Grid */}
         <div className="destinations-grid">
           {destinations.map((destination, index) => (
-            <div
+            <Link
               key={index}
+              to={`/destinations/${destination.name.toLowerCase().replace(/\s+/g, '-')}`}
               className="destination-card"
             >
               <div className="destination-image-wrapper">
@@ -59,6 +61,7 @@ const DestinationsSection = () => {
                   src={destination.image}
                   alt={destination.name}
                   className="destination-image"
+                  loading="lazy"
                 />
                 <div className="destination-image-overlay" />
               </div>
@@ -77,7 +80,7 @@ const DestinationsSection = () => {
                   {destination.description}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

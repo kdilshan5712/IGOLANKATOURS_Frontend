@@ -64,14 +64,19 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="#about">
+                <Link to="/about">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#contact">
+                <Link to="/contact">
                   Contact
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq">
+                  FAQs
+                </Link>
               </li>
               <li>
                 <Link to="/guide/register">
@@ -91,7 +96,9 @@ const Footer = () => {
               <li>Cultural Triangle</li>
               <li>Wildlife Safaris</li>
               <li>Hill Country</li>
-              <li>Custom Tours</li>
+              <li>
+                <Link to="/custom-tour-chat">Custom Tours</Link>
+              </li>
             </ul>
           </div>
 
@@ -121,12 +128,15 @@ const Footer = () => {
         <div className="footer-bottom">
           <p>© 2026 I GO LANKA TOURS. All rights reserved.</p>
           <div className="footer-bottom-links">
-            <a href="#">
+            <Link to="/privacy-policy">
               Privacy Policy
-            </a>
-            <a href="#">
-              Terms of Service
-            </a>
+            </Link>
+            <Link to="/terms-and-conditions">
+              Terms & Conditions
+            </Link>
+            <Link to="/cancellation-policy">
+              Cancellation Policy
+            </Link>
           </div>
         </div>
       </div>

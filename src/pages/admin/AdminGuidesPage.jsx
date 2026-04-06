@@ -18,6 +18,8 @@ function AdminGuidesPage() {
   const [approvalMessage, setApprovalMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [editingCommission, setEditingCommission] = useState(false);
+  const [tempCommission, setTempCommission] = useState("");
 
   useEffect(() => {
     fetchGuides();
@@ -25,7 +27,7 @@ function AdminGuidesPage() {
 
   useEffect(() => {
     filterGuides();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guides, statusFilter]);
 
   const fetchGuides = async () => {
@@ -33,12 +35,12 @@ function AdminGuidesPage() {
       setLoading(true);
       const token = localStorage.getItem("token");
       console.log('🔍 Fetching guides with token:', token ? 'Present' : 'Missing');
-      
+
       // Use new endpoint that includes documents array
       const result = await adminAPI.getGuidesWithDocuments(token);
-      
+
       console.log('📦 API Response:', result);
-      
+
       if (result.success) {
         console.log(`✅ Setting ${result.guides?.length || 0} guides to state`);
         setGuides(result.guides || []);
@@ -68,7 +70,7 @@ function AdminGuidesPage() {
     try {
       const token = localStorage.getItem("token");
       const result = await adminAPI.getGuideDetails(guideId, token);
-      
+
       if (result.success) {
         setSelectedGuide(result.guide);
         setShowModal(true);
@@ -95,7 +97,7 @@ function AdminGuidesPage() {
       setActionLoading(true);
       const token = localStorage.getItem("token");
       const result = await adminAPI.approveGuideAction(approvalGuideId, token);
-      
+
       if (result.success) {
         setShowApproveConfirm(false);
         setApprovalMessage(
@@ -130,7 +132,7 @@ function AdminGuidesPage() {
     try {
       const token = localStorage.getItem("token");
       const result = await adminAPI.getDocumentUrl(guideId, documentId, token);
-      
+
       if (result.success && result.url) {
         window.open(result.url, "_blank");
       } else {
@@ -155,7 +157,7 @@ function AdminGuidesPage() {
       setActionLoading(true);
       const token = localStorage.getItem("token");
       const result = await adminAPI.rejectGuideAction(selectedGuide.guide_id, rejectReason, token);
-      
+
       if (result.success) {
         setShowRejectModal(false);
         setShowModal(false);
@@ -174,6 +176,39 @@ function AdminGuidesPage() {
     } catch (error) {
       console.error("Error rejecting guide:", error);
       setErrorMessage("An error occurred while rejecting the application. Please try again.");
+      setShowErrorModal(true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateCommission = async () => {
+    const rate = parseFloat(tempCommission);
+    if (isNaN(rate) || rate < 0 || rate > 1) {
+      setErrorMessage("Please enter a valid commission rate between 0 and 1 (e.g., 0.15 for 15%).");
+      setShowErrorModal(true);
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      const token = localStorage.getItem("token");
+      const result = await adminAPI.updateGuideCommission(selectedGuide.guide_id, rate, token);
+
+      if (result.success) {
+        setApprovalMessage(`Commission rate for ${selectedGuide.full_name} updated to ${(rate * 100).toFixed(0)}%`);
+        setShowApprovalSuccess(true);
+        setEditingCommission(false);
+        // Update selected guide and local guides list
+        setSelectedGuide({ ...selectedGuide, commission_rate: rate });
+        setGuides(guides.map(g => g.guide_id === selectedGuide.guide_id ? { ...g, commission_rate: rate } : g));
+      } else {
+        setErrorMessage(result.message || "Failed to update commission rate.");
+        setShowErrorModal(true);
+      }
+    } catch (error) {
+      console.error("Error updating commission:", error);
+      setErrorMessage("An error occurred. Please try again.");
       setShowErrorModal(true);
     } finally {
       setActionLoading(false);
@@ -220,7 +255,7 @@ function AdminGuidesPage() {
           <p>Manage guide applications</p>
         </div>
       </div>
-      
+
       {/* Filter Tabs */}
       <div className="guides-filters">
         <button
@@ -255,8 +290,8 @@ function AdminGuidesPage() {
           <p>No guides found for this filter</p>
         </div>
       ) : (
-        <div className="guides-table-container">
-          <table className="guides-table">
+        <div className="guides-table-container glass-panel">
+          <table className="glass-table">
             <thead>
               <tr>
                 <th>NAME</th>
@@ -266,6 +301,7 @@ function AdminGuidesPage() {
                 <th>EXPERIENCE</th>
                 <th>LICENSE</th>
                 <th>DOCUMENTS</th>
+                <th>COMMISSION</th>
                 <th>STATUS</th>
                 <th>APPLIED ON</th>
                 <th>ACTIONS</th>
@@ -288,31 +324,39 @@ function AdminGuidesPage() {
                     </span>
                   </td>
                   <td>
-                    <span className={getStatusBadgeClass(guide)}>
+                    <span className="commission-badge">
+                      {((guide.commission_rate || 0.10) * 100).toFixed(0)}%
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`status-badge status-${guide.status}`}>
                       {getStatusText(guide)}
                     </span>
                   </td>
                   <td>{new Date(guide.created_at).toLocaleDateString()}</td>
                   <td className="actions">
                     <button
-                      className="btn-view"
+                      className="btn btn-primary"
                       onClick={() => viewGuideDetails(guide.guide_id)}
+                      title="View Details"
                     >
                       View
                     </button>
-                    {!guide.approved && (
+                    {!guide.approved && guide.status !== 'rejected' && (
                       <>
                         <button
-                          className="btn-approve"
+                          className="btn btn-success"
                           onClick={() => handleApprove(guide.guide_id)}
                           disabled={actionLoading}
+                          title="Approve Guide"
                         >
                           Approve
                         </button>
                         <button
-                          className="btn-reject"
+                          className="btn btn-danger"
                           onClick={() => openRejectModal(guide)}
                           disabled={actionLoading}
+                          title="Reject Application"
                         >
                           Reject
                         </button>
@@ -334,7 +378,7 @@ function AdminGuidesPage() {
               <h2>Guide Application Details</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
             </div>
-            
+
             <div className="modal-body">
               <div className="guide-info-section">
                 <h3>Personal Information</h3>
@@ -366,10 +410,45 @@ function AdminGuidesPage() {
                   <div className="info-item">
                     <label>Status:</label>
                     <p>
-                      <span className={getStatusBadgeClass(selectedGuide)}>
+                      <span className={`status-badge status-${selectedGuide.status}`}>
                         {getStatusText(selectedGuide)}
                       </span>
                     </p>
+                  </div>
+                  <div className="info-item">
+                    <label>Commission Rate:</label>
+                    <div className="commission-edit-container">
+                      {editingCommission ? (
+                        <div className="commission-edit-form">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="1"
+                            value={tempCommission}
+                            onChange={(e) => setTempCommission(e.target.value)}
+                            className="commission-input"
+                          />
+                          <button className="btn-save-sm" onClick={handleUpdateCommission} disabled={actionLoading}>
+                            {actionLoading ? "..." : "Save"}
+                          </button>
+                          <button className="btn-cancel-sm" onClick={() => setEditingCommission(false)}>✕</button>
+                        </div>
+                      ) : (
+                        <div className="commission-display">
+                          <p>{((selectedGuide.commission_rate || 0.10) * 100).toFixed(0)}%</p>
+                          <button 
+                            className="btn-edit-link" 
+                            onClick={() => {
+                              setTempCommission(selectedGuide.commission_rate || 0.10);
+                              setEditingCommission(true);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="info-item">
                     <label>Applied On:</label>
@@ -425,17 +504,17 @@ function AdminGuidesPage() {
             </div>
 
             <div className="modal-footer">
-              {!selectedGuide.approved && (
+              {!selectedGuide.approved && selectedGuide.status !== 'rejected' && (
                 <>
                   <button
-                    className="btn-approve-modal"
+                    className="btn btn-success"
                     onClick={() => handleApprove(selectedGuide.guide_id)}
                     disabled={actionLoading}
                   >
                     {actionLoading ? "Processing..." : "Approve Guide"}
                   </button>
                   <button
-                    className="btn-reject-modal"
+                    className="btn btn-danger"
                     onClick={() => {
                       setShowModal(false);
                       openRejectModal(selectedGuide);
@@ -446,7 +525,7 @@ function AdminGuidesPage() {
                   </button>
                 </>
               )}
-              <button className="btn-close-modal" onClick={() => setShowModal(false)}>
+              <button className="btn btn-secondary" onClick={() => setShowModal(false)} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
                 Close
               </button>
             </div>
@@ -462,7 +541,7 @@ function AdminGuidesPage() {
               <h2>Reject Guide Application</h2>
               <button className="modal-close" onClick={() => setShowRejectModal(false)}>×</button>
             </div>
-            
+
             <div className="modal-body">
               <p className="reject-warning">
                 You are about to reject the application from <strong>{selectedGuide.full_name}</strong>.
@@ -479,16 +558,17 @@ function AdminGuidesPage() {
 
             <div className="modal-footer">
               <button
-                className="btn-confirm-reject"
+                className="btn btn-danger"
                 onClick={handleReject}
                 disabled={actionLoading || !rejectReason.trim()}
               >
                 {actionLoading ? "Processing..." : "Confirm Rejection"}
               </button>
               <button
-                className="btn-cancel-reject"
+                className="btn btn-secondary"
                 onClick={() => setShowRejectModal(false)}
                 disabled={actionLoading}
+                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
               >
                 Cancel
               </button>
@@ -503,15 +583,15 @@ function AdminGuidesPage() {
           <div className="modal-content approve-confirm-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Confirm Approval</h2>
-              <button 
-                className="modal-close" 
+              <button
+                className="modal-close"
                 onClick={() => !actionLoading && setShowApproveConfirm(false)}
                 disabled={actionLoading}
               >
                 ×
               </button>
             </div>
-            
+
             <div className="modal-body">
               <div className="approval-confirm-content">
                 <div className="confirm-icon">✓</div>
@@ -540,16 +620,17 @@ function AdminGuidesPage() {
 
             <div className="modal-footer">
               <button
-                className="btn-approve-confirm"
+                className="btn btn-success"
                 onClick={confirmApprove}
                 disabled={actionLoading}
               >
                 {actionLoading ? "Processing..." : "Yes, Approve Guide"}
               </button>
               <button
-                className="btn-cancel-confirm"
+                className="btn btn-secondary"
                 onClick={() => setShowApproveConfirm(false)}
                 disabled={actionLoading}
+                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
               >
                 Cancel
               </button>
@@ -583,7 +664,7 @@ function AdminGuidesPage() {
               <h2>Error</h2>
               <button className="modal-close" onClick={() => setShowErrorModal(false)}>×</button>
             </div>
-            
+
             <div className="modal-body">
               <div className="error-icon">!</div>
               <p className="error-message">{errorMessage}</p>

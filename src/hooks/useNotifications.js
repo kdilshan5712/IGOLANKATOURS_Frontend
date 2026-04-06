@@ -28,7 +28,12 @@ export const useNotifications = (token, refreshInterval = 30000) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch notifications');
+        console.warn('Failed to fetch notifications, status:', response.status);
+        // Don't throw, just set empty state
+        setNotifications([]);
+        setUnreadCount(0);
+        setLoading(false);
+        return;
       }
 
       const data = await response.json();
@@ -36,9 +41,15 @@ export const useNotifications = (token, refreshInterval = 30000) => {
       if (data.success) {
         setNotifications(data.notifications || []);
         setUnreadCount(data.unreadCount || 0);
+      } else {
+        setNotifications([]);
+        setUnreadCount(0);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.warn('Error fetching notifications (non-critical):', error.message);
+      // Silently fail and set empty state
+      setNotifications([]);
+      setUnreadCount(0);
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Users, DollarSign, Clock, Package, AlertCircle } from "lucide-react";
-import { authAPI, userAPI } from "../services/api";
+import { Calendar, MapPin, Users, DollarSign, Clock, Package, AlertCircle, FileDown } from "lucide-react";
+import { authAPI, userAPI, cancelBooking, bookingAPI } from "../services/api";
 import NotificationBell from "../components/NotificationBell";
+import CancelBookingModal from "../components/CancelBookingModal";
 import "./MyBookingsPage.css";
 
 const MyBookingsPage = () => {
@@ -14,6 +15,7 @@ const MyBookingsPage = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [notification, setNotification] = useState({ type: null, message: '' });
+  const [downloadingInvoice, setDownloadingInvoice] = useState(null); // stores booking.id being downloaded
 
   useEffect(() => {
     // Check if user is logged in
@@ -30,9 +32,9 @@ const MyBookingsPage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       console.log("🔑 [MyBookingsPage] Fetching bookings with token:", !!token);
-      
+
       if (!token) {
         setError("Not logged in. Please log in to view bookings.");
         setLoading(false);
@@ -44,7 +46,7 @@ const MyBookingsPage = () => {
 
       if (data.bookings) {
         console.log("✅ [MyBookingsPage] Bookings found:", data.bookings.length);
-        
+
         // Transform backend data to frontend format
         const transformedBookings = data.bookings.map((booking) => ({
           id: booking.booking_id,
@@ -113,53 +115,45 @@ const MyBookingsPage = () => {
     setShowCancelModal(true);
   };
 
-  const confirmCancellation = async () => {
-    if (!bookingToCancel) return;
-    
+  const handleCancelSuccess = (result) => {
+    setNotification({
+      type: 'success',
+      message: `Booking cancelled successfully. Refund: $${result.refund_amount}`
+    });
+    setTimeout(() => setNotification({ type: null, message: '' }), 5000);
+    fetchBookings();
+  };
+
+  const handleDownloadInvoice = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token");
-      const data = await userAPI.cancelBooking(token, bookingToCancel.id);
-      
-      if (data.message && !data.message.includes("Failed")) {
-        // Update local state
-        const updatedBookings = bookings.map(b => 
-          b.id === bookingToCancel.id 
-            ? { ...b, status: 'Cancelled', cancelledAt: new Date().toISOString() }
-            : b
-        );
-        
-        setBookings(updatedBookings);
-        setShowCancelModal(false);
-        setBookingToCancel(null);
-        
-        // Show success notification
-        setNotification({ 
-          type: 'success', 
-          message: 'Booking cancelled successfully' 
-        });
-        setTimeout(() => setNotification({ type: null, message: '' }), 3000);
-        
-        // Refresh bookings from backend
-        fetchBookings();
+      setDownloadingInvoice(bookingId);
+      const token = localStorage.getItem('token');
+      const result = await bookingAPI.downloadInvoice(bookingId, token);
+
+      if (result.success && result.blob) {
+        const url = window.URL.createObjectURL(new Blob([result.blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Invoice_${String(bookingId)}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        window.URL.revokeObjectURL(url);
       } else {
-        setNotification({ 
-          type: 'error', 
-          message: data.message || "Failed to cancel booking" 
-        });
-        setTimeout(() => setNotification({ type: null, message: '' }), 3000);
+        setNotification({ type: 'error', message: result.message || 'Failed to download invoice.' });
+        setTimeout(() => setNotification({ type: null, message: '' }), 5000);
       }
     } catch (err) {
-      console.error("Error cancelling booking:", err);
-      setNotification({ 
-        type: 'error', 
-        message: "Failed to cancel booking. Please try again." 
-      });
-      setTimeout(() => setNotification({ type: null, message: '' }), 3000);
+      console.error('Invoice download error:', err);
+      setNotification({ type: 'error', message: 'An error occurred while downloading the invoice.' });
+      setTimeout(() => setNotification({ type: null, message: '' }), 5000);
+    } finally {
+      setDownloadingInvoice(null);
     }
   };
 
-  const filteredBookings = statusFilter === 'all' 
-    ? bookings 
+  const filteredBookings = statusFilter === 'all'
+    ? bookings
     : bookings.filter(b => b.status?.toLowerCase() === statusFilter);
 
   const getPaymentHistory = () => {
@@ -221,31 +215,31 @@ const MyBookingsPage = () => {
 
         {/* Filter Tabs */}
         <div className="booking-filters">
-          <button 
+          <button
             className={`filter-tab ${statusFilter === 'all' ? 'active' : ''}`}
             onClick={() => setStatusFilter('all')}
           >
             All Bookings ({bookings.length})
           </button>
-          <button 
+          <button
             className={`filter-tab ${statusFilter === 'confirmed' ? 'active' : ''}`}
             onClick={() => setStatusFilter('confirmed')}
           >
             Confirmed ({bookings.filter(b => b.status?.toLowerCase() === 'confirmed').length})
           </button>
-          <button 
+          <button
             className={`filter-tab ${statusFilter === 'pending' ? 'active' : ''}`}
             onClick={() => setStatusFilter('pending')}
           >
             Pending ({bookings.filter(b => b.status?.toLowerCase() === 'pending').length})
           </button>
-          <button 
+          <button
             className={`filter-tab ${statusFilter === 'completed' ? 'active' : ''}`}
             onClick={() => setStatusFilter('completed')}
           >
             Completed ({bookings.filter(b => b.status?.toLowerCase() === 'completed').length})
           </button>
-          <button 
+          <button
             className={`filter-tab ${statusFilter === 'cancelled' ? 'active' : ''}`}
             onClick={() => setStatusFilter('cancelled')}
           >
@@ -291,7 +285,7 @@ const MyBookingsPage = () => {
             <Package size={64} />
             <h2>No Bookings Yet</h2>
             <p>You haven't made any bookings yet. Explore our packages and start your Sri Lankan adventure!</p>
-            <button 
+            <button
               onClick={() => navigate("/packages")}
               className="my-bookings-browse-btn"
             >
@@ -310,8 +304,8 @@ const MyBookingsPage = () => {
               <div key={booking.id} className="booking-card">
                 <div className="booking-card-header">
                   <div className="booking-card-image">
-                    <img 
-                      src={booking.packageData?.image || "/placeholder-tour.jpg"} 
+                    <img
+                      src={booking.packageData?.image || "/placeholder-tour.jpg"}
                       alt={booking.packageData?.name || "Tour Package"}
                     />
                   </div>
@@ -361,20 +355,31 @@ const MyBookingsPage = () => {
                   )}
 
                   <div className="booking-card-actions">
-                    <button 
-                      onClick={() => navigate(`/booking/${booking.packageId}/confirmation`, { state: booking })}
+                    <button
+                      onClick={() => navigate(`/dashboard/bookings/${booking.id}`)}
                       className="booking-action-btn booking-action-view"
                     >
                       View Details
                     </button>
+                    {(booking.status === "Confirmed" || booking.status === "Completed") && (
+                      <button
+                        onClick={() => handleDownloadInvoice(booking.id)}
+                        className="booking-action-btn booking-action-invoice"
+                        disabled={downloadingInvoice === booking.id}
+                        title="Download Invoice PDF"
+                      >
+                        <FileDown size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                        {downloadingInvoice === booking.id ? 'Downloading...' : 'Invoice'}
+                      </button>
+                    )}
                     {booking.status === "Confirmed" && (
-                      <button 
-                        onClick={() => navigate(`/contact`, { 
-                          state: { 
-                            packageId: booking.packageId, 
+                      <button
+                        onClick={() => navigate(`/contact`, {
+                          state: {
+                            packageId: booking.packageId,
                             packageName: booking.packageData?.name,
-                            bookingReference: booking.bookingReference 
-                          } 
+                            bookingReference: booking.bookingReference
+                          }
                         })}
                         className="booking-action-btn booking-action-contact"
                       >
@@ -382,7 +387,7 @@ const MyBookingsPage = () => {
                       </button>
                     )}
                     {canCancelBooking(booking) && (
-                      <button 
+                      <button
                         onClick={() => handleCancelBooking(booking)}
                         className="booking-action-btn booking-action-cancel"
                       >
@@ -398,44 +403,19 @@ const MyBookingsPage = () => {
 
         {/* Cancellation Modal */}
         {showCancelModal && bookingToCancel && (
-          <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h2 className="modal-title">Cancel Booking</h2>
-              <div className="modal-body">
-                <p className="modal-warning">
-                  Are you sure you want to cancel this booking?
-                </p>
-                <div className="cancel-booking-details">
-                  <p><strong>Package:</strong> {bookingToCancel.packageData?.name}</p>
-                  <p><strong>Travel Date:</strong> {bookingToCancel.travelDate}</p>
-                  <p><strong>Booking Reference:</strong> {bookingToCancel.bookingReference}</p>
-                </div>
-                <div className="cancellation-policy">
-                  <h3>Cancellation Policy</h3>
-                  <ul>
-                    <li>Cancellations must be made at least 7 days before travel date</li>
-                    <li>Full refund for cancellations made 14+ days in advance</li>
-                    <li>50% refund for cancellations made 7-14 days in advance</li>
-                    <li>No refund for cancellations made less than 7 days before travel</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="modal-actions">
-                <button 
-                  onClick={() => setShowCancelModal(false)}
-                  className="modal-btn modal-btn-secondary"
-                >
-                  Keep Booking
-                </button>
-                <button 
-                  onClick={confirmCancellation}
-                  className="modal-btn modal-btn-danger"
-                >
-                  Confirm Cancellation
-                </button>
-              </div>
-            </div>
-          </div>
+          <CancelBookingModal
+            booking={{
+              booking_id: bookingToCancel.id,
+              package_name: bookingToCancel.packageData?.name,
+              travel_date: bookingToCancel.travelDate,
+              total_price: bookingToCancel.totalAmount
+            }}
+            onClose={() => {
+              setShowCancelModal(false);
+              setBookingToCancel(null);
+            }}
+            onSuccess={handleCancelSuccess}
+          />
         )}
       </div>
     </main>

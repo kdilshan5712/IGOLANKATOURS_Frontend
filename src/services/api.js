@@ -10,6 +10,112 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 // API Service Functions
 // ============================================
 
+// 💬 CHAT API (Auth Required)
+export const chatAPI = {
+  // Get messages for a booking
+  getMessages: async (bookingId, token) => {
+    try {
+      if (!token) throw new Error("Authentication required");
+
+      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Chat getMessages Error:", error);
+      return { success: false, message: error.message || "Failed to fetch chat messages." };
+    }
+  },
+
+  // Send a message for a booking
+  sendMessage: async (bookingId, message, token) => {
+    try {
+      if (!token) throw new Error("Authentication required");
+
+      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Chat sendMessage Error:", error);
+      return { success: false, message: error.message || "Failed to send chat message." };
+    }
+  },
+
+  // Authorize or revoke chat room (Admin only)
+  authorizeChat: async (bookingId, is_authorized, token) => {
+    try {
+      if (!token) throw new Error("Authentication required");
+
+      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}/authorize`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ is_authorized })
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Chat authorize Error:", error);
+      return { success: false, message: error.message || "Failed to authorize chat." };
+    }
+  },
+
+  // Get messages for a custom tour session
+  getSessionMessages: async (sessionId, token) => {
+    try {
+      if (!token) throw new Error("Authentication required");
+
+      const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Chat getSessionMessages Error:", error);
+      return { success: false, message: error.message || "Failed to fetch session messages." };
+    }
+  },
+
+  // Send a message for a custom tour session
+  sendSessionMessage: async (sessionId, message, token) => {
+    try {
+      if (!token) throw new Error("Authentication required");
+
+      const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Chat sendSessionMessage Error:", error);
+      return { success: false, message: error.message || "Failed to send session message." };
+    }
+  }
+};
+
 // 📦 PACKAGES (Public - No Auth)
 export const packageAPI = {
   // Get all packages with filters
@@ -37,27 +143,27 @@ export const packageAPI = {
 
       console.log('[API] Fetching package with ID:', id);
       const res = await fetch(`${API_BASE_URL}/packages/${id}`);
-      
+
       console.log('[API] Response status:', res.status);
-      
+
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error('Package not found');
         }
         throw new Error('Failed to retrieve package');
       }
-      
+
       const data = await res.json();
       console.log('[API] Response data:', data);
-      
+
       // Handle different response formats
       if (data.success === false) {
         throw new Error(data.message || 'Failed to load package');
       }
-      
+
       // Get the raw package data
       const rawPackage = data.package || data;
-      
+
       // Transform to consistent format
       const transformedPackage = {
         id: rawPackage.package_id || rawPackage.id,
@@ -75,9 +181,14 @@ export const packageAPI = {
         highlights: rawPackage.highlights,
         included: rawPackage.included,
         notIncluded: rawPackage.notIncluded || rawPackage.not_included,
-        fullDescription: rawPackage.fullDescription || rawPackage.full_description
+        fullDescription: rawPackage.fullDescription || rawPackage.full_description,
+        itinerary: rawPackage.itinerary || [],
+        images: rawPackage.images || [],
+        reviewImages: rawPackage.reviewImages || [],
+        reviewStats: rawPackage.reviewStats || null,
+        latestReviews: rawPackage.latestReviews || []
       };
-      
+
       console.log('[API] Transformed package:', transformedPackage);
       return transformedPackage;
     } catch (error) {
@@ -120,6 +231,18 @@ export const packageAPI = {
       console.error("Error fetching stats:", error);
       return { success: false, stats: {} };
     }
+  },
+
+  // Calculate dynamic price
+  calculatePrice: async (id, date, adults = 1, children = 0) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/packages/${id}/price?date=${date}&adults=${adults}&children=${children}`);
+      const data = await res.json();
+      return data; // { success, pricing: {...} }
+    } catch (error) {
+      console.error("Error calculating price:", error);
+      return { success: false, pricing: null };
+    }
   }
 };
 
@@ -140,7 +263,7 @@ export const bookingAPI = {
       return data; // { message, booking }
     } catch (error) {
       console.error("Error creating booking:", error);
-      return { success: false, message: "Failed to create booking" };
+      return { success: false, message: "Failed to create booking", errors: error.errors || null };
     }
   },
 
@@ -151,7 +274,7 @@ export const bookingAPI = {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      return data; // { message, count, bookings }
+      return { success: res.ok, ...data }; // { message, count, bookings, success }
     } catch (error) {
       console.error("Error fetching bookings:", error);
       return { success: false, bookings: [] };
@@ -185,6 +308,94 @@ export const bookingAPI = {
       console.error("Error cancelling booking:", error);
       return { success: false, message: "Failed to cancel booking" };
     }
+  },
+
+  // Download Invoice
+  downloadInvoice: async (bookingId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/invoice`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        let errorMsg = "Failed to download invoice";
+        try {
+          const data = await res.json();
+          errorMsg = data.message || errorMsg;
+        } catch (e) { }
+        return { success: false, message: errorMsg };
+      }
+
+      const blob = await res.blob();
+      return { success: true, blob };
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+      return { success: false, message: "Network error while downloading invoice." };
+    }
+  },
+
+  acceptCustomTour: async (sessionId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/bookings/accept-custom/${sessionId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error accepting custom tour:", error);
+      return { success: false, message: "Network error" };
+    }
+  }
+};
+
+// ❤️ WISHLIST (Auth Required)
+export const wishlistAPI = {
+  get: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/wishlist`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+      return { success: false, wishlistIds: [] };
+    }
+  },
+
+  toggle: async (packageId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/wishlist/toggle`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ package_id: packageId })
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      return { success: false, message: "Network error." };
+    }
+  }
+};
+
+// ❓ FAQs (Public)
+export const faqAPI = {
+  getAll: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/faqs`);
+      const data = await res.json();
+      return data; // { success, faqData: [] }
+    } catch (error) {
+      console.error("Error fetching FAQs:", error);
+      return { success: false, faqData: [] };
+    }
   }
 };
 
@@ -209,7 +420,8 @@ export const authAPI = {
       if (!res.ok) {
         return {
           success: false,
-          message: data.message || "Registration failed"
+          message: data.message || "Registration failed",
+          errors: data.errors || null
         };
       }
 
@@ -229,7 +441,8 @@ export const authAPI = {
           email: user.email,
           name: nameFallback,
           role: user.role || "tourist",
-          email_verified: user.email_verified
+          email_verified: user.email_verified,
+          profile_photo: user.profile_photo || null
         },
         message:
           data.message ||
@@ -254,7 +467,8 @@ export const authAPI = {
       if (!res.ok) {
         return {
           success: false,
-          message: data.message || "Login failed"
+          message: data.message || "Login failed",
+          errors: data.errors || null
         };
       }
 
@@ -270,7 +484,12 @@ export const authAPI = {
           email: user.email,
           name: nameFallback,
           role: user.role || "tourist",
-          email_verified: user.email_verified
+          status: user.status || "active",
+          email_verified: user.email_verified,
+          profile_photo: user.profile_photo || null,
+          isPending: user.isPending || false,
+          isRejected: user.isRejected || false,
+          hasUploadedDocuments: user.hasUploadedDocuments || false
         },
         message: data.message || "Login successful"
       };
@@ -284,6 +503,17 @@ export const authAPI = {
   getCurrentUser: () => {
     const userStr = localStorage.getItem("user");
     return userStr ? JSON.parse(userStr) : null;
+  },
+
+  // Update current user in localStorage
+  updateCurrentUser: (userData) => {
+    const currentUser = authAPI.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...userData };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      return updatedUser;
+    }
+    return null;
   },
 
   // Get token
@@ -334,6 +564,7 @@ export const authAPI = {
   }
 };
 
+
 // ============================================
 // Helper Functions
 // ============================================
@@ -352,7 +583,13 @@ export const transformPackage = (pkg) => {
     hotel: pkg.hotel,
     rating: pkg.rating || 4.5,
     image: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
-    image_url: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070"
+    image: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
+    image_url: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
+    currentPrice: pkg.currentPrice || parseFloat(pkg.price),
+    seasonLabel: pkg.seasonLabel || null,
+    pricing: pkg.pricing || null,
+    isDynamic: pkg.isDynamic || false,
+    itinerary: pkg.itinerary || []
   };
 };
 
@@ -362,21 +599,126 @@ export const transformPackages = (packages) => {
 };
 
 // 👨‍💼 ADMIN API (Auth Required - Admin Role Only)
+export const destinationAPI = {
+  getAll: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/destinations`);
+      const data = await response.json();
+      return data; // { success, data: [] }
+    } catch (error) {
+      console.error("Error fetching destinations:", error);
+      return { success: false, data: [] };
+    }
+  }
+};
+
 export const adminAPI = {
+  // Get Admin Profile
+  getProfile: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { message, profile }
+    } catch (error) {
+      console.error("Error fetching admin profile:", error);
+      return { success: false, message: "Failed to connect to server" };
+    }
+  },
+
+  // Upload Profile Photo
+  uploadProfilePhoto: async (file, token) => {
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/profile-photo`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error uploading profile photo:", error);
+      return { success: false, message: "Network error during upload" };
+    }
+  },
+
+  // Delete Profile Photo
+  deleteProfilePhoto: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/profile-photo`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting profile photo:", error);
+      return { success: false, message: "Network error during deletion" };
+    }
+  },
+
+  // Create New Admin (Admin Only)
+  createAdmin: async (token, adminData) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/admins`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(adminData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating admin:", error);
+      return { success: false, message: "Failed to connect to server" };
+    }
+  },
+
+  // Get All Admins (Admin Only)
+  getAllAdmins: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/admins`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching admins:", error);
+      return { success: false, admins: [] };
+    }
+  },
+
   // Dashboard Stats
   getDashboardStats: async (token) => {
     try {
-      console.log("🔍 API: Fetching dashboard stats with token:", token ? "Present" : "Missing");
       const res = await fetch(`${API_BASE_URL}/admin/dashboard/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      console.log("📡 Response status:", res.status);
-      const data = await res.json();
-      console.log("📦 Response data:", data);
-      return data;
+      return await res.json();
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       return { success: false, stats: null };
+    }
+  },
+
+  // Notification Counts
+  getNotificationCounts: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/dashboard/notifications/counts`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching notification counts:", error);
+      return { success: false, counts: null };
     }
   },
 
@@ -391,6 +733,206 @@ export const adminAPI = {
     } catch (error) {
       console.error("Error fetching recent bookings:", error);
       return { success: false, bookings: [] };
+    }
+  },
+
+  // Revenue Report
+  getRevenueReport: async (dateFrom, dateTo, token) => {
+    try {
+      const params = new URLSearchParams();
+      if (dateFrom) params.append('dateFrom', dateFrom);
+      if (dateTo) params.append('dateTo', dateTo);
+
+      const queryString = params.toString() ? `?${params.toString()}` : '';
+      const res = await fetch(`${API_BASE_URL}/admin/dashboard/revenue-report${queryString}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching revenue report:", error);
+      return { success: false, report: null };
+    }
+  },
+
+  // Generate & Download Report (PDF/CSV)
+  generateReport: async (reportType, format, dateFrom, dateTo, token) => {
+    try {
+      const params = new URLSearchParams();
+      params.append('type', reportType);
+      params.append('format', format);
+      if (dateFrom) params.append('dateFrom', dateFrom);
+      if (dateTo) params.append('dateTo', dateTo);
+
+      const queryString = params.toString() ? `?${params.toString()}` : '';
+
+      console.log(`📥 Downloading report: ${reportType} (${format})`);
+
+      const res = await fetch(`${API_BASE_URL}/admin/dashboard/generate-report${queryString}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.message || "Failed to generate report");
+        } catch (e) {
+          throw new Error("Failed to generate report");
+        }
+      }
+
+      // Return the blob for download
+      const blob = await res.blob();
+      return { success: true, blob };
+    } catch (error) {
+      console.error("Error generating report:", error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  // === CUSTOM TOURS CONVERSION ===
+  convertCustomToBooking: async (sessionId, bookingData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/bookings/convert/${sessionId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bookingData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error converting custom request:", error);
+      return { success: false, message: "Network error during conversion" };
+    }
+  },
+
+  // === PRICING RULES ===
+  getPricingRules: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/pricing-rules`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching pricing rules:", error);
+      return { success: false, rules: [] };
+    }
+  },
+
+  createPricingRule: async (ruleData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/pricing-rules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(ruleData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating pricing rule:", error);
+      return { success: false, message: "Failed to create pricing rule" };
+    }
+  },
+
+  updatePricingRule: async (id, ruleData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/pricing-rules/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(ruleData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating pricing rule:", error);
+      return { success: false, message: "Failed to update pricing rule" };
+    }
+  },
+
+  deletePricingRule: async (id, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/pricing-rules/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting pricing rule:", error);
+      return { success: false, message: "Failed to delete pricing rule" };
+    }
+  },
+
+  // === FAQS ===
+  getFaqs: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/faqs`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching admin FAQs:", error);
+      return { success: false, faqs: [] };
+    }
+  },
+
+  createFaq: async (faqData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/faqs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(faqData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error creating FAQ:", error);
+      return { success: false, message: "Failed to create FAQ" };
+    }
+  },
+
+  updateFaq: async (id, faqData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/faqs/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(faqData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating FAQ:", error);
+      return { success: false, message: "Failed to update FAQ" };
+    }
+  },
+
+  deleteFaq: async (id, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/faqs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+      return { success: false, message: "Failed to delete FAQ" };
     }
   },
 
@@ -490,52 +1032,6 @@ export const adminAPI = {
     }
   },
 
-  // === GUIDE ASSIGNMENT ===
-  getAvailableGuides: async (token) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/admin/guides/available`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching available guides:", error);
-      return { success: false, guides: [] };
-    }
-  },
-
-  // Get approved guides (for assignment dropdown)
-  getApprovedGuides: async (token) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/admin/guides/approved`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching approved guides:", error);
-      return { success: false, guides: [] };
-    }
-  },
-
-  assignGuideToBooking: async (bookingId, guideId, token, adminNotes = null) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/admin/bookings/${bookingId}/assign-guide`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ guideId, adminNotes })
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error("Error assigning guide:", error);
-      return { success: false, message: "Failed to assign guide" };
-    }
-  },
-
   // === REVIEWS MANAGEMENT ===
   getAllReviews: async (token) => {
     try {
@@ -575,6 +1071,68 @@ export const adminAPI = {
     } catch (error) {
       console.error("Error rejecting review:", error);
       return { success: false, message: "Failed to reject review" };
+    }
+  },
+
+  // === GUIDE ASSIGNMENT ===
+  getAvailableGuides: async (token, date = null) => {
+    try {
+      const url = date 
+        ? `${API_BASE_URL}/admin/bookings/available-guides?date=${date}`
+        : `${API_BASE_URL}/admin/bookings/available-guides`;
+        
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching available guides:", error);
+      return { success: false, guides: [] };
+    }
+  },
+
+  assignGuideToBooking: async (bookingId, guideId, adminNotes, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/bookings/${bookingId}/assign-guide`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ guideId, adminNotes })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Guide assignment failed:", res.status, errorData);
+        return {
+          success: false,
+          message: errorData.message || "Failed to assign guide",
+          error: errorData.error,
+          status: res.status
+        };
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error assigning guide:", error);
+      return { success: false, message: "Failed to assign guide: " + error.message };
+    }
+  },
+
+  unassignGuideFromBooking: async (bookingId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/bookings/${bookingId}/unassign-guide`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error unassigning guide:", error);
+      return { success: false, message: "Failed to unassign guide" };
     }
   },
 
@@ -652,6 +1210,24 @@ export const adminAPI = {
     }
   },
 
+  replyContactMessage: async (messageId, message, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/contacts/${messageId}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error replying to contact message:", error);
+      return { success: false, message: "Failed to send reply" };
+    }
+  },
+
   // === CUSTOM TOUR REQUESTS ===
   getCustomTourRequests: async (token) => {
     try {
@@ -666,11 +1242,47 @@ export const adminAPI = {
     }
   },
 
+  updateCustomTourStatus: async (requestId, updateData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/custom-tours/${requestId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updateData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating custom tour status:", error);
+      return { success: false, message: "Failed to update status" };
+    }
+  },
+
+  replyCustomTour: async (requestId, message, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/custom-tours/${requestId}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error replying to custom tour request:", error);
+      return { success: false, message: "Failed to send quote" };
+    }
+  },
+
   // === TOUR GUIDE APPROVAL SYSTEM ===
   // Get all guides with documents (NEW ENDPOINT - includes documents array)
   getGuidesWithDocuments: async (token, status = null) => {
     try {
-      const url = status 
+      const url = status
         ? `${API_BASE_URL}/admin/guides-with-docs?status=${status}`
         : `${API_BASE_URL}/admin/guides-with-docs`;
       const res = await fetch(url, {
@@ -687,7 +1299,7 @@ export const adminAPI = {
   // Get all guides with optional status filter (LEGACY - kept for backward compatibility)
   getAllGuides: async (token, status = null) => {
     try {
-      const url = status 
+      const url = status
         ? `${API_BASE_URL}/admin/guides?status=${status}`
         : `${API_BASE_URL}/admin/guides`;
       const res = await fetch(url, {
@@ -807,7 +1419,7 @@ export const adminAPI = {
       console.log('🔴 Rejecting guide:', guideId);
       console.log('🔴 Token:', token ? 'Present' : 'Missing');
       console.log('🔴 Reason:', reason);
-      
+
       const res = await fetch(`${API_BASE_URL}/admin/guides/${guideId}/reject-action`, {
         method: 'PATCH',
         headers: {
@@ -816,11 +1428,11 @@ export const adminAPI = {
         },
         body: JSON.stringify({ reason })
       });
-      
+
       console.log('🔴 Response status:', res.status);
       const data = await res.json();
       console.log('🔴 Response data:', data);
-      
+
       return data;
     } catch (error) {
       console.error("Error rejecting guide:", error);
@@ -845,10 +1457,250 @@ export const adminAPI = {
       console.error("Error rejecting guide:", error);
       return { success: false, message: "Failed to reject guide" };
     }
+  },
+
+  // === PAYOUT MANAGEMENT ===
+  getPayoutRequests: async (token, status = null) => {
+    try {
+      // Handle if status is passed as an object { status: '...' }
+      const statusValue = (status && typeof status === 'object') ? status.status : status;
+      
+      const url = statusValue && statusValue !== 'all'
+        ? `${API_BASE_URL}/admin/payouts?status=${statusValue}`
+        : `${API_BASE_URL}/admin/payouts`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching payout requests:", error);
+      return { success: false, payouts: [] };
+    }
+  },
+
+  updatePayoutStatus: async (payoutId, statusData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/payouts/${payoutId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(statusData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating payout status:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Update guide commission rate
+  updateGuideCommission: async (guideId, commissionRate, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/guides/${guideId}/commission`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ commissionRate })
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating guide commission:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // === DESTINATIONS MANAGEMENT ===
+  getAllDestinations: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/destinations`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching destinations:", error);
+      return { success: false, data: [] };
+    }
+  },
+
+  createDestination: async (destinationData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/destinations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(destinationData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating destination:", error);
+      return { success: false, message: "Failed to create destination" };
+    }
+  },
+
+  updateDestination: async (id, destinationData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/destinations/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(destinationData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating destination:", error);
+      return { success: false, message: "Failed to update destination" };
+    }
+  },
+
+  deleteDestination: async (id, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/destinations/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error deleting destination:", error);
+      return { success: false, message: "Failed to delete destination" };
+    }
   }
 };
+
+// ============================================
+// GUIDE AVAILABILITY API
+// ============================================
+export const availabilityAPI = {
+  // Get guide's availability
+  getAvailability: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/availability`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          availability: [],
+          message: data.message || "Failed to fetch availability"
+        };
+      }
+
+      return {
+        success: true,
+        availability: data.availability || [],
+        count: data.availability?.length || 0,
+        message: "Availability fetched successfully"
+      };
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      return { success: false, availability: [], message: "Network error" };
+    }
+  },
+
+  // Set/update single date availability
+  setAvailability: async (date, status, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/availability`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ date, status })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to set availability"
+        };
+      }
+
+      return {
+        success: true,
+        availability: data.availability,
+        message: data.message || "Availability updated successfully"
+      };
+    } catch (error) {
+      console.error("Error setting availability:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Batch set availability for multiple dates
+  setMultipleAvailability: async (dates, status, token) => {
+    try {
+      const results = await Promise.allSettled(
+        dates.map(date => availabilityAPI.setAvailability(date, status, token))
+      );
+
+      const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+      const failed = results.length - successful;
+
+      return {
+        success: failed === 0,
+        message: `${successful} date(s) updated successfully${failed > 0 ? `, ${failed} failed` : ''}`,
+        results: results
+      };
+    } catch (error) {
+      console.error("Error setting multiple availability:", error);
+      return { success: false, message: "Network error" };
+    }
+  }
+};
+
 // 🎓 GUIDE MANAGEMENT (Auth Required)
 export const guideAPI = {
+  // Upload Profile Photo
+  uploadProfilePhoto: async (file, token) => {
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error uploading profile photo:", error);
+      return { success: false, message: "Network error during upload" };
+    }
+  },
+
+  // Delete Profile Photo
+  deleteProfilePhoto: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting profile photo:", error);
+      return { success: false, message: "Network error during deletion" };
+    }
+  },
+
   // Register as a tour guide
   register: async (guideData) => {
     try {
@@ -928,12 +1780,100 @@ export const guideAPI = {
 
       return {
         success: true,
-        guide: data,
+        guide: data.guide,
         message: "Profile fetched successfully"
       };
     } catch (error) {
       console.error("Error fetching profile:", error);
       return { success: false, guide: null, message: "Network error" };
+    }
+  },
+
+  // Update guide profile
+  updateProfile: async (profileData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/me`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to update profile"
+        };
+      }
+
+      return {
+        success: true,
+        guide: data.guide,
+        message: data.message || "Profile updated successfully"
+      };
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  },
+
+  // Upload profile photo
+  uploadProfilePhoto: async (file, token) => {
+    try {
+      const formData = new FormData();
+      formData.append('profile_photo', file);
+
+      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to upload photo"
+        };
+      }
+
+      return {
+        success: true,
+        profile_photo: data.profile_photo,
+        message: data.message || "Photo uploaded successfully"
+      };
+    } catch (error) {
+      console.error("Error uploading profile photo:", error);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  },
+
+  // Delete profile photo
+  deleteProfilePhoto: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to delete photo"
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Photo deleted successfully"
+      };
+    } catch (error) {
+      console.error("Error deleting profile photo:", error);
+      return { success: false, message: "Network error. Please try again." };
     }
   },
 
@@ -964,34 +1904,32 @@ export const guideAPI = {
     }
   },
 
-  // Set availability
+  // Set availability (redirects to availabilityAPI for proper backend format)
   setAvailability: async (availabilityData, token) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/guides/availability`, {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(availabilityData)
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        return {
-          success: false,
-          message: data.message || "Failed to set availability"
-        };
-      }
-
-      return {
-        success: true,
-        message: data.message || "Availability updated successfully"
-      };
-    } catch (error) {
-      console.error("Error setting availability:", error);
-      return { success: false, message: "Network error" };
+    // Handle old format: {is_available, dates: []}
+    if (availabilityData.dates && Array.isArray(availabilityData.dates)) {
+      const status = availabilityData.is_available ? 'available' : 'unavailable';
+      return availabilityAPI.setMultipleAvailability(availabilityData.dates, status, token);
     }
+
+    // Handle new format: {date, status}
+    if (availabilityData.date && availabilityData.status) {
+      return availabilityAPI.setAvailability(
+        availabilityData.date,
+        availabilityData.status,
+        token
+      );
+    }
+
+    return {
+      success: false,
+      message: "Invalid availability data format"
+    };
+  },
+
+  // Get availability
+  getAvailability: async (token) => {
+    return availabilityAPI.getAvailability(token);
   },
 
   // Get guide bookings
@@ -1000,55 +1938,11 @@ export const guideAPI = {
       const res = await fetch(`${API_BASE_URL}/guides/bookings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-
       const data = await res.json();
-      if (!res.ok) {
-        return {
-          success: false,
-          bookings: [],
-          message: data.message || "Failed to fetch bookings"
-        };
-      }
-
-      return {
-        success: true,
-        bookings: data.bookings || [],
-        categorized: data.categorized || {},
-        message: "Bookings fetched successfully"
-      };
+      return data;
     } catch (error) {
       console.error("Error fetching guide bookings:", error);
-      return { success: false, bookings: [], message: "Network error" };
-    }
-  },
-
-  // Get my assigned tours (alias for getBookings)
-  getMyTours: async (token) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/guides/my-tours`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        return {
-          success: false,
-          bookings: [],
-          categorized: {},
-          message: data.message || "Failed to fetch tours"
-        };
-      }
-
-      return {
-        success: true,
-        bookings: data.bookings || [],
-        categorized: data.categorized || {},
-        count: data.count || 0,
-        message: "Tours fetched successfully"
-      };
-    } catch (error) {
-      console.error("Error fetching my tours:", error);
-      return { success: false, bookings: [], categorized: {}, message: "Network error" };
+      return { success: false, bookings: [] };
     }
   },
 
@@ -1080,7 +1974,76 @@ export const guideAPI = {
       console.error("Error updating booking status:", error);
       return { success: false, message: "Network error" };
     }
+  },
+
+  // Get reviews for the authenticated guide
+  getReviews: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/reviews`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, reviews, stats }
+    } catch (error) {
+      console.error("Error fetching guide reviews:", error);
+      return { success: false, reviews: [], stats: { totalReviews: 0, averageRating: 0 } };
+    }
+  },
+
+  // Update bank details
+  updateBankDetails: async (bankData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/me/bank-details`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bankData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating bank details:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Request a payout
+  requestPayout: async (amount, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/payouts/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ amount })
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error requesting payout:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Get payout history
+  getPayoutHistory: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/guides/payouts`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching payout history:", error);
+      return { success: false, payouts: [] };
+    }
   }
+};
+
+// Standalone export for backward compatibility with GuideReviewsPage.jsx
+export const getGuideReviews = async () => {
+  const token = localStorage.getItem('token');
+  return guideAPI.getReviews(token);
 };
 
 // ============================================
@@ -1116,21 +2079,28 @@ export const reviewAPI = {
     try {
       // Check if images are included
       const hasImages = reviewData.images && reviewData.images.length > 0;
-      
+
       let res;
       if (hasImages) {
         // Use FormData for multipart upload
         const formData = new FormData();
-        formData.append('packageId', reviewData.packageId);
-        formData.append('rating', reviewData.rating);
+        formData.append('packageId', String(reviewData.packageId)); // Ensure it's a string for FormData
+        formData.append('rating', String(reviewData.rating)); // Ensure numeric values are explicitly stringified
         formData.append('title', reviewData.title || '');
         formData.append('comment', reviewData.comment);
-        
+
         // Append image files
         reviewData.images.forEach(image => {
           formData.append('images', image);
         });
-        
+
+        console.log("📤 Submitting review with FormData:", {
+          packageId: reviewData.packageId,
+          rating: reviewData.rating,
+          comment: reviewData.comment ? reviewData.comment.substring(0, 50) + '...' : '',
+          imageCount: reviewData.images.length
+        });
+
         res = await fetch(`${API_BASE_URL}/reviews`, {
           method: 'POST',
           headers: {
@@ -1155,8 +2125,18 @@ export const reviewAPI = {
           })
         });
       }
-      
+
       const data = await res.json();
+
+      // Log response for debugging
+      if (!data.success) {
+        console.error("❌ Review submission failed:", {
+          status: res.status,
+          message: data.message,
+          error: data.error
+        });
+      }
+
       return data; // { success, message, review }
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -1336,9 +2316,10 @@ export const contactAPI = {
 // 🔔 NOTIFICATIONS API
 export const notificationAPI = {
   // Get user notifications
-  getAll: async (token) => {
+  getAll: async (limit = 20) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/notifications`, {
+      const token = authAPI.getToken();
+      const res = await fetch(`${API_BASE_URL}/notifications?limit=${limit}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -1349,9 +2330,25 @@ export const notificationAPI = {
     }
   },
 
-  // Mark notification as read
-  markAsRead: async (token, notificationId) => {
+  // Get unread notification count
+  getUnreadCount: async () => {
     try {
+      const token = authAPI.getToken();
+      const res = await fetch(`${API_BASE_URL}/notifications/unread-count`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, count }
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      return { success: false, count: 0 };
+    }
+  },
+
+  // Mark notification as read
+  markAsRead: async (notificationId) => {
+    try {
+      const token = authAPI.getToken();
       const res = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -1361,6 +2358,171 @@ export const notificationAPI = {
     } catch (error) {
       console.error("Error marking notification as read:", error);
       return { success: false, message: "Failed to mark as read" };
+    }
+  },
+
+  // Mark all notifications as read
+  markAllAsRead: async () => {
+    try {
+      const token = authAPI.getToken();
+      const res = await fetch(`${API_BASE_URL}/notifications/mark-all-read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, message }
+    } catch (error) {
+      console.error("Error marking all as read:", error);
+      return { success: false, message: "Failed to mark all as read" };
+    }
+  },
+
+  // Delete notification
+  delete: async (notificationId) => {
+    try {
+      const token = authAPI.getToken();
+      const res = await fetch(`${API_BASE_URL}/notifications/${notificationId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, message }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      return { success: false, message: "Failed to delete notification" };
+    }
+  }
+};
+
+// 📸 GALLERY API
+export const galleryAPI = {
+  // --- Public Routes ---
+
+  // Get all approved gallery images
+  getAll: async (filters = {}) => {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const url = params ? `${API_BASE_URL}/gallery?${params}` : `${API_BASE_URL}/gallery`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data; // { success, count, totalCount, gallery }
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+      return { success: false, gallery: [], count: 0 };
+    }
+  },
+
+  // Get gallery categories
+  getCategories: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/gallery/categories`);
+      const data = await res.json();
+      return data; // { success, categories }
+    } catch (error) {
+      console.error("Error fetching gallery categories:", error);
+      return { success: false, categories: [] };
+    }
+  },
+
+  // --- Admin Routes ---
+
+  // Admin: Get all gallery images
+  getAdminAll: async (token, filters = {}) => {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const url = params ? `${API_BASE_URL}/admin/gallery?${params}` : `${API_BASE_URL}/admin/gallery`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching admin gallery images:", error);
+      return { success: false, gallery: [] };
+    }
+  },
+
+  // Admin: Upload new image
+  uploadImage: async (token, formData) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/gallery/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        // FormData boundary is automatically set
+        body: formData
+      });
+      const data = await res.json();
+      return data; // { success, gallery, message }
+    } catch (error) {
+      console.error("Error uploading gallery image:", error);
+      return { success: false, message: "Network error occurred." };
+    }
+  },
+
+  // Admin: Update image details
+  updateImage: async (token, galleryId, updateData) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/gallery/${galleryId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating gallery image:", error);
+      return { success: false, message: "Network error occurred." };
+    }
+  },
+
+  // Admin: Delete image
+  deleteImage: async (token, galleryId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/gallery/${galleryId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error deleting gallery image:", error);
+      return { success: false, message: "Network error occurred." };
+    }
+  },
+
+  // Admin: Reorder images
+  reorderImages: async (token, imagesArray) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/gallery/reorder`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ images: imagesArray })
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error reordering gallery images:", error);
+      return { success: false, message: "Network error occurred." };
+    }
+  },
+
+  // Admin: Get stats
+  getStats: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/gallery/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching gallery stats:", error);
+      return { success: false, stats: null };
     }
   }
 };
@@ -1381,6 +2543,42 @@ export const userAPI = {
     }
   },
 
+  // Upload Profile Photo
+  uploadProfilePhoto: async (file, token) => {
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/user/profile-photo`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error uploading profile photo:", error);
+      return { success: false, message: "Network error during upload" };
+    }
+  },
+
+  // Delete Profile Photo
+  deleteProfilePhoto: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/user/profile-photo`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting profile photo:", error);
+      return { success: false, message: "Network error during deletion" };
+    }
+  },
+
   // Get user bookings
   getBookings: async (token) => {
     try {
@@ -1388,25 +2586,39 @@ export const userAPI = {
       console.log("📡 [API] Token present:", !!token);
       console.log("📡 [API] Token preview:", token ? token.substring(0, 20) + "..." : "none");
       console.log("📡 [API] Full URL:", `${API_BASE_URL}/user/bookings`);
-      
+
       const res = await fetch(`${API_BASE_URL}/user/bookings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       console.log("📡 [API] Response status:", res.status);
       console.log("📡 [API] Response ok:", res.ok);
       console.log("📡 [API] Response headers:", Object.fromEntries(res.headers.entries()));
-      
+
       const data = await res.json();
       console.log("📡 [API] Response data keys:", Object.keys(data));
       console.log("📡 [API] Response data:", JSON.stringify(data, null, 2));
-      
-      return data; // { message, bookings }
+
+      return { success: res.ok, ...data }; // { message, bookings, success }
     } catch (error) {
       console.error("❌ [API] Error fetching user bookings:", error);
       console.error("❌ [API] Error message:", error.message);
       console.error("❌ [API] Error stack:", error.stack);
       return { success: false, message: "Failed to connect to server", bookings: [] };
+    }
+  },
+
+  // Get user custom tours
+  getCustomTours: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/user/custom-tours`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return { success: res.ok, ...data };
+    } catch (error) {
+      console.error("❌ [API] Error fetching custom tours:", error);
+      return { success: false, message: "Failed to connect to server", customTours: [] };
     }
   },
 
@@ -1422,6 +2634,195 @@ export const userAPI = {
     } catch (error) {
       console.error("Error cancelling booking:", error);
       return { success: false, message: "Failed to connect to server" };
+    }
+  }
+};
+
+// 👨‍🏫 GUIDE API (Auth Required - Guide Role)
+export const uploadGuideDocuments = async (formData) => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/documents`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    const data = await res.json();
+    return { data, status: res.status };
+  } catch (error) {
+    console.error('Error uploading guide documents:', error);
+    throw error;
+  }
+};
+
+export const getRejectionDetails = async () => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/rejection-details`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    return { data, status: res.status };
+  } catch (error) {
+    console.error('Error fetching rejection details:', error);
+    throw error;
+  }
+};
+
+export const resubmitApplication = async () => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/resubmit`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const data = await res.json();
+    return { data, status: res.status };
+  } catch (error) {
+    console.error('Error resubmitting application:', error);
+    throw error;
+  }
+};
+
+
+// Get guide dashboard statistics
+export const getGuideDashboardStats = async () => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/dashboard/stats`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching guide dashboard stats:', error);
+    return { success: false, message: 'Network error', stats: null };
+  }
+};
+
+// Standalone exports for components
+export const cancelBooking = async (bookingId, reason = '') => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reason })
+    });
+
+    // Check if response is ok before parsing JSON
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({ message: 'Failed to cancel booking' }));
+      throw new Error(errorData.message || 'Failed to cancel booking');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    throw error;
+  }
+};
+
+
+export const getGuideBookings = async () => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/bookings`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching guide bookings:', error);
+    throw error;
+  }
+};
+
+export const markTourCompleted = async (bookingId) => {
+  try {
+    const token = authAPI.getToken();
+    const res = await fetch(`${API_BASE_URL}/guides/bookings/${bookingId}/complete`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('Error marking tour as completed:', error);
+    throw error;
+  }
+};
+
+// 🤖 AI AGENT API
+export const aiAPI = {
+  // Save chatbot session for admin review
+  saveSession: async (sessionData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/ai/session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { "Authorization": `Bearer ${token}` }),
+        },
+        body: JSON.stringify(sessionData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error saving AI session:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Submit AI custom itinerary directly for Admin Approval
+  submitCustomTourForApproval: async (tourData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/ai/submit-custom-tour`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { "Authorization": `Bearer ${token}` }),
+        },
+        body: JSON.stringify(tourData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error submitting custom tour:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Sync AI Chat History to tour_messages table
+  syncChatHistory: async (sessionId, messages) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/ai/sync-history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { "Authorization": `Bearer ${token}` }),
+        },
+        body: JSON.stringify({ sessionId, messages })
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error syncing chat history:", error);
+      return { success: false, message: "Network error" };
     }
   }
 };

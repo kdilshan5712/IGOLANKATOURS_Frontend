@@ -80,91 +80,91 @@ const GuideDocumentsPage = () => {
       <Navbar />
       <main className="guide-documents-page">
         <div className="guide-documents-container">
-        <div className="guide-documents-card">
-          <div className="guide-documents-header">
-            <h1 className="guide-documents-title">Upload Verification Documents</h1>
-            <p className="guide-documents-subtitle">
-              Please upload documents to verify your credentials
-            </p>
-          </div>
-
-          {error && (
-            <div className="guide-documents-alert error-alert">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {success && (
-            <div className="guide-documents-alert success-alert">
-              <CheckCircle size={18} />
-              <span>{success}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="guide-documents-form">
-            <div className="guide-documents-form-group">
-              <label className="guide-documents-label">Document Type *</label>
-              <select
-                value={docType}
-                onChange={(e) => setDocType(e.target.value)}
-                className="guide-documents-select"
-              >
-                <option value="license">Tour Guide License</option>
-                <option value="certificate">Certification</option>
-                <option value="id_card">ID Card / Passport</option>
-                <option value="other">Other</option>
-              </select>
+          <div className="guide-documents-card">
+            <div className="guide-documents-header">
+              <h1 className="guide-documents-title">Upload Verification Documents</h1>
+              <p className="guide-documents-subtitle">
+                Please upload your tour guide license, certifications, and ID to verify your credentials
+              </p>
             </div>
 
-            <div className="guide-documents-form-group">
-              <label className="guide-documents-label">Upload Document *</label>
-              <div className="guide-documents-upload">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handleFileChange}
-                  className="guide-documents-file-input"
-                />
-                <div className="guide-documents-upload-area">
-                  <Upload size={32} />
-                  <p>
-                    {file ? file.name : "Click to select or drag and drop"}
-                  </p>
-                  <small>Supported: PDF, JPG, PNG (Max 10MB)</small>
+            {error && (
+              <div className="guide-documents-alert error-alert">
+                <AlertCircle size={18} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div className="guide-documents-alert success-alert">
+                <CheckCircle size={18} />
+                <span>{success}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="guide-documents-form">
+              <div className="guide-documents-form-group">
+                <label className="guide-documents-label">Document Type *</label>
+                <select
+                  value={docType}
+                  onChange={(e) => setDocType(e.target.value)}
+                  className="guide-documents-select"
+                >
+                  <option value="license">Tour Guide License</option>
+                  <option value="certificate">Certification</option>
+                  <option value="id_card">ID Card / Passport</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div className="guide-documents-form-group">
+                <label className="guide-documents-label">Upload Document *</label>
+                <div className="guide-documents-upload">
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleFileChange}
+                    className="guide-documents-file-input"
+                  />
+                  <div className="guide-documents-upload-area">
+                    <Upload size={32} />
+                    <p>
+                      {file ? file.name : "Click to select or drag and drop"}
+                    </p>
+                    <small>Supported: PDF, JPG, PNG (Max 10MB)</small>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button type="submit" className="guide-documents-button" disabled={loading}>
-              {loading ? "Uploading..." : "Upload Document"}
-            </button>
-          </form>
-
-          {uploadedDocs.length > 0 && (
-            <div className="guide-documents-uploaded">
-              <h3 className="guide-documents-uploaded-title">Uploaded Documents</h3>
-              <div className="guide-documents-list">
-                {uploadedDocs.map((doc, idx) => (
-                  <div key={idx} className="guide-documents-item">
-                    <FileText size={18} />
-                    <span>{doc.document_type}</span>
-                    <span className="guide-doc-status">Pending Review</span>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={handleContinue}
-                className="guide-documents-continue-button"
-              >
-                Continue to Next Step
+              <button type="submit" className="guide-documents-button" disabled={loading}>
+                {loading ? "Uploading..." : "Upload Document"}
               </button>
-            </div>
-          )}
+            </form>
+
+            {uploadedDocs.length > 0 && (
+              <div className="guide-documents-uploaded">
+                <h3 className="guide-documents-uploaded-title">Uploaded Documents</h3>
+                <div className="guide-documents-list">
+                  {uploadedDocs.map((doc, idx) => (
+                    <div key={idx} className="guide-documents-item">
+                      <FileText size={18} />
+                      <span>{doc.document_type}</span>
+                      <span className="guide-doc-status">Pending Review</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  className="guide-documents-continue-button"
+                >
+                  Continue to Next Step
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       </main>
       <Footer />
     </>

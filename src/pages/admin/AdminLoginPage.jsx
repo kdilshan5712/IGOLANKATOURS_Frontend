@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Mail, Lock, AlertCircle, Eye, EyeOff, Shield } from "lucide-react";
 import { authAPI } from "../../services/api";
+import { Button, Card } from "../../components/shared";
 import "./AdminLogin.css";
 
 function AdminLoginPage() {
@@ -11,6 +13,7 @@ function AdminLoginPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,7 +30,7 @@ function AdminLoginPage() {
 
     try {
       const result = await authAPI.login(formData.email, formData.password);
-      
+
       if (result.success && result.user.role === "admin") {
         localStorage.setItem("token", result.token);
         localStorage.setItem("userRole", result.user.role);
@@ -49,56 +52,83 @@ function AdminLoginPage() {
   return (
     <div className="admin-login-page">
       <div className="admin-login-container">
-        <div className="admin-login-header">
-          <h1>Admin Portal</h1>
-          <p>I GO LANKA TOURS</p>
-        </div>
-
-        <form className="admin-login-form" onSubmit={handleSubmit}>
-          {error && (
-            <div className="error-message">
-              {error}
+        <Card className="admin-login-card" padding="large">
+          <div className="admin-login-header">
+            <div className="admin-shield-icon">
+              <Shield size={48} />
             </div>
-          )}
-
-          <div className="form-group">
-            <label htmlFor="email">Admin Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="admin@igolankatours.com"
-              required
-            />
+            <h1>Admin Portal</h1>
+            <p>I GO LANKA TOURS</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
+          <form className="admin-login-form" onSubmit={handleSubmit}>
+            {error && (
+              <div className="admin-error-message">
+                <AlertCircle size={18} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <div className="admin-form-group">
+              <label htmlFor="email" className="admin-label">
+                <Mail size={18} />
+                <span>Admin Email</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="admin@igolankatours.com"
+                className="admin-input"
+                autoComplete="email"
+                required
+              />
+            </div>
+
+            <div className="admin-form-group">
+              <label htmlFor="password" className="admin-label">
+                <Lock size={18} />
+                <span>Password</span>
+              </label>
+              <div className="admin-password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="admin-input"
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="admin-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              loading={loading}
+              className="admin-login-btn-full"
+            >
+              Sign In
+            </Button>
+          </form>
+
+          <div className="admin-login-footer">
+            <p>Authorized personnel only</p>
           </div>
-
-          <button 
-            type="submit" 
-            className="admin-login-btn"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="admin-login-footer">
-          <p>Authorized personnel only</p>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Star, Send, AlertCircle, CheckCircle, Camera, X } from "lucide-react";
-import { reviewAPI, packageAPI } from "../services/api";
+import { reviewAPI, packageAPI, bookingAPI } from "../services/api";
 import "./ReviewForm.css";
 
 const ReviewForm = ({ packageId = null }) => {
@@ -21,37 +21,59 @@ const ReviewForm = ({ packageId = null }) => {
   const [confirmedBookings, setConfirmedBookings] = useState([]);
   const token = localStorage.getItem("token");
 
-  // Fetch packages and user bookings
+  // Fetch user bookings only - no need for all packages
   useEffect(() => {
-    if (!packageId && token) {
-      const fetchPackages = async () => {
-        const result = await packageAPI.getAll({ limit: 50 });
-        if (result.success) {
-          setPackages(result.packages || []);
-        }
-      };
-      fetchPackages();
-    }
-
-    // Get user's confirmed bookings from backend
     if (token) {
-      const fetchUserBookings = async () => {
+      const fetchData = async () => {
+        setLoading(true);
         try {
-          const result = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/bookings/my-bookings`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const data = await result.json();
-          if (data.success && data.bookings) {
-            const confirmed = data.bookings.filter(b => b.status === 'confirmed');
+          // 1. Fetch user's bookings
+          const bookingResult = await bookingAPI.getMy(token);
+
+          if (bookingResult.success && bookingResult.bookings) {
+            // Filter for confirmed or completed bookings
+            const confirmed = bookingResult.bookings.filter(b =>
+              b.status === 'confirmed' || b.status === 'completed'
+            );
+
             setConfirmedBookings(confirmed);
+
+            // Extract unique packages from bookings for the dropdown
+            // We use a Map to ensure unique package_ids
+            const uniquePackagesMap = new Map();
+            confirmed.forEach(booking => {
+              if (booking.package_id && !uniquePackagesMap.has(booking.package_id)) {
+                uniquePackagesMap.set(booking.package_id, {
+                  package_id: booking.package_id,
+                  name: booking.package_name || `Package #${booking.package_id}`
+                });
+              }
+            });
+
+            setPackages(Array.from(uniquePackagesMap.values()));
           }
         } catch (err) {
-          console.error('Error fetching bookings:', err);
+          console.error("Error fetching data:", err);
+          setMessage("Failed to load your bookings. Please try again.");
+          setMessageType("error");
+        } finally {
+          setLoading(false);
         }
       };
-      fetchUserBookings();
+
+      fetchData();
     }
-  }, [packageId, token]);
+  }, [token]);
+
+  // Set initial package from props if available and valid
+  useEffect(() => {
+    if (packageId && packages.length > 0) {
+      const hasBooked = packages.some(p => p.package_id === parseInt(packageId) || p.package_id === packageId);
+      if (hasBooked) {
+        setFormData(prev => ({ ...prev, packageId: packageId }));
+      }
+    }
+  }, [packageId, packages]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,7 +98,7 @@ const ReviewForm = ({ packageId = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!token) {
       setMessage("Please log in to submit a review");
@@ -98,6 +120,18 @@ const ReviewForm = ({ packageId = null }) => {
 
     if (!formData.comment || formData.comment.trim().length < 10) {
       setMessage("Review must be at least 10 characters long");
+      setMessageType("error");
+      return;
+    }
+
+    // Verify user has a confirmed booking for this package (Double check)
+    const hasBooking = confirmedBookings.some(b =>
+      b.package_id === parseInt(formData.packageId) ||
+      b.package_id === formData.packageId
+    );
+
+    if (!hasBooking) {
+      setMessage("You can only review packages you have booked and completed.");
       setMessageType("error");
       return;
     }
@@ -190,7 +224,14 @@ const ReviewForm = ({ packageId = null }) => {
         </p>
       </div>
 
-      {formData.packageId && confirmedBookings.length === 0 && (
+      {packages.length === 0 && !loading && (
+        <div className="review-form-warning">
+          <AlertCircle size={20} />
+          <p>You can only review packages you have booked and completed. We couldn't find any confirmed bookings in your history.</p>
+        </div>
+      )}
+
+      {formData.packageId && confirmedBookings.length > 0 && !confirmedBookings.some(b => b.package_id == formData.packageId) && (
         <div className="review-form-warning">
           <AlertCircle size={20} />
           <p>You can only review packages you have booked. This review will be validated against your confirmed bookings.</p>
@@ -217,7 +258,7 @@ const ReviewForm = ({ packageId = null }) => {
             >
               <option value="">Choose a package you've visited...</option>
               {packages.map((pkg) => (
-                <option key={pkg.id} value={pkg.id}>
+                <option key={pkg.package_id} value={pkg.package_id}>
                   {pkg.name}
                 </option>
               ))}
@@ -270,7 +311,7 @@ const ReviewForm = ({ packageId = null }) => {
         <div className="review-form-group">
           <label className="review-form-label">Add Photos (Optional)</label>
           <p className="review-form-helper">Share up to 5 photos from your trip</p>
-          
+
           <div className="photo-upload-container">
             {photos.length < 5 && (
               <label className="photo-upload-button">
@@ -285,7 +326,7 @@ const ReviewForm = ({ packageId = null }) => {
                 />
               </label>
             )}
-            
+
             {photos.length > 0 && (
               <div className="photo-preview-grid">
                 {photos.map((photo, index) => (
@@ -308,8 +349,8 @@ const ReviewForm = ({ packageId = null }) => {
           )}
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="review-form-submit-btn"
           disabled={loading}
         >

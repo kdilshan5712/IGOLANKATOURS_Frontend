@@ -1,91 +1,36 @@
-import { MapPin, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, ArrowRight, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
 import DestinationsMap from "../components/DestinationsMap";
+import { destinationAPI } from "../services/api";
+import SEO from "../components/SEO";
 import "./DestinationsPage.css";
 
 const DestinationsPage = () => {
-  const destinations = [
-    {
-      name: "Sigiriya",
-      category: "Cultural",
-      description:
-        "Sigiriya is an ancient rock fortress and one of Sri Lanka's most iconic landmarks. Rising nearly 200 meters above the surrounding plains, it features remarkable frescoes, landscaped gardens, and the remains of a 5th-century royal palace.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjIyOCwiZXhwIjoxODAwMTIyMjI4fQ.dS3hGhIXJh0rbVJh_22v0GyYrWK-VaMxQFmBRmuCOkI",
-    },
-    {
-      name: "Kandy",
-      category: "Cultural",
-      description:
-        "Kandy is a sacred city nestled in the central hills, home to the Temple of the Tooth Relic, one of Buddhism's most revered sites. The city blends cultural heritage with natural beauty, featuring a scenic lake, traditional dance performances, and the nearby Royal Botanical Gardens.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/kandy.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMva2FuZHkucG5nIiwiaWF0IjoxNzY4NTg1OTk5LCJleHAiOjE4MDAxMjE5OTl9.S9fjTptzFD7DTF3jWTrpJh4UjmzQe_js_GhTWosYYv0",
-    },
-    {
-      name: "Ella",
-      category: "Nature",
-      description:
-        "Ella is a charming mountain town known for its stunning vistas, rolling tea estates, and laid-back atmosphere. Popular attractions include the Nine Arch Bridge, Little Adam's Peak, and Ella Rock, all offering spectacular hiking experiences.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/Ella.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvRWxsYS5wbmciLCJpYXQiOjE3Njg1ODU3NzQsImV4cCI6MTgwMDEyMTc3NH0.f6FoLcMxe86B8NTozCC-jt6QD0usqWuT0OYYJrPKbUk",
-    },
-    {
-      name: "Nuwara Eliya",
-      category: "Nature",
-      description:
-        "Often called \"Little England,\" Nuwara Eliya sits at the heart of Sri Lanka's tea country with its cool climate and colonial-era architecture. Visitors can tour world-renowned tea factories, explore sprawling plantations, and enjoy the picturesque landscapes of Horton Plains National Park.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/nuwaraeliya.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvbnV3YXJhZWxpeWEucG5nIiwiaWF0IjoxNzY4NTgxNTc3LCJleHAiOjE4MDAxMTc1Nzd9.QjLX5etS9tNSU0a8cpuBJc9hQrjSbDi3yx5vQ_PkdQc",
-    },
-    {
-      name: "Galle",
-      category: "Cultural",
-      description:
-        "Galle is a historic coastal city famous for its well-preserved Dutch Fort, a UNESCO World Heritage Site dating back to the 17th century. The fort area features charming boutiques, cafes, museums, and colonial architecture within its ramparts.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/galle.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvZ2FsbGUucG5nIiwiaWF0IjoxNzY4NTg1Nzk5LCJleHAiOjE4MDAxMjE3OTl9.V_DdXV7al2X55SV0eG-pjY9YtND_zhkdd4daTadmlSE",
-    },
-    {
-      name: "Mirissa",
-      category: "Beach",
-      description:
-        "Mirissa is a tranquil beach destination on the southern coast, renowned for its golden sands and excellent whale watching opportunities. The relaxed atmosphere, palm-fringed shores, and vibrant beach scene make it ideal for both relaxation and water activities.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/mirissa.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvbWlyaXNzYS5wbmciLCJpYXQiOjE3Njg1ODY1MDIsImV4cCI6MTgwMDEyMjUwMn0.LPfGCBUtObc8TCOjpL2Wi9bK9EaGL-6EOoOYzTWik7Y",
-    },
-    {
-      name: "Yala National Park",
-      category: "Wildlife",
-      description:
-        "Yala National Park is Sri Lanka's most visited wildlife reserve, famous for having one of the highest leopard densities in the world. The park is home to elephants, sloth bears, crocodiles, and over 200 bird species across diverse ecosystems.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/yala.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMveWFsYS5wbmciLCJpYXQiOjE3Njg1ODYxODQsImV4cCI6MTkyNjI2NjE4NH0.A3Jtn33o0iScYF2oBq38gBcjNLEO02ri3XFagprvtd4",
-    },
-    {
-      name: "Bentota",
-      category: "Beach",
-      description:
-        "Bentota is a premier beach resort town known for its pristine coastline and water sports activities including jet skiing, windsurfing, and diving. The Bentota River adds to the scenic beauty and offers boat safaris through mangrove forests.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/bentota.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvYmVudG90YS5wbmciLCJpYXQiOjE3Njg1ODU4OTAsImV4cCI6MTgwMDEyMTg5MH0.3JIcPnoZtKU-hh7smhnN0zvcrIpPdvsz2fXDWRmXaXE",
-    },
-    {
-      name: "Anuradhapura",
-      category: "Cultural",
-      description:
-        "Anuradhapura is one of Sri Lanka's ancient capitals and a sacred Buddhist pilgrimage site with over 2,000 years of history. The city features massive dagobas, ancient monasteries, and the sacred Bodhi Tree, believed to be the oldest historically documented tree in the world.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/anuradhapura.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvYW51cmFkaGFwdXJhLnBuZyIsImlhdCI6MTc2ODU4NTc0MCwiZXhwIjoxODAwMTIxNzQwfQ.wrGC3MQvmHV9WpnjFcN3WnSTKMfbTzT_ulvBa-SG7Dg",
-    },
-    {
-      name: "Polonnaruwa",
-      category: "Cultural",
-      description:
-        "Polonnaruwa served as Sri Lanka's medieval capital and remains one of the best-preserved ancient cities in South Asia. Visitors can explore impressive archaeological sites including royal palaces, Buddha statues, and intricate stone carvings.",
-      image:
-        "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/polonnaruwa.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvcG9sb25uYXJ1d2EucG5nIiwiaWF0IjoxNzY4NTg2MzUwLCJleHAiOjE4MDAxMjIzNTB9.HogzDo2oFAQUhkP15CqSGOzTSBv_W3qmf9yMW5jP--U",
-    },
-  ];
+  const [destinations, setDestinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const response = await destinationAPI.getAll();
+        if (response.success && Array.isArray(response.data)) {
+          setDestinations(response.data);
+        } else {
+          console.error("Invalid destinations data:", response);
+          setError("Failed to load destinations data.");
+        }
+      } catch (err) {
+        console.error("Failed to load destinations:", err);
+        setError("Failed to load destinations. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -97,8 +42,36 @@ const DestinationsPage = () => {
     return colors[category] || "bg-gray-100 text-gray-800";
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader className="animate-spin text-teal-600" size={48} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen flex-col gap-4">
+        <p className="text-red-500 text-xl">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+
   return (
     <main className="destinations-page">
+      <SEO 
+        title="Explore Sri Lanka Destinations"
+        description="Discover the most beautiful destinations in Sri Lanka. From the ancient cities of the Cultural Triangle to the pristine beaches of the South Coast."
+        keywords="Sri Lanka destinations, visit Sri Lanka, Sri Lanka travel guide, best places in Sri Lanka"
+      />
       <div className="destinations-page-container">
         {/* Hero Header */}
         <div className="destinations-page-hero">
@@ -117,7 +90,7 @@ const DestinationsPage = () => {
             <div key={index} className="destination-page-card">
               <div className="destination-page-image-wrapper">
                 <img
-                  src={destination.image}
+                  src={destination.image_url || destination.image}
                   alt={destination.name}
                   className="destination-page-image"
                 />
@@ -141,8 +114,11 @@ const DestinationsPage = () => {
                   {destination.description}
                 </p>
 
-                <Link to="/packages" className="destination-page-link">
-                  View Tours
+                <Link
+                  to={`/destinations/${destination.id || destination.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="destination-page-link"
+                >
+                  Explore Features
                   <ArrowRight size={16} />
                 </Link>
               </div>
@@ -166,9 +142,9 @@ const DestinationsPage = () => {
             <Link to="/packages" className="btn-primary">
               Browse Tour Packages
             </Link>
-            <a href="#contact" className="btn-secondary">
+            <Link to="/contact" className="btn-secondary">
               Contact Us
-            </a>
+            </Link>
           </div>
         </div>
       </div>

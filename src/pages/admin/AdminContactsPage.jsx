@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, CheckCircle, Mail, Phone, Trash2, Save } from "lucide-react";
-import { contactAPI } from "../../services/api";
+import { AlertCircle, CheckCircle, Mail, Phone, Trash2, Save, MessageSquare, X, User, Send, Loader } from "lucide-react";
+import { contactAPI, adminAPI } from "../../services/api";
 import "./AdminContacts.css";
 
 function AdminContactsPage() {
@@ -14,6 +14,13 @@ function AdminContactsPage() {
   const [messageType, setMessageType] = useState(null);
   const [notesEdit, setNotesEdit] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+
+  // Reply State
+  const [replyText, setReplyText] = useState("");
+  const [replying, setReplying] = useState(false);
+  const [replyError, setReplyError] = useState(null);
+  const [replySuccess, setReplySuccess] = useState(false);
+
   const [statusCounts, setStatusCounts] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -40,7 +47,7 @@ function AdminContactsPage() {
       });
 
       if (result.success) {
-        setMessages(result.messages || []); // Backend returns 'messages' not 'contacts'
+        setMessages(result.messages || []);
         setStatusCounts(result.statusCounts || {});
         setMessage(null);
       } else {
@@ -59,11 +66,13 @@ function AdminContactsPage() {
   const handleViewMessage = async (msg) => {
     setSelectedMessage(msg);
     setNotesEdit(msg.admin_notes || "");
-    
-    // Mark as read if it's new
+    setReplyText("");
+    setReplyError(null);
+    setReplySuccess(false);
+
     if (msg.status === "new") {
       try {
-        const result = await contactAPI.markRead(token, msg.contact_id);
+        const result = await contactAPI.markRead(token, msg.message_id);
         if (result.success) {
           await fetchMessages();
         }
@@ -78,7 +87,7 @@ function AdminContactsPage() {
 
     try {
       setSavingNotes(true);
-      const result = await contactAPI.update(token, selectedMessage.contact_id, {
+      const result = await contactAPI.update(token, selectedMessage.message_id, {
         admin_notes: notesEdit,
         status: selectedMessage.status
       });
@@ -87,13 +96,12 @@ function AdminContactsPage() {
         setMessage("Notes saved successfully");
         setMessageType("success");
         setTimeout(() => setMessage(null), 3000);
-        
-        // Update selected message
+
         setSelectedMessage({
           ...selectedMessage,
           admin_notes: notesEdit
         });
-        
+
         await fetchMessages();
       } else {
         setMessage(result.message || "Failed to save notes");
@@ -105,6 +113,36 @@ function AdminContactsPage() {
       setMessageType("error");
     } finally {
       setSavingNotes(false);
+    }
+  };
+
+  const handleSendReply = async () => {
+    if (!replyText.trim() || !selectedMessage) return;
+
+    try {
+      setReplying(true);
+      setReplyError(null);
+      setReplySuccess(false);
+
+      const result = await adminAPI.replyContactMessage(selectedMessage.message_id, replyText, token);
+
+      if (result.success) {
+        setReplySuccess(true);
+        setReplyText("");
+        // Optionally update the selected message status locally so the UI updates
+        setSelectedMessage({
+          ...selectedMessage,
+          status: "responded"
+        });
+        fetchMessages();
+      } else {
+        setReplyError(result.message || "Failed to send reply");
+      }
+    } catch (error) {
+      console.error("Error sending reply:", error);
+      setReplyError("An unexpected error occurred");
+    } finally {
+      setReplying(false);
     }
   };
 
@@ -161,184 +199,193 @@ function AdminContactsPage() {
   const handleCloseModal = () => {
     setSelectedMessage(null);
     setNotesEdit("");
+    setReplyText("");
+    setReplyError(null);
+    setReplySuccess(false);
   };
 
   if (loading) {
     return (
       <div className="admin-page">
         <div className="loading-message">Loading messages...</div>
-    </div>
-  );
+      </div>
+    );
   }
 
   return (
     <div className="admin-page">
-          {message && (
-            <div className={`admin-message admin-message-${messageType}`}>
-              {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-              <p>{message}</p>
-            </div>
-          )}
+      <div className="admin-page-header">
+        <div>
+          <h1 className="page-title">Contact Messages</h1>
+          <p className="page-subtitle">Inquiries from the contact form</p>
+        </div>
+      </div>
 
-          <div className="contacts-filters">
-            <button
-              className={statusFilter === "new" ? "filter-btn active" : "filter-btn"}
-              onClick={() => setStatusFilter("new")}
+      {message && (
+        <div className={`admin-message admin-message-${messageType}`}>
+          {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+          <p>{message}</p>
+        </div>
+      )}
+
+      <div className="contacts-filters">
+        {["new", "read", "responded", "archived"].map((status) => (
+          <button
+            key={status}
+            className={statusFilter === status ? "filter-btn active" : "filter-btn"}
+            onClick={() => setStatusFilter(status)}
+          >
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+            <span className="count-badge">
+              {statusCounts[status] || 0}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="messages-grid">
+        {messages.length === 0 ? (
+          <div className="no-data glass-panel">No {statusFilter} messages found</div>
+        ) : (
+          messages.map((msg) => (
+            <div
+              key={msg.message_id}
+              className={`message-card glass-panel ${msg.status === "new" ? "unread" : ""}`}
+              onClick={() => handleViewMessage(msg)}
             >
-              New ({statusCounts.new || 0})
-            </button>
-            <button
-              className={statusFilter === "read" ? "filter-btn active" : "filter-btn"}
-              onClick={() => setStatusFilter("read")}
-            >
-              Read ({statusCounts.read || 0})
-            </button>
-            <button
-              className={statusFilter === "responded" ? "filter-btn active" : "filter-btn"}
-              onClick={() => setStatusFilter("responded")}
-            >
-              Responded ({statusCounts.responded || 0})
-            </button>
-            <button
-              className={statusFilter === "archived" ? "filter-btn active" : "filter-btn"}
-              onClick={() => setStatusFilter("archived")}
-            >
-              Archived ({statusCounts.archived || 0})
-            </button>
-          </div>
-
-          <div className="messages-list">
-            {messages.length === 0 ? (
-              <p className="no-data">No {statusFilter} messages found</p>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.contact_id}
-                  className={`message-card ${msg.status === "new" ? "unread" : ""}`}
-                  onClick={() => handleViewMessage(msg)}
-                >
-                  <div className="message-header">
-                    <div className="sender-info">
-                      <strong>{msg.name}</strong>
-                      <span className={`status-badge status-${msg.status}`}>
-                        {msg.status}
-                      </span>
-                    </div>
-                    <small>{msg.created_at ? new Date(msg.created_at).toLocaleString() : "Recently"}</small>
-                  </div>
-
-                  <div className="message-subject">
-                    {msg.subject || "No Subject"}
-                  </div>
-
-                  <div className="message-preview">
-                    {msg.message.substring(0, 120)}...
-                  </div>
-
-                  <div className="message-meta">
-                    <span><Mail size={14} /> {msg.email}</span>
-                    {msg.phone && <span><Phone size={14} /> {msg.phone}</span>}
-                  </div>
+              <div className="message-header">
+                <div className="sender-info">
+                  <User size={16} className="text-muted" />
+                  <strong>{msg.name}</strong>
                 </div>
-              ))
-            )}
-          </div>
+                <small className="text-secondary">{msg.created_at ? new Date(msg.created_at).toLocaleDateString() : "Recently"}</small>
+              </div>
+
+              <div className="message-subject">
+                {msg.subject || "No Subject"}
+              </div>
+
+              <div className="message-preview text-secondary">
+                {msg.message.substring(0, 100)}...
+              </div>
+
+              <div className="message-footer">
+                <span className={`status-badge status-${msg.status}`}>
+                  {msg.status}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       {selectedMessage && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content glass-panel modal-large" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <div>
-                <h2>Contact Message</h2>
-                <span className={`status-badge status-${selectedMessage.status}`}>
-                  {selectedMessage.status}
-                </span>
-              </div>
-              <button onClick={handleCloseModal} className="modal-close">✕</button>
+              <h2>Contact Message</h2>
+              <button onClick={handleCloseModal} className="modal-close"><X size={24} /></button>
             </div>
 
-            <div className="message-details">
-              <div className="detail-section">
-                <h3>Sender Information</h3>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <label>Name:</label>
+            <div className="message-details-grid">
+              <div className="detail-section full-width">
+                <h3><User size={18} /> Sender Info</h3>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>Name</label>
                     <span>{selectedMessage.name}</span>
                   </div>
-                  <div className="detail-item">
-                    <label>Email:</label>
+                  <div className="info-item">
+                    <label>Email</label>
                     <span>{selectedMessage.email}</span>
                   </div>
-                  {selectedMessage.phone && (
-                    <div className="detail-item">
-                      <label>Phone:</label>
-                      <span>{selectedMessage.phone}</span>
-                    </div>
-                  )}
-                  <div className="detail-item">
-                    <label>Received:</label>
-                    <span>
-                      {selectedMessage.created_at
-                        ? new Date(selectedMessage.created_at).toLocaleString()
-                        : "Recently"}
-                    </span>
+                  <div className="info-item">
+                    <label>Phone</label>
+                    <span>{selectedMessage.phone || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Date</label>
+                    <span>{new Date(selectedMessage.created_at).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="detail-section">
-                <h3>Subject</h3>
-                <p className="message-subject-full">
-                  {selectedMessage.subject || "No Subject"}
-                </p>
-              </div>
-
-              <div className="detail-section">
-                <h3>Message</h3>
-                <div className="message-content">
+              <div className="detail-section full-width">
+                <h3><MessageSquare size={18} /> Message Content</h3>
+                <div className="subject-box glass-panel-inner">
+                  <strong>Subject:</strong> {selectedMessage.subject || "No Subject"}
+                </div>
+                <div className="message-box glass-panel-inner">
                   {selectedMessage.message}
                 </div>
               </div>
 
-              <div className="detail-section">
-                <h3>Admin Notes</h3>
-                <textarea
-                  className="notes-textarea"
-                  value={notesEdit}
-                  onChange={(e) => setNotesEdit(e.target.value)}
-                  placeholder="Add internal notes about this message..."
-                  rows="4"
-                />
-                <button
-                  className="btn-save-notes"
-                  onClick={handleSaveNotes}
-                  disabled={savingNotes}
-                >
-                  <Save size={16} />
-                  {savingNotes ? "Saving..." : "Save Notes"}
-                </button>
+              <div className="detail-section full-width reply-section">
+                <h3><Mail size={18} /> Direct Email Reply</h3>
+                <div className="reply-box-container">
+                  <textarea
+                    placeholder="Draft your response here to send directly to the user's email..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="reply-textarea"
+                    rows={4}
+                    disabled={replying}
+                  />
+                  {replyError && <div className="reply-alert error-alert">{replyError}</div>}
+                  {replySuccess && <div className="reply-alert success-alert">Your reply was sent successfully!</div>}
+
+                  <div className="reply-actions">
+                    <button
+                      onClick={handleSendReply}
+                      disabled={!replyText.trim() || replying}
+                      className="btn btn-primary"
+                    >
+                      {replying ? <Loader size={16} className="spinner" /> : <Send size={16} />}
+                      {replying ? "Sending Email..." : "Send Email Reply"}
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div className="modal-actions">
-                {selectedMessage.status !== "responded" && (
+              <div className="detail-section full-width">
+                <h3><Save size={18} /> Admin Notes</h3>
+                <textarea
+                  className="glass-input"
+                  value={notesEdit}
+                  onChange={(e) => setNotesEdit(e.target.value)}
+                  placeholder="Internal notes..."
+                  rows="3"
+                />
+                <div className="mt-2 text-right">
                   <button
-                    className="btn-marked-responded"
-                    onClick={() => handleMarkResponded(selectedMessage.contact_id)}
+                    className="btn btn-primary"
+                    onClick={handleSaveNotes}
+                    disabled={savingNotes}
                   >
-                    Mark as Responded
+                    {savingNotes ? "Saving..." : "Save Notes"}
                   </button>
-                )}
-                <button
-                  className="btn-delete-message"
-                  onClick={() => handleDelete(selectedMessage.contact_id)}
-                >
-                  <Trash2 size={16} />
-                  Delete Message
-                </button>
-                <button className="btn-close-modal" onClick={handleCloseModal}>
-                  Close
-                </button>
+                </div>
               </div>
+            </div>
+
+            <div className="modal-footer">
+              {selectedMessage.status !== "responded" && (
+                <button
+                  className="btn btn-success"
+                  onClick={() => handleMarkResponded(selectedMessage.message_id)}
+                >
+                  <CheckCircle size={16} /> Mark Responded
+                </button>
+              )}
+              <button
+                className="btn btn-danger"
+                onClick={() => handleDelete(selectedMessage.message_id)}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+              <button className="btn btn-secondary" onClick={handleCloseModal}>
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -347,12 +394,12 @@ function AdminContactsPage() {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
-          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content-confirm glass-panel" onClick={(e) => e.stopPropagation()}>
             <h3>Confirm Delete</h3>
             <p>{confirmMessage}</p>
             <div className="modal-footer-confirm">
               <button
-                className="btn-confirm-yes"
+                className="btn btn-primary"
                 onClick={() => {
                   if (confirmAction) confirmAction();
                 }}
@@ -360,7 +407,7 @@ function AdminContactsPage() {
                 Yes, Delete
               </button>
               <button
-                className="btn-confirm-no"
+                className="btn btn-secondary"
                 onClick={() => setShowConfirmModal(false)}
               >
                 Cancel

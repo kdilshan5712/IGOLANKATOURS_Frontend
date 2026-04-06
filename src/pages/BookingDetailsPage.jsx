@@ -159,12 +159,23 @@ const BookingDetailsPage = () => {
                 <input
                   type="number"
                   value={numberOfTravelers}
-                  onChange={(e) =>
-                    setNumberOfTravelers(Math.max(1, parseInt(e.target.value) || 1))
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      setNumberOfTravelers("");
+                      return;
+                    }
+                    const num = parseInt(val);
+                    setNumberOfTravelers(isNaN(num) ? 1 : num);
+                  }}
+                  onBlur={() => {
+                    if (numberOfTravelers === "" || numberOfTravelers < 1) setNumberOfTravelers(1);
+                  }}
                   className="booking-input"
                   min="1"
                   max="20"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
               </div>
 

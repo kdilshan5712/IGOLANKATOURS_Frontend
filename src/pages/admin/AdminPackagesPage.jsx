@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Edit, Trash2, Plus, X, Check, AlertCircle, Image as ImageIcon } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import "./AdminPackages.css";
 
@@ -43,7 +44,7 @@ function AdminPackagesPage() {
     try {
       const token = localStorage.getItem("token");
       const result = await adminAPI.getAllPackages(token);
-      
+
       if (result.success) {
         setPackages(result.packages || []);
       }
@@ -187,209 +188,228 @@ function AdminPackagesPage() {
     return (
       <div className="admin-page">
         <div className="loading-message">Loading packages...</div>
-    </div>
-  );
+      </div>
+    );
   }
 
   return (
     <div className="admin-page">
-          <div className="packages-header">
-            <h2>All Packages ({packages.length})</h2>
-            <button onClick={() => handleOpenModal()} className="btn-primary">
-              + Add New Package
-            </button>
-          </div>
+      <div className="admin-page-header">
+        <div>
+          <h1 className="page-title">Packages</h1>
+          <p className="page-subtitle">Manage tour packages and inventory</p>
+        </div>
+        <button onClick={() => handleOpenModal()} className="btn btn-primary">
+          <Plus size={18} /> Add New Package
+        </button>
+      </div>
 
-          <div className="packages-table-container">
-            <table className="packages-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Category</th>
-                  <th>Budget</th>
-                  <th>Duration</th>
-                  <th>Price</th>
-                  <th>Rating</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {packages.map((pkg) => (
-                  <tr key={pkg.package_id}>
-                    <td className="package-name-cell">
-                      <div className="package-info">
-                        {pkg.image && (
-                          <img src={pkg.image} alt={pkg.name} className="package-thumb" />
-                        )}
-                        <span>{pkg.name}</span>
+      <div className="table-responsive packages-table-container glass-panel">
+        <table className="glass-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Budget</th>
+              <th>Duration</th>
+              <th>Price</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {packages.map((pkg) => (
+              <tr key={pkg.package_id}>
+                <td className="package-name-cell">
+                  <div className="package-info">
+                    {pkg.image ? (
+                      <img src={pkg.image} alt={pkg.name} className="package-thumb" />
+                    ) : (
+                      <div className="package-thumb-placeholder">
+                        <ImageIcon size={20} />
                       </div>
-                    </td>
-                    <td>{pkg.category}</td>
-                    <td>
-                      <span className={`badge badge-${pkg.budget}`}>
-                        {pkg.budget}
-                      </span>
-                    </td>
-                    <td>{pkg.duration}</td>
-                    <td className="price-cell">${pkg.price}</td>
-                    <td>⭐ {pkg.rating}</td>
-                    <td>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          checked={pkg.is_active}
-                          onChange={() => handleToggleStatus(pkg.package_id, pkg.is_active)}
-                        />
-                        <span className="toggle-slider"></span>
-                      </label>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          onClick={() => handleOpenModal(pkg)}
-                          className="btn-edit"
-                          title="Edit"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => handleDelete(pkg.package_id)}
-                          className="btn-delete"
-                          title="Delete"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    )}
+                    <span>{pkg.name}</span>
+                  </div>
+                </td>
+                <td>{pkg.category}</td>
+                <td>
+                  <span className={`status-badge status-${pkg.budget || 'mid'}`}>
+                    {pkg.budget}
+                  </span>
+                </td>
+                <td>{pkg.duration}</td>
+                <td className="price-cell">${pkg.price}</td>
+                <td>⭐ {pkg.rating}</td>
+                <td>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={pkg.is_active}
+                      onChange={() => handleToggleStatus(pkg.package_id, pkg.is_active)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      onClick={() => handleOpenModal(pkg)}
+                      className="btn-icon btn-edit"
+                      title="Edit"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(pkg.package_id)}
+                      className="btn-icon btn-delete"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-container" style={{ maxWidth: '800px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingPackage ? "Edit Package" : "Add New Package"}</h2>
-              <button onClick={handleCloseModal} className="modal-close">✕</button>
+              <button onClick={handleCloseModal} className="modal-close-btn"><X size={20} /></button>
             </div>
 
-            <form onSubmit={handleSubmit} className="package-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Package Name *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="package-form">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Package Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        className="modal-input"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-                <div className="form-group">
-                  <label>Duration *</label>
-                  <input
-                    type="text"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder="e.g., 7 Days"
-                    required
-                  />
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Duration *</label>
+                      <input
+                        type="text"
+                        name="duration"
+                        className="modal-input"
+                        value={formData.duration}
+                        onChange={handleChange}
+                        placeholder="e.g., 7 Days"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="modal-form-group">
+                    <label className="modal-label">Description *</label>
+                    <textarea
+                      name="description"
+                      className="modal-input"
+                      style={{ minHeight: '100px', resize: 'vertical' }}
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows="4"
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Price (USD) *</label>
+                      <input
+                        type="number"
+                        name="price"
+                        className="modal-input"
+                        value={formData.price}
+                        onChange={handleChange}
+                        step="0.01"
+                        required
+                      />
+                    </div>
+
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Category *</label>
+                      <select name="category" value={formData.category} onChange={handleChange} className="modal-input">
+                        <option value="Cultural">Cultural</option>
+                        <option value="Beach">Beach</option>
+                        <option value="Wildlife">Wildlife</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Luxury">Luxury</option>
+                      </select>
+                    </div>
+
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Budget Level *</label>
+                      <select name="budget" value={formData.budget} onChange={handleChange} className="modal-input">
+                        <option value="budget">Budget</option>
+                        <option value="mid">Mid-Range</option>
+                        <option value="luxury">Luxury</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Hotel Level</label>
+                      <input
+                        type="text"
+                        name="hotel"
+                        className="modal-input"
+                        value={formData.hotel}
+                        onChange={handleChange}
+                        placeholder="e.g., 4-star"
+                      />
+                    </div>
+
+                    <div className="modal-form-group" style={{ marginBottom: 0 }}>
+                      <label className="modal-label">Rating</label>
+                      <input
+                        type="number"
+                        name="rating"
+                        className="modal-input"
+                        value={formData.rating}
+                        onChange={handleChange}
+                        step="0.1"
+                        min="0"
+                        max="5"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="modal-form-group">
+                    <label className="modal-label">Image URL</label>
+                    <input
+                      type="url"
+                      name="image"
+                      className="modal-input"
+                      value={formData.image}
+                      onChange={handleChange}
+                      placeholder="https://..."
+                    />
+                    <small style={{ display: 'block', marginTop: '4px', fontSize: '0.75rem', color: '#64748b' }}>Enter Unsplash or Supabase Storage URL</small>
+                  </div>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Description *</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="4"
-                  required
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Price (USD) *</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    step="0.01"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Category *</label>
-                  <select name="category" value={formData.category} onChange={handleChange}>
-                    <option value="Cultural">Cultural</option>
-                    <option value="Beach">Beach</option>
-                    <option value="Wildlife">Wildlife</option>
-                    <option value="Adventure">Adventure</option>
-                    <option value="Luxury">Luxury</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Budget Level *</label>
-                  <select name="budget" value={formData.budget} onChange={handleChange}>
-                    <option value="budget">Budget</option>
-                    <option value="mid">Mid-Range</option>
-                    <option value="luxury">Luxury</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Hotel Level</label>
-                  <input
-                    type="text"
-                    name="hotel"
-                    value={formData.hotel}
-                    onChange={handleChange}
-                    placeholder="e.g., 4-star"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Rating</label>
-                  <input
-                    type="number"
-                    name="rating"
-                    value={formData.rating}
-                    onChange={handleChange}
-                    step="0.1"
-                    min="0"
-                    max="5"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Image URL</label>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                />
-                <small>Enter Unsplash or Supabase Storage URL</small>
-              </div>
-
-              <div className="form-actions">
-                <button type="button" onClick={handleCloseModal} className="btn-secondary">
+              <div className="modal-footer" style={{ border: 'none', background: 'transparent' }}>
+                <button type="button" onClick={handleCloseModal} className="btn btn-secondary">
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
+                <button type="submit" className="btn btn-primary">
                   {editingPackage ? "Update Package" : "Create Package"}
                 </button>
               </div>
@@ -400,18 +420,22 @@ function AdminPackagesPage() {
 
       {/* Notification Modal */}
       {showNotification && (
-        <div className="notification-modal-overlay" onClick={() => setShowNotification(false)}>
-          <div className={`notification-modal notification-${notificationType}`}>
-            <div className="notification-icon">
-              {notificationType === "success" && "✓"}
-              {notificationType === "error" && "!"}
+        <div className="modal-overlay" onClick={() => setShowNotification(false)}>
+          <div className="modal-container" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
+            <div className="notification-icon" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+              {notificationType === "success" && <Check size={56} color="#10b981" style={{ background: '#f0fdf4', padding: '12px', borderRadius: '50%' }} />}
+              {notificationType === "error" && <AlertCircle size={56} color="#ef4444" style={{ background: '#fef2f2', padding: '12px', borderRadius: '50%' }} />}
             </div>
-            <p className="notification-message">{notificationMessage}</p>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>
+              {notificationType === "success" ? "Success!" : "Notice"}
+            </h3>
+            <p style={{ color: '#64748b', marginBottom: '2rem' }}>{notificationMessage}</p>
             <button
-              className="notification-close-btn"
+              className="btn btn-secondary"
+              style={{ minWidth: '120px' }}
               onClick={() => setShowNotification(false)}
             >
-              Close
+              Okay
             </button>
           </div>
         </div>
@@ -419,24 +443,37 @@ function AdminPackagesPage() {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="modal-overlay-confirm" onClick={() => setShowConfirmModal(false)}>
-          <div className="modal-content-confirm" onClick={(e) => e.stopPropagation()}>
-            <h3>Confirm Delete</h3>
-            <p>{confirmMessage}</p>
-            <div className="modal-footer-confirm">
+        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-container" style={{ maxWidth: '450px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#dc2626' }}>
+                <AlertCircle size={20} /> Confirm Delete
+              </h2>
+              <button onClick={() => setShowConfirmModal(false)} className="modal-close-btn"><X size={20} /></button>
+            </div>
+            
+            <div className="modal-body" style={{ textAlign: 'center', padding: '2.5rem 1.5rem' }}>
+              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Trash2 size={32} color="#dc2626" />
+              </div>
+              <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1.25rem' }}>Are you sure?</h3>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '0.9375rem' }}>{confirmMessage}</p>
+            </div>
+
+            <div className="modal-footer" style={{ border: 'none', background: 'transparent' }}>
               <button
-                className="btn-confirm-yes"
+                className="btn btn-secondary"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                No, Keep it
+              </button>
+              <button
+                className="btn btn-danger"
                 onClick={() => {
                   if (confirmAction) confirmAction();
                 }}
               >
                 Yes, Delete
-              </button>
-              <button
-                className="btn-confirm-no"
-                onClick={() => setShowConfirmModal(false)}
-              >
-                Cancel
               </button>
             </div>
           </div>

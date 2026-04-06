@@ -1,426 +1,397 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { CreditCard, Lock } from "lucide-react";
-import { packageAPI, bookingAPI, authAPI } from "../services/api";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Lock, AlertCircle, Loader, CheckCircle, CreditCard, Calendar, User, Users } from "lucide-react";
+import { packageAPI, authAPI, bookingAPI } from "../services/api";
+import paymentService from "../services/paymentService";
 import "./BookingPaymentPage.css";
+
+const DummyCheckoutForm = ({ amount, onPay, processing }) => {
+  // ... (keeping original DummyCheckoutForm)
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    cardHolder: ""
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCardDetails(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv || !cardDetails.cardHolder) {
+      alert("Please fill in all dummy card details (any values work)");
+      return;
+    }
+    onPay();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="form-group">
+        <label>Card Number</label>
+        <div className="card-input-wrapper">
+          <input
+            type="text"
+            name="cardNumber"
+            placeholder="0000 0000 0000 0000"
+            maxLength="19"
+            value={cardDetails.cardNumber}
+            onChange={handleInputChange}
+          />
+          <CreditCard className="icon-right" size={18} style={{ position: 'absolute', right: '10px', top: '10px', color: '#999' }} />
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label>Expiry Date</label>
+          <input
+            type="text"
+            name="expiryDate"
+            placeholder="MM/YY"
+            maxLength="5"
+            value={cardDetails.expiryDate}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="form-group">
+          <label>CVV</label>
+          <input
+            type="text"
+            name="cvv"
+            placeholder="123"
+            maxLength="4"
+            value={cardDetails.cvv}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label>Cardholder Name</label>
+        <input
+          type="text"
+          name="cardHolder"
+          placeholder="Name on Card"
+          value={cardDetails.cardHolder}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="btn-primary"
+        disabled={processing}
+        style={{ width: '100%', marginTop: '1rem' }}
+      >
+        {processing ? (
+          <>Processing...</>
+        ) : (
+          <>Pay ${amount} Now</>
+        )}
+      </button>
+    </form>
+  );
+};
 
 const BookingPaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [packageData, setPackageData] = useState(null);
-  const [bookingData, setBookingData] = useState(null);
+  const [step1Data, setStep1Data] = useState(null);
+  const [travellers, setTravellers] = useState([]);
+  const [existingBooking, setExistingBooking] = useState(null);
+  const [isDirectBooking, setIsDirectBooking] = useState(false);
+
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
-  
-  // Payment form state
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [saveCard, setSaveCard] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
-    // Check if user is logged in
+    // 1. Auth Check
     if (!authAPI.isAuthenticated()) {
-      // Store return URL and redirect to login
-      sessionStorage.setItem('returnUrl', `/booking/${id}/payment`);
+      sessionStorage.setItem('returnUrl', `/booking/${id}`);
       navigate('/login');
       return;
     }
 
-    // Check if email is verified
-    const user = authAPI.getCurrentUser();
-    if (user && user.email_verified === false) {
-      alert('Please verify your email before making a booking. Check your inbox for the verification link.');
-      navigate('/profile');
+    // 2. Direct Booking Check (from Custom Tours dashboard)
+    if (location.state?.isDirect && location.state?.booking) {
+      console.log("🛠️ Processing Direct Booking for Approved Custom Tour");
+      setExistingBooking(location.state.booking);
+      setIsDirectBooking(true);
+      
+      // Load simple data for the summary
+      const directBooking = location.state.booking;
+      setStep1Data({
+        package_id: directBooking.package_id,
+        travel_date: new Date(directBooking.travel_date).toLocaleDateString(),
+        total_price: directBooking.total_price,
+        adults: directBooking.travelers || 1,
+        children: 0,
+        room_type: "Custom",
+        special_requests: "Custom Approved Itinerary"
+      });
+      // We don't have traveller details but we don't need them to pay
+      setTravellers([]); 
+      
+      setLoading(false);
       return;
     }
 
-    // Validate ID
-    if (!id) {
-      navigate('/packages');
+    // 3. Wizard Flow Check
+    const s1 = sessionStorage.getItem('booking_step1');
+    const s2 = sessionStorage.getItem('booking_travellers');
+
+    if (!s1) {
+      navigate(`/booking/${id}`); 
+      return;
+    }
+    if (!s2) {
+      navigate(`/booking/${id}/travellers`); 
       return;
     }
 
-    // Get booking data from sessionStorage
-    const storedData = sessionStorage.getItem('bookingData');
-    if (!storedData) {
-      navigate(`/booking/${id}`);
-      return;
-    }
+    setStep1Data(JSON.parse(s1));
+    setTravellers(JSON.parse(s2));
 
-    const parsedData = JSON.parse(storedData);
-    setBookingData(parsedData);
-
-    // Fetch package details
+    // 4. Load Package
     const fetchPackage = async () => {
       try {
-        setLoading(true);
         const data = await packageAPI.getById(id);
         setPackageData(data);
-      } catch (err) {
-        console.error("Error fetching package:", err);
-        setError("Failed to load package details");
+      } catch (e) {
+        setError("Failed to load package data");
       } finally {
         setLoading(false);
       }
     };
-
     fetchPackage();
-  }, [id, navigate]);
 
-  // Format card number with spaces
-  const formatCardNumber = (value) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || "";
-    const parts = [];
+  }, [id, navigate, location.state]);
 
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-
-    if (parts.length) {
-      return parts.join(" ");
-    } else {
-      return value;
-    }
-  };
-
-  const handleCardNumberChange = (e) => {
-    const formatted = formatCardNumber(e.target.value);
-    if (formatted.replace(/\s/g, "").length <= 16) {
-      setCardNumber(formatted);
-    }
-  };
-
-  // Format expiry date as MM/YY
-  const handleExpiryChange = (e) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length >= 2) {
-      value = value.slice(0, 2) + "/" + value.slice(2, 4);
-    }
-    setExpiryDate(value);
-  };
-
-  // Format CVV
-  const handleCvvChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 4);
-    setCvv(value);
-  };
-
-  // Validate payment form
-  const validatePaymentForm = () => {
-    if (paymentMethod === "card") {
-      const cardDigits = cardNumber.replace(/\s/g, "");
-      if (cardDigits.length < 15 || cardDigits.length > 16) {
-        setError("Please enter a valid card number");
-        return false;
-      }
-      if (!cardName.trim()) {
-        setError("Please enter the cardholder name");
-        return false;
-      }
-      if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-        setError("Please enter a valid expiry date (MM/YY)");
-        return false;
-      }
-      const [month, year] = expiryDate.split("/");
-      const expMonth = parseInt(month);
-      const expYear = parseInt(year);
-      
-      if (expMonth < 1 || expMonth > 12) {
-        setError("Please enter a valid expiry month (01-12)");
-        return false;
-      }
-      
-      // Check if card is expired
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth() + 1; // getMonth() is 0-indexed
-      const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2)); // Get last 2 digits of year
-      
-      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-        setError("Card has expired. Please use a valid card");
-        return false;
-      }
-      if (cvv.length < 3 || cvv.length > 4) {
-        setError("Please enter a valid CVV");
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handlePayment = async (e) => {
-    e.preventDefault();
-    
-    if (!bookingData || !packageData) {
-      setError("Booking data is missing");
-      return;
-    }
-
-    if (!validatePaymentForm()) {
-      return;
-    }
-
-    setSubmitting(true);
+  const handlePay = async () => {
+    setProcessing(true);
     setError(null);
+    setFieldErrors({});
 
     try {
-      // Simulate secure payment processing
-      await new Promise(resolve => setTimeout(resolve, 2500));
-
-      // Create booking in backend
       const token = authAPI.getToken();
-      const response = await bookingAPI.create({
-        package_id: bookingData.package_id,
-        travel_date: bookingData.travel_date,
-        travelers: bookingData.travelers
-      }, token);
+      let bookingId;
+      let finalPrice;
 
-      if (response.booking) {
-        // Store booking info for success page
-        sessionStorage.setItem('completedBooking', JSON.stringify({
-          booking_id: response.booking.booking_id,
-          package_name: packageData.name,
-          travel_date: bookingData.travel_date,
-          travelers: bookingData.travelers,
-          total_price: bookingData.total_price
-        }));
-
-        // Clear booking data
-        sessionStorage.removeItem('bookingData');
-
-        // Navigate to success page
-        navigate(`/booking/${id}/success`);
+      if (isDirectBooking && existingBooking) {
+        // --- CASE 1: Direct Payment for Existing Booking ---
+        bookingId = existingBooking.booking_id;
+        finalPrice = existingBooking.total_price;
       } else {
-        throw new Error(response.message || "Payment declined. Please try again.");
+        // --- CASE 2: Create New Booking (Wizard Flow) ---
+        const payload = {
+          package_id: step1Data.package_id,
+          travel_date: step1Data.travel_date,
+          adults: step1Data.adults,
+          children: step1Data.children,
+          room_type: step1Data.room_type,
+          special_requests: step1Data.special_requests,
+          travellers: travellers,
+        };
+
+        const bookingRes = await bookingAPI.create(payload, token);
+        if (!bookingRes.success) {
+          if (bookingRes.errors) {
+            setFieldErrors(bookingRes.errors);
+            throw new Error("Please correct the traveler information errors below.");
+          }
+          throw new Error(bookingRes.message || "Failed to create booking");
+        }
+
+        bookingId = bookingRes.booking.booking_id;
+        finalPrice = bookingRes.booking.total_price;
       }
+
+      // Process Payment (Deposit or Full)
+      const travelDateStr = isDirectBooking ? existingBooking.travel_date : step1Data.travel_date;
+      const travelDate = new Date(travelDateStr);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
+      
+      // For custom bookings (Direct), we usually require full payment as finalized by admin
+      const paymentAmount = isDirectBooking ? finalPrice : (daysUntilTravel <= 30 ? finalPrice : (finalPrice * 0.3).toFixed(2));
+      
+      const paymentRes = await paymentService.processDummyPayment(bookingId, paymentAmount, token);
+
+      if (paymentRes.success) {
+        // Success!
+        sessionStorage.removeItem('booking_step1');
+        sessionStorage.removeItem('booking_travellers');
+
+        navigate(`/booking/${id}/success`, {
+          state: {
+            booking: {
+              ...(isDirectBooking ? existingBooking : null),
+              booking_id: bookingId,
+              total_price: finalPrice,
+              package_name: isDirectBooking ? (existingBooking.package_name || "Custom Tour") : packageData.name
+            }
+          }
+        });
+      } else {
+        throw new Error("Payment failed: " + paymentRes.message);
+      }
+
     } catch (err) {
-      const errorMessage = err.message || "Payment processing failed. Please verify your card details and try again.";
-      
-      // Check if error is due to email not verified
-      if (err.response?.data?.error === 'EMAIL_NOT_VERIFIED' || errorMessage.includes('verify your email')) {
-        alert('Please verify your email before making a booking. Check your inbox for the verification link.');
-        navigate('/profile');
-        return;
-      }
-      
-      setError(errorMessage);
-      console.error(err);
-  if (loading) {
-    return (
-      <div className="booking-payment-container">
-        <div className="loading">Loading payment details...</div>
-      </div>
-    );
-  }
-
-  if (error && !packageData) {
-    return (
-      <div className="booking-payment-container">
-        <div className="error-message">{error}</div>
-        <button onClick={() => navigate("/packages")} className="back-button">
-          Back to Packages
-        </button>
-      </div>
-    );
-  }
-
-      setSubmitting(false);
+      console.error("Booking Error:", err);
+      setError(err.message || "An error occurred during booking.");
+    } finally {
+      setProcessing(false);
     }
   };
 
-  // Render logic
-  if (!bookingData || !packageData) {
-    return (
-      <div className="booking-payment-container">
-        <div className="error-message">Booking data not found</div>
-        <button onClick={() => navigate(`/booking/${id}`)} className="back-button">
-          Start Booking Again
-        </button>
+  if (loading) return <div className="booking-payment-container"><div className="loading">Loading...</div></div>;
+  if (error) return (
+    <div className="booking-payment-container">
+      <div className="error-message">
+        <h3>Error</h3>
+        <p>{error}</p>
+        <button onClick={() => navigate(`/booking/${id}/travellers`)} className="btn-secondary">go back</button>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="booking-payment-container">
       <div className="booking-payment-content">
-        <h1>Payment Details</h1>
+        <h1>Review & Pay</h1>
 
-        <div className="booking-summary">
-          <h2>Booking Summary</h2>
-          <div className="summary-item">
-            <span>Package:</span>
-            <strong>{packageData.name}</strong>
+        {/* Steps - Only show for standard bookings */}
+        {!isDirectBooking && (
+          <div className="steps-indicator" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="step"><div className="step-number" style={{ background: '#e2e8f0', width: 30, height: 30, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>1</div></div>
+            <div className="step"><div className="step-number" style={{ background: '#e2e8f0', width: 30, height: 30, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>2</div></div>
+            <div className="step active" style={{ color: '#3182ce' }}><div className="step-number" style={{ background: '#3182ce', color: 'white', width: 30, height: 30, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>3</div> Payment</div>
           </div>
-          <div className="summary-item">
-            <span>Travel Date:</span>
-            <strong>{new Date(bookingData.travel_date).toLocaleDateString()}</strong>
-          </div>
-          <div className="summary-item">
-            <span>Travelers:</span>
-            <strong>{bookingData.travelers}</strong>
-          </div>
-          <div className="summary-item total">
-            <span>Total Amount:</span>
-            <strong>${bookingData.total_price}</strong>
-          </div>
-        </div>
+        )}
 
-        <form onSubmit={handlePayment} className="payment-form">
-          <div className="payment-header">
-            <Lock size={20} />
-            <h2>Secure Payment</h2>
-          </div>
+        {(() => {
+          const travelDate = new Date(step1Data.travel_date);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
+          const isCloseIn = daysUntilTravel <= 30;
+          const depositAmount = isCloseIn ? step1Data.total_price : (step1Data.total_price * 0.3);
+          const balanceAmount = isCloseIn ? 0 : (step1Data.total_price * 0.7);
 
-          <div className="security-badge">
-            <Lock size={14} />
-            <span>256-bit SSL Encrypted</span>
-          </div>
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
 
-          {error && (
-            <div className="error-alert">{error}</div>
-          )}
+              {/* Left Col: Summary */}
+              <div>
+                <div className="booking-summary">
+                  <h2 style={{ borderBottom: '1px solid #ddd', paddingBottom: '0.5rem' }}>Booking Summary</h2>
 
-          {/* Payment Method Selection */}
-          <div className="payment-methods">
-            <label className="payment-method-option">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="card"
-                checked={paymentMethod === "card"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              <div className="method-content">
-                <CreditCard size={20} />
-                <span>Credit / Debit Card</span>
-              </div>
-            </label>
-          </div>
-
-          {/* Card Payment Form */}
-          {paymentMethod === "card" && (
-            <div className="card-payment-section">
-              <div className="form-group">
-                <label htmlFor="cardNumber">Card Number</label>
-                <div className="card-input-wrapper">
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    value={cardNumber}
-                    onChange={handleCardNumberChange}
-                    placeholder="1234 5678 9012 3456"
-                    required
-                    autoComplete="cc-number"
-                  />
-                  <div className="card-logos">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='20' viewBox='0 0 32 20'%3E%3Crect width='32' height='20' rx='2' fill='%231434CB'/%3E%3Ccircle cx='12' cy='10' r='5' fill='%23EB001B'/%3E%3Ccircle cx='20' cy='10' r='5' fill='%23FF5F00'/%3E%3C/svg%3E" alt="Mastercard" />
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='20' viewBox='0 0 32 20'%3E%3Crect width='32' height='20' rx='2' fill='%230066B2'/%3E%3Cpath d='M13 5h6v10h-6z' fill='%23FFF'/%3E%3C/svg%3E" alt="Visa" />
+                  <div className="summary-item">
+                    <span>Package:</span>
+                    <strong>{isDirectBooking ? (existingBooking?.package_name || "Custom Approved Tour") : (packageData?.name || "Tour Package")}</strong>
                   </div>
+                  <div className="summary-item">
+                    <span>Date:</span>
+                    <strong>{step1Data.travel_date}</strong>
+                  </div>
+                  <div className="summary-item">
+                    <span>Guests:</span>
+                    <strong>{step1Data.adults} Adults, {step1Data.children} Children</strong>
+                  </div>
+                  <div className="summary-item">
+                    <span>Room:</span>
+                    <strong style={{ textTransform: 'capitalize' }}>{isDirectBooking ? "Tailored" : step1Data.room_type}</strong>
+                  </div>
+
+                  {travellers.length > 0 && (
+                    <>
+                      <h3 style={{ marginTop: '1.5rem', fontSize: '1.1rem', color: '#4a5568' }}>Travellers</h3>
+                      <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem', color: '#666' }}>
+                        {travellers.map((t, i) => (
+                          <li key={i} style={{ marginBottom: '0.25rem' }}>
+                            {i + 1}. {t.fullName} ({t.type})
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+
+                  <div className="summary-item total" style={{ borderTop: 'double #ddd', marginTop: '1rem', paddingTop: '1rem' }}>
+                    <span>Total Package Price:</span>
+                    <span>${step1Data.total_price}</span>
+                  </div>
+
+                  {isCloseIn ? (
+                    <div className="summary-item full-payment" style={{ color: '#c53030', fontWeight: 'bold', fontSize: '1.2rem', marginTop: '1rem' }}>
+                      <span>Full Payment Required:</span>
+                      <span>${step1Data.total_price}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="summary-item deposit" style={{ color: '#2e7d32', fontWeight: 'bold', fontSize: '1.2rem', marginTop: '1rem' }}>
+                        <span>Deposit Due Today (30%):</span>
+                        <span>${depositAmount.toFixed(2)}</span>
+                      </div>
+
+                      <div className="summary-item balance" style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+                        <span>Remaining Balance (70%):</span>
+                        <span>${balanceAmount.toFixed(2)}</span>
+                      </div>
+                    </>
+                  )}
+                  
+                  <p style={{ fontSize: '0.8rem', color: '#718096', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                    {isCloseIn 
+                      ? "* Tours starting within 30 days require full payment at the time of booking."
+                      : "* Balance must be paid at least 30 days before departure."}
+                  </p>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="cardName">Cardholder Name</label>
-                <input
-                  type="text"
-                  id="cardName"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  placeholder="JOHN DOE"
-                  required
-                  autoComplete="cc-name"
-                />
-              </div>
+              {/* Right Col: Payment */}
+              <div>
+                <div className="payment-form">
+                  <div className="payment-header">
+                    <Lock size={20} color="#2e7d32" />
+                    <h2>Secure Payment</h2>
+                  </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="expiryDate">Expiry Date</label>
-                  <input
-                    type="text"
-                    id="expiryDate"
-                    value={expiryDate}
-                    onChange={handleExpiryChange}
-                    placeholder="MM/YY"
-                    maxLength="5"
-                    required
-                    autoComplete="cc-exp"
-                  />
-                </div>
+                  <div className="security-badge">
+                    <CheckCircle size={16} />
+                    <span>SSL Encrypted Transaction</span>
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="cvv">CVV</label>
-                  <input
-                    type="text"
-                    id="cvv"
-                    value={cvv}
-                    onChange={handleCvvChange}
-                    placeholder="123"
-                    maxLength="4"
-                    required
-                    autoComplete="cc-csc"
+                  <DummyCheckoutForm
+                    amount={depositAmount.toFixed(2)}
+                    onPay={handlePay}
+                    processing={processing}
                   />
+
+                  <button
+                    onClick={() => isDirectBooking ? navigate('/custom-tours') : navigate(`/booking/${id}/travellers`)}
+                    className="btn-secondary"
+                    style={{ marginTop: '1rem', width: '100%', background: 'transparent', color: '#666', border: '1px solid #ddd' }}
+                    disabled={processing}
+                  >
+                    {isDirectBooking ? "Back to Custom Tours" : "Back to Travellers"}
+                  </button>
                 </div>
               </div>
 
-              <div className="form-group-checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={saveCard}
-                    onChange={(e) => setSaveCard(e.target.checked)}
-                  />
-                  <span>Save card details for future bookings</span>
-                </label>
-              </div>
             </div>
-          )}
+          );
+        })()}
 
-          <div className="payment-terms">
-            <p>
-              By completing this payment, you agree to our{" "}
-              <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms & Conditions</a> and{" "}
-              <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
-            </p>
-          </div>
-
-          <div className="form-actions">
-            <button 
-              type="button" 
-              onClick={() => navigate(`/booking/${id}`)} 
-              className="btn-secondary"
-              disabled={submitting}
-            >
-              Back
-            </button>
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <span className="spinner"></span>
-                  Processing Payment...
-                </>
-              ) : (
-                <>
-                  <Lock size={16} />
-                  Pay ${bookingData.total_price}
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="payment-footer">
-            <Lock size={14} />
-            <span>Your payment information is secure and encrypted</span>
-          </div>
-        </form>
       </div>
     </div>
   );

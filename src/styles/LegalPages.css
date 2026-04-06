@@ -1,0 +1,142 @@
+/* Global Legal Pages Styles - White Theme */
+.legal-page-layout {
+  min-height: 100vh;
+  padding: 120px 20px 80px;
+  background-color: #f8fafc; /* Light slate background */
+  color: #1e293b;
+  position: relative;
+  overflow: hidden;
+}
+
+.legal-page-layout::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: 0;
+}
+
+.legal-container {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.legal-glass-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 60px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+.legal-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.legal-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.legal-subtitle {
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+.legal-section {
+  margin-bottom: 48px;
+}
+
+.legal-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-section-title::before {
+  content: "";
+  width: 4px;
+  height: 24px;
+  background: #2563eb;
+  border-radius: 2px;
+}
+
+.legal-text {
+  color: #475569;
+  line-height: 1.8;
+  font-size: 1.0625rem;
+  margin-bottom: 20px;
+}
+
+.legal-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.legal-list li {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 12px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.legal-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #2563eb;
+  font-weight: bold;
+}
+
+.legal-contact-card {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  margin-top: 40px;
+}
+
+.legal-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #334155;
+}
+
+.legal-contact-item:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .legal-page-layout {
+    padding: 100px 16px 60px;
+  }
+  
+  .legal-glass-panel {
+    padding: 40px 24px;
+  }
+  
+  .legal-title {
+    font-size: 2.25rem;
+  }
+}

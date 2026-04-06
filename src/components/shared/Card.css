@@ -1,0 +1,78 @@
+/* Card Component Styles */
+
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Padding Variants */
+.card-padding-none {
+    padding: 0;
+}
+
+.card-padding-small {
+    padding: 1rem;
+}
+
+.card-padding-medium {
+    padding: 1.5rem;
+}
+
+.card-padding-large {
+    padding: 2rem;
+}
+
+/* Hoverable */
+.card-hoverable {
+    cursor: pointer;
+}
+
+.card-hoverable:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+}
+
+.card-hoverable:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* Gradient Border Top */
+.card-gradient {
+    border-top: 4px solid transparent;
+}
+
+.card-gradient-blue {
+    border-top-color: #2563eb;
+}
+
+.card-gradient-gold {
+    border-top-color: #fbbf24;
+}
+
+.card-gradient-green {
+    border-top-color: #16a34a;
+}
+
+.card-gradient-red {
+    border-top-color: #dc2626;
+}
+
+/* Gradient Hover Enhancement */
+.card-hoverable.card-gradient-blue:hover {
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
+}
+
+.card-hoverable.card-gradient-gold:hover {
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.15);
+}
+
+.card-hoverable.card-gradient-green:hover {
+    box-shadow: 0 10px 30px rgba(22, 163, 74, 0.15);
+}
+
+.card-hoverable.card-gradient-red:hover {
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.15);
+}

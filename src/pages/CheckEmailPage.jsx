@@ -145,7 +145,7 @@ export default function CheckEmailPage() {
         {/* Action Section */}
         <div className="check-email-actions">
           <p className="help-text">Already verified your email?</p>
-          <button className="login-button" onClick={() => navigate("/login")}>
+          <button className="login-button" onClick={() => navigate("/login", { state: { from: location.state?.from } })}>
             Go to Login
           </button>
         </div>

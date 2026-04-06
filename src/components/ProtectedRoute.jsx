@@ -1,22 +1,50 @@
 import { Navigate } from "react-router-dom";
 import { authAPI } from "../services/api";
+import { SESSION_CONFIG } from "../config/session";
 
 /**
  * ProtectedRoute Component
- * Handles role-based route protection
+ * Handles role-based route protection with session validation
  * 
  * @param {Object} props
  * @param {React.ReactNode} props.children - Component to render if authorized
- * @param {string} props.requiredRole - Required role to access route ("admin" | "tourist" | null)
+ * @param {string} props.requiredRole - Required role to access route ("admin" | "tourist" | "guide" | null)
  * @param {string} props.redirectTo - Where to redirect if unauthorized
  */
 function ProtectedRoute({ children, requiredRole = null, redirectTo = "/login" }) {
   const isAuthenticated = authAPI.isAuthenticated();
   const userRole = localStorage.getItem("userRole");
+  const loginTimestamp = localStorage.getItem("loginTimestamp");
+
+  // Validate session hasn't expired
+  const isSessionValid = () => {
+    if (!loginTimestamp) return false;
+
+    const elapsed = Date.now() - parseInt(loginTimestamp);
+    const isExpired = elapsed > SESSION_CONFIG.SESSION_TIMEOUT;
+
+    if (isExpired) {
+      // Session expired, clear everything
+      localStorage.clear();
+      sessionStorage.clear();
+      return false;
+    }
+
+    return true;
+  };
 
   // Not logged in - redirect to login
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
+  }
+
+  // Check if session is still valid
+  if (!isSessionValid()) {
+    return <Navigate
+      to="/login"
+      state={{ error: "Your session has expired. Please log in again." }}
+      replace
+    />;
   }
 
   // Logged in but wrong role - redirect

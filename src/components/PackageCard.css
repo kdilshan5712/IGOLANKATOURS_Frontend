@@ -18,6 +18,26 @@
   position: relative;
   height: 14rem;
   overflow: hidden;
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    90deg,
+    #f6f7f8 0%,
+    #edeef1 20%,
+    #f6f7f8 40%,
+    #f6f7f8 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+  100% {
+    background-position: 800px 0;
+  }
 }
 
 .package-image {
@@ -47,8 +67,8 @@
 
 .package-rating {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -58,6 +78,39 @@
   padding: 0.375rem 0.625rem;
   border-radius: 9999px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Wishlist Button */
+.package-wishlist-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #9ca3af;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.package-wishlist-btn:hover {
+  transform: scale(1.1);
+  color: #ef4444;
+}
+
+.package-wishlist-btn.saved {
+  color: #ef4444;
+}
+
+.package-wishlist-btn.saved svg {
+  fill: currentColor;
 }
 
 .package-rating svg {

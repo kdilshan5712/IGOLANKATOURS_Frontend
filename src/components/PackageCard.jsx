@@ -1,8 +1,18 @@
-import { Star, Clock } from "lucide-react";
+import { Star, Clock, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWishlist } from "../hooks/useWishlist";
 import "./PackageCard.css";
 
 const PackageCard = ({ pkg }) => {
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const isSaved = isInWishlist(pkg.id);
+
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(pkg.id);
+  };
+
   return (
     <div className="package-card">
       {/* Image */}
@@ -11,7 +21,18 @@ const PackageCard = ({ pkg }) => {
           src={pkg.image}
           alt={pkg.name}
           className="package-image"
+          loading="lazy"
         />
+
+        {/* Wishlist Button */}
+        <button
+          className={`package-wishlist-btn ${isSaved ? 'saved' : ''}`}
+          onClick={handleWishlistClick}
+          aria-label={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+          title={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart size={20} className={isSaved ? "fill-current text-red-500" : ""} />
+        </button>
 
         {/* Category */}
         <span className="package-category">
@@ -50,12 +71,17 @@ const PackageCard = ({ pkg }) => {
           <div>
             <span className="package-price-label">From</span>
             <div className="package-price">
-              ${pkg.price}
+              ${pkg.currentPrice || pkg.price}
               <span className="package-price-per">
                 {" "}
                 / person
               </span>
             </div>
+            {pkg.seasonLabel && (
+              <div className="package-season-label" style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>
+                {pkg.seasonLabel} Pricing
+              </div>
+            )}
           </div>
 
           <div className="package-actions">

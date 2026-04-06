@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { userAPI, authAPI } from "../services/api";
-import { Mail, AlertCircle } from "lucide-react";
+import { Mail, AlertCircle, Camera, Trash2, Loader } from "lucide-react";
 import "./UserProfile.css";
 
 const UserProfile = () => {
@@ -9,6 +9,8 @@ const UserProfile = () => {
   const [error, setError] = useState(null);
   const [resendingVerification, setResendingVerification] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
+  const [uploadingInfo, setUploadingInfo] = useState({ uploading: false, message: "" });
+  const fileInputRef = useRef(null);
   const currentUser = authAPI.getCurrentUser();
 
   useEffect(() => {
@@ -55,6 +57,69 @@ const UserProfile = () => {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
+    setUploadingInfo({ uploading: true, message: "Uploading..." });
+    try {
+      const response = await userAPI.uploadProfilePhoto(file, localStorage.getItem('token'));
+      if (response.success) {
+        const updatedPhoto = response.profile_photo;
+        setProfile({ ...profile, profile_photo: updatedPhoto });
+        
+        // Update local storage user session
+        authAPI.updateCurrentUser({ profile_photo: updatedPhoto });
+        
+        setUploadingInfo({ uploading: false, message: "Photo updated!" });
+        setTimeout(() => setUploadingInfo({ uploading: false, message: "" }), 3000);
+      } else {
+        alert(response.message || "Failed to upload photo");
+        setUploadingInfo({ uploading: false, message: "" });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to connect");
+      setUploadingInfo({ uploading: false, message: "" });
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handlePhotoDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete your profile photo?")) return;
+
+    setUploadingInfo({ uploading: true, message: "Deleting..." });
+    try {
+      const response = await userAPI.deleteProfilePhoto(localStorage.getItem('token'));
+      if (response.success) {
+        setProfile({ ...profile, profile_photo: null });
+        
+        // Update local storage user session
+        authAPI.updateCurrentUser({ profile_photo: null });
+        
+        setUploadingInfo({ uploading: false, message: "Photo deleted!" });
+        setTimeout(() => setUploadingInfo({ uploading: false, message: "" }), 3000);
+      } else {
+        alert(response.message || "Failed to delete photo");
+        setUploadingInfo({ uploading: false, message: "" });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to connect");
+      setUploadingInfo({ uploading: false, message: "" });
+    }
+  };
+
   if (loading) {
     return (
       <div className="profile-container">
@@ -92,8 +157,8 @@ const UserProfile = () => {
               )}
             </div>
           </div>
-          <button 
-            onClick={handleResendVerification} 
+          <button
+            onClick={handleResendVerification}
             disabled={resendingVerification}
             className="resend-btn"
           >
@@ -104,10 +169,50 @@ const UserProfile = () => {
       )}
 
       <div className="profile-card">
-        <div className="profile-avatar">
-          <div className="avatar-circle">
-            {profile?.first_name?.charAt(0) || "U"}
+        <div className="profile-avatar-section">
+          <div className="profile-avatar">
+            <div className="avatar-wrapper">
+              {profile?.profile_photo ? (
+                <img src={profile.profile_photo} alt="Profile" className="avatar-image" />
+              ) : (
+                <div className="avatar-circle">
+                  {profile?.first_name?.charAt(0) || "U"}
+                </div>
+              )}
+
+              <div className="avatar-overlay">
+                <button
+                  className="avatar-action-btn upload-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload Photo"
+                >
+                  <Camera size={20} />
+                </button>
+                {profile?.profile_photo && (
+                  <button
+                    className="avatar-action-btn delete-btn"
+                    onClick={handlePhotoDelete}
+                    title="Remove Photo"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                )}
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+            </div>
           </div>
+          {uploadingInfo.message && (
+            <div className={`avatar-status ${uploadingInfo.uploading ? 'uploading' : 'success'}`}>
+              {uploadingInfo.uploading && <Loader size={14} className="spin-icon" />}
+              <span>{uploadingInfo.message}</span>
+            </div>
+          )}
         </div>
 
         <div className="profile-details">

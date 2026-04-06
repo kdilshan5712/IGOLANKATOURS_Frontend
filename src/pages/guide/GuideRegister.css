@@ -1,8 +1,8 @@
-/* Guide Register Page Styles */
+/* GuideRegister Styles */
 
 .guide-register-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
   padding-top: 7rem;
   padding-bottom: 5rem;
   display: flex;
@@ -11,17 +11,16 @@
 }
 
 .guide-register-container {
-  max-width: 28rem;
-  width: 90%;
+  max-width: 32rem;
+  width: 100%;
   padding: 0 1.5rem;
 }
 
 .guide-register-card {
   background-color: #ffffff;
-  padding: 2.5rem;
   border-radius: 1rem;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .guide-register-header {
@@ -32,8 +31,9 @@
 .guide-register-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #111827;
+  color: #1f2937;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
 }
 
 .guide-register-subtitle {
@@ -46,11 +46,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background-color: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #991b1b;
   border-radius: 0.5rem;
   font-size: 0.875rem;
   margin-bottom: 1.25rem;
+  border: 1px solid #fca5a5;
 }
 
 .guide-register-error svg {
@@ -63,53 +64,77 @@
 }
 
 .guide-register-form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .guide-register-label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
+  font-size: 0.875rem;
 }
 
 .guide-register-label svg {
-  color: #d97706;
+  color: #fbbf24;
 }
 
-.guide-register-input-wrapper {
+.guide-register-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.guide-register-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.guide-register-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Password Wrapper */
+.guide-password-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.guide-register-input-icon {
+.guide-password-wrapper .guide-register-input {
+  padding-right: 3rem;
+}
+
+.guide-password-toggle {
   position: absolute;
-  left: 1rem;
-  color: #d97706;
-  pointer-events: none;
-  flex-shrink: 0;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.guide-register-input {
-  width: 90%;
-  padding: 0.75rem 1rem 0.75rem 3rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  transition: all 0.3s;
+.guide-password-toggle:hover {
+  color: #fbbf24;
+  background-color: #fffbeb;
 }
 
-.guide-register-input:focus {
+.guide-password-toggle:focus {
   outline: none;
-  border-color: #d97706;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
-}
-
-.guide-register-input.error {
-  border-color: #dc2626;
+  color: #fbbf24;
 }
 
 .guide-password-hint {
@@ -120,133 +145,9 @@
   line-height: 1.4;
 }
 
-/* Password Strength Indicator */
-.guide-register-password-strength {
+.guide-register-button-full {
+  width: 100%;
   margin-top: 0.5rem;
-}
-
-.guide-register-strength-bar {
-  width: 100%;
-  height: 0.375rem;
-  background-color: #e5e7eb;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
-}
-
-.guide-register-strength-fill {
-  height: 100%;
-  width: 0%;
-  transition: all 0.3s;
-  border-radius: 0.25rem;
-}
-
-.guide-register-strength-fill.weak {
-  width: 33%;
-  background-color: #dc2626;
-}
-
-.guide-register-strength-fill.fair {
-  width: 66%;
-  background-color: #f59e0b;
-}
-
-.guide-register-strength-fill.good {
-  width: 100%;
-  background-color: #10b981;
-}
-
-.guide-register-strength-text {
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.guide-register-strength-text.weak {
-  color: #dc2626;
-}
-
-.guide-register-strength-text.fair {
-  color: #f59e0b;
-}
-
-.guide-register-strength-text.good {
-  color: #10b981;
-}
-
-.guide-register-strength-indicator {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.guide-register-requirements {
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin-top: 0.625rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-}
-
-.guide-register-requirement {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.375rem;
-}
-
-.guide-register-requirement:last-child {
-  margin-bottom: 0;
-}
-
-.guide-register-requirement-check {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  flex-shrink: 0;
-}
-
-.guide-register-requirement.met .guide-register-requirement-check {
-  background-color: #10b981;
-  color: #ffffff;
-}
-
-.guide-register-requirement.unmet .guide-register-requirement-check {
-  background-color: #e5e7eb;
-  color: #6b7280;
-}
-
-.guide-register-button {
-  width: 100%;
-  padding: 0.875rem 1.5rem;
-  background-color: #d97706;
-  color: #ffffff;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-top: 0.5rem;
-}
-
-.guide-register-button:hover:not(:disabled) {
-  background-color: #b45309;
-  transform: translateY(-2px);
-}
-
-.guide-register-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .guide-register-footer {
@@ -261,30 +162,34 @@
   font-size: 0.9375rem;
 }
 
-.guide-register-footer-link {
-  color: #d97706;
+.guide-register-link {
+  color: #fbbf24;
   font-weight: 500;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.2s ease;
 }
 
-.guide-register-footer-link:hover {
-  color: #b45309;
+.guide-register-link:hover {
+  color: #f59e0b;
   text-decoration: underline;
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .guide-register-page {
     padding-top: 5rem;
     padding-bottom: 3rem;
   }
 
-  .guide-register-card {
-    padding: 2rem 1.5rem;
+  .guide-register-container {
+    max-width: 28rem;
   }
 
   .guide-register-title {
     font-size: 1.5rem;
+  }
+
+  .guide-register-subtitle {
+    font-size: 0.875rem;
   }
 }

@@ -51,7 +51,7 @@
   object-fit: cover;
 }
 
-.status-badge {
+.booking-card .status-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;

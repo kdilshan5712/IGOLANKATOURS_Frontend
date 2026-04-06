@@ -1,4 +1,5 @@
 import { CheckCircle, Award, Users, HeartHandshake } from "lucide-react";
+import SEO from "../components/SEO";
 import "./AboutPage.css";
 
 const AboutPage = () => {
@@ -27,6 +28,11 @@ const AboutPage = () => {
 
   return (
     <main className="about-page">
+      <SEO 
+        title="About Us"
+        description="Learn more about I GO LANKA TOURS, our mission, and our founder Indika Sampath. We provide authentic and personalized Sri Lankan travel experiences."
+        keywords="about I GO LANKA TOURS, Sri Lanka tour operator, Indika Sampath, Sri Lanka travel agency"
+      />
       <div className="about-page-container">
         {/* Hero Section */}
         <div className="about-hero">

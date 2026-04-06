@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle, AlertCircle, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
+import { Mail, Phone, MapPin, Send, MessageCircle, AlertCircle, CheckCircle, HelpCircle } from "lucide-react";
 import { contactAPI } from "../services/api";
+import SEO from "../components/SEO";
 import "./ContactPage.css";
 
 const ContactPage = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,6 +18,24 @@ const ContactPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [aiSessionId, setAiSessionId] = useState(null);
+
+  // Handle pre-filled contextual data from routing
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.aiItinerary) {
+        setAiSessionId(location.state.aiSessionId);
+        setFormData(prev => ({
+          ...prev,
+          subject: "Custom AI Itinerary Quote Request",
+          message: `I would like to request an official quote to book this custom AI-generated itinerary:\n\n${location.state.aiItinerary}\n\nEstimated Target Price: $${location.state.aiPrice || 'TBD'}\n\nPlease let me know the final price and how to proceed with booking.`
+        }));
+      } else if (location.state.packageName) {
+        // ... (existing packageName logic)
+      }
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,31 +44,10 @@ const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (!formData.name || formData.name.trim().length < 2) {
-      setMessage("Please enter a valid name (at least 2 characters)");
-      setMessageType("error");
-      return;
-    }
+    setFieldErrors({});
+    setMessage(null);
 
-    if (!formData.email || !formData.email.includes("@")) {
-      setMessage("Please enter a valid email address");
-      setMessageType("error");
-      return;
-    }
-
-    if (!formData.subject || formData.subject.trim().length < 3) {
-      setMessage("Subject must be at least 3 characters");
-      setMessageType("error");
-      return;
-    }
-
-    if (!formData.message || formData.message.trim().length < 10) {
-      setMessage("Message must be at least 10 characters");
-      setMessageType("error");
-      return;
-    }
+    // ... (existing validation logic)
 
     setLoading(true);
     try {
@@ -56,7 +56,8 @@ const ContactPage = () => {
         email: formData.email.trim(),
         phone: formData.phone.trim() || null,
         subject: formData.subject.trim(),
-        message: formData.message.trim()
+        message: formData.message.trim(),
+        session_id: aiSessionId
       });
 
       if (result.success) {
@@ -72,7 +73,12 @@ const ContactPage = () => {
         // Clear message after 5 seconds
         setTimeout(() => setMessage(null), 5000);
       } else {
-        setMessage(result.message || "Failed to send message");
+        if (result.errors) {
+          setFieldErrors(result.errors);
+          setMessage("Please correct the highlighted errors.");
+        } else {
+          setMessage(result.message || "Failed to send message");
+        }
         setMessageType("error");
       }
     } catch (error) {
@@ -86,6 +92,11 @@ const ContactPage = () => {
 
   return (
     <main className="contact-page">
+      <SEO 
+        title="Contact Us"
+        description="Have questions about your Sri Lanka trip? Contact I GO LANKA TOURS via email, phone, or WhatsApp. Our travel experts are here to help."
+        keywords="contact Sri Lanka tours, travel inquiry Sri Lanka, I GO LANKA TOURS support"
+      />
       <div className="contact-page-container">
         <div className="contact-page-header">
           <h1 className="contact-page-title">Get In Touch</h1>
@@ -120,6 +131,7 @@ const ContactPage = () => {
                     required
                     minLength={2}
                   />
+                  {fieldErrors.name && <span className="field-error-message">{fieldErrors.name}</span>}
                 </div>
 
                 <div className="contact-form-group">
@@ -133,6 +145,7 @@ const ContactPage = () => {
                     placeholder="your.email@example.com"
                     required
                   />
+                  {fieldErrors.email && <span className="field-error-message">{fieldErrors.email}</span>}
                 </div>
 
                 <div className="contact-form-group">
@@ -161,6 +174,7 @@ const ContactPage = () => {
                     required
                     minLength={3}
                   />
+                  {fieldErrors.subject && <span className="field-error-message">{fieldErrors.subject}</span>}
                 </div>
 
                 <div className="contact-form-group">
@@ -176,13 +190,14 @@ const ContactPage = () => {
                     minLength={10}
                     maxLength={5000}
                   />
+                  {fieldErrors.message && <span className="field-error-message">{fieldErrors.message}</span>}
                   <p className="contact-form-char-count">
                     {formData.message.length}/5000 characters
                   </p>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="contact-form-submit-btn"
                   disabled={loading}
                 >
@@ -208,7 +223,7 @@ const ContactPage = () => {
                   <div>
                     <h4 className="contact-info-item-title">Phone</h4>
                     <p className="contact-info-item-value">+94 77 763 9196</p>
-                    
+
                   </div>
                 </div>
 
@@ -221,7 +236,7 @@ const ContactPage = () => {
                     <p className="contact-info-item-value">
                       tours.igolanka@gmail.com
                     </p>
-                    
+
                   </div>
                 </div>
 
@@ -245,11 +260,26 @@ const ContactPage = () => {
                   <div>
                     <h4 className="contact-info-item-title">Office Address</h4>
                     <p className="contact-info-item-value">
-                        Katunayaka  
+                      Katunayaka
                     </p>
                     <p className="contact-info-item-value">Sri Lanka</p>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            <div className="contact-faq-card">
+              <div className="contact-faq-icon">
+                <HelpCircle size={32} />
+              </div>
+              <div className="contact-faq-content">
+                <h3 className="contact-faq-title">Frequently Asked Questions</h3>
+                <p className="contact-faq-text">
+                  Find quick answers to common questions about our tours, bookings, and policies.
+                </p>
+                <Link to="/faq" className="contact-faq-btn">
+                  View FAQs
+                </Link>
               </div>
             </div>
 

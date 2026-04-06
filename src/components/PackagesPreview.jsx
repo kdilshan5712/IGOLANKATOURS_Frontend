@@ -9,7 +9,7 @@ const PackagesPreview = () => {
       id: 1,
       name: "Classic Sri Lanka Tour",
       image:
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800",
       rating: 4.9,
       duration: "7 Days",
       price: 899,
@@ -21,7 +21,7 @@ const PackagesPreview = () => {
       id: 2,
       name: "Adventure & Nature Escape",
       image:
-        "https://images.unsplash.com/photo-1568219656418-15c329312bf1?q=80&w=2070",
+        "https://images.unsplash.com/photo-1568219656418-15c329312bf1?q=80&w=800",
       rating: 4.8,
       duration: "5 Days",
       price: 699,
@@ -33,7 +33,7 @@ const PackagesPreview = () => {
       id: 3,
       name: "Luxury Beach & Spa Retreat",
       image:
-        "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
+        "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=800",
       rating: 5.0,
       duration: "4 Days",
       price: 1299,

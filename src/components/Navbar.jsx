@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Heart } from "lucide-react";
 import { authAPI } from "../services/api";
-import Logo from "../assets/Logo.jpg";
+import { useWishlist } from "../hooks/useWishlist";
+import NotificationBell from "./NotificationBell";
+
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -10,6 +12,8 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
+  const { getWishlistCount } = useWishlist();
+  const wishlistCount = getWishlistCount();
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 60);
@@ -46,7 +50,7 @@ const Navbar = () => {
         <div className="navbar-content">
           {/* Logo */}
           <Link to="/" className="navbar-logo">
-            <img src={Logo} alt="I GO LANKA TOURS" className="navbar-logo-image" />
+            <img src="https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/Logo.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9Mb2dvLmpwZyIsImlhdCI6MTc3MDEzMzM2MywiZXhwIjoxOTI3ODEzMzYzfQ.2qbZSGwqCn0kGlcKWf8B1p5BQzYFVnUeXXJy-k2mRIA" alt="I GO LANKA TOURS" className="navbar-logo-image" />
             <div className="navbar-logo-text-container">
               <span className={`navbar-logo-text ${isScrolled ? "scrolled" : "transparent"}`}>
                 I GO LANKA
@@ -62,7 +66,7 @@ const Navbar = () => {
                 key={link.name}
                 to={link.to}
                 className={({ isActive }) =>
-                  `nav-link ${isScrolled ? "scrolled" : "transparent"} ${isActive ? "active" : ""}`
+                  `nav-link ${isScrolled ? "scrolled" : "transparent"} ${isActive ? "nav-item-active" : ""}`
                 }
               >
                 {link.name}
@@ -72,45 +76,73 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="navbar-cta">
+            {/* Wishlist Icon */}
+            <Link to="/wishlist" className={`navbar-wishlist-icon ${isScrolled ? "scrolled" : "transparent"}`} aria-label="Wishlist">
+              <Heart size={20} />
+              {wishlistCount > 0 && (
+                <span className="navbar-wishlist-badge">{wishlistCount}</span>
+              )}
+            </Link>
+
             {isLoggedIn ? (
-              <div className="navbar-user-menu">
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={`user-menu-button ${isScrolled ? "scrolled" : "transparent"}`}
-                >
-                  <User size={18} />
-                  <span>{currentUser?.name || "Account"}</span>
-                </button>
-                {showUserMenu && (
-                  <div className="user-dropdown">
-                    {userRole !== "admin" && (
-                      <Link
-                        to="/my-bookings"
-                        onClick={() => setShowUserMenu(false)}
-                        className="user-dropdown-item"
+              <>
+                <NotificationBell />
+                <div className="navbar-user-menu">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className={`user-menu-button ${isScrolled ? "scrolled" : "transparent"}`}
+                  >
+                    <User size={18} />
+                    <span>{currentUser?.name || "Account"}</span>
+                  </button>
+                  {showUserMenu && (
+                    <div className="user-dropdown">
+                      {userRole === "tourist" && (
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setShowUserMenu(false)}
+                          className="user-dropdown-item"
+                        >
+                          Dashboard
+                        </Link>
+                      )}
+                      {userRole === "guide" && (
+                        <Link
+                          to={
+                            currentUser?.status === 'active' 
+                              ? "/guide/dashboard" 
+                              : currentUser?.hasUploadedDocuments === false 
+                                ? "/guide/documents" 
+                                : currentUser?.isRejected 
+                                  ? "/guide/rejected"
+                                  : "/guide/pending"
+                          }
+                          onClick={() => setShowUserMenu(false)}
+                          className="user-dropdown-item"
+                        >
+                          {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
+                        </Link>
+                      )}
+                      {userRole === "admin" && (
+                        <Link
+                          to="/admin/dashboard"
+                          onClick={() => setShowUserMenu(false)}
+                          className="user-dropdown-item"
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="user-dropdown-item logout"
                       >
-                        My Bookings
-                      </Link>
-                    )}
-                    {userRole === "admin" && (
-                      <Link
-                        to="/admin/dashboard"
-                        onClick={() => setShowUserMenu(false)}
-                        className="user-dropdown-item"
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="user-dropdown-item logout"
-                    >
-                      <LogOut size={16} />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+                        <LogOut size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <Link
                 to="/login"
@@ -142,23 +174,52 @@ const Navbar = () => {
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `mobile-nav-link ${isActive ? "active" : ""}`
+                    `mobile-nav-link ${isActive ? "nav-item-active" : ""}`
                   }
                 >
                   {link.name}
                 </NavLink>
               ))}
+
+              <Link
+                to="/wishlist"
+                onClick={() => setMobileOpen(false)}
+                className="mobile-nav-link"
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                Wishlist
+                {wishlistCount > 0 && (
+                  <span className="mobile-wishlist-badge">{wishlistCount}</span>
+                )}
+              </Link>
             </div>
 
             {isLoggedIn ? (
               <>
-                {userRole !== "admin" && (
+                {userRole === "tourist" && (
                   <Link
-                    to="/my-bookings"
+                    to="/dashboard"
                     onClick={() => setMobileOpen(false)}
                     className="mobile-cta"
                   >
-                    My Bookings
+                    Dashboard
+                  </Link>
+                )}
+                {userRole === "guide" && (
+                  <Link
+                    to={
+                      currentUser?.status === 'active' 
+                        ? "/guide/dashboard" 
+                        : currentUser?.hasUploadedDocuments === false 
+                          ? "/guide/documents" 
+                          : currentUser?.isRejected 
+                            ? "/guide/rejected"
+                            : "/guide/pending"
+                    }
+                    onClick={() => setMobileOpen(false)}
+                    className="mobile-cta"
+                  >
+                    {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
                   </Link>
                 )}
                 {userRole === "admin" && (

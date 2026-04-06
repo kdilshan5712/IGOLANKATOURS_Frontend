@@ -1,16 +1,26 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { packageAPI, authAPI } from "../services/api";
 import "./BookingStartPage.css";
 
 const BookingStartPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [packageData, setPackageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [travelDate, setTravelDate] = useState("");
-  const [travelers, setTravelers] = useState(1);
+
+  // Form State
+  // Initialize from location state if coming back, or defaults
+  const [travelDate, setTravelDate] = useState(location.state?.travelDate || "");
+  const [adults, setAdults] = useState(location.state?.adults || 1);
+  const [children, setChildren] = useState(location.state?.children || 0);
+  const [roomType, setRoomType] = useState(location.state?.roomType || 'double');
+  const [specialRequests, setSpecialRequests] = useState(location.state?.specialRequests || '');
+
+  const [calculatedPrice, setCalculatedPrice] = useState(location.state?.pricing_data || null);
+  const [calculating, setCalculating] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
@@ -20,7 +30,7 @@ const BookingStartPage = () => {
       return;
     }
 
-    // Check if email is verified
+    // Enforce email verification
     const user = authAPI.getCurrentUser();
     if (user && user.email_verified === false) {
       alert('Please verify your email before making a booking. Check your inbox for the verification link.');
@@ -49,11 +59,35 @@ const BookingStartPage = () => {
     fetchPackage();
   }, [id, navigate]);
 
+
+  // Recalculate price when inputs change
+  useEffect(() => {
+    if (!packageData || !travelDate) return;
+
+    // Use a debounce or simple check to avoid excessive calls
+    const getPrice = async () => {
+      setCalculating(true);
+      try {
+        const res = await packageAPI.calculatePrice(id, travelDate, adults, children);
+        if (res.success) {
+          setCalculatedPrice(res.pricing);
+        }
+      } catch (e) {
+        console.error("Price calc error", e);
+      } finally {
+        setCalculating(false);
+      }
+    };
+
+    const timer = setTimeout(getPrice, 500);
+    return () => clearTimeout(timer);
+  }, [id, packageData, travelDate, adults, children]); // roomType doesn't affect price currently, but could
+
   const handleContinue = (e) => {
     e.preventDefault();
 
-    if (!travelDate || !travelers) {
-      alert("Please fill in all fields");
+    if (!travelDate) {
+      alert("Please select a travel date");
       return;
     }
 
@@ -67,21 +101,31 @@ const BookingStartPage = () => {
       return;
     }
 
-    // Store booking data in sessionStorage for refresh safety
-    sessionStorage.setItem('bookingData', JSON.stringify({
+    // Store booking data in sessionStorage for next steps
+    // We use sessionStorage to persist across the multi-step flow
+    // location.state is also passed for immediate transition
+    const bookingData = {
       package_id: packageData.package_id,
+      package_name: packageData.name, // useful for UI
       travel_date: travelDate,
-      travelers: travelers,
-      total_price: packageData.price * travelers
-    }));
+      adults: parseInt(adults),
+      children: parseInt(children),
+      room_type: roomType,
+      special_requests: specialRequests,
+      pricing_data: calculatedPrice,
+      total_price: calculatedPrice ? calculatedPrice.totalPrice : 0
+    };
 
-    navigate(`/booking/${id}/payment`);
+    sessionStorage.setItem('booking_step1', JSON.stringify(bookingData));
+
+    // Navigate to Step 2: Traveller Info
+    navigate(`/booking/${id}/travellers`);
   };
 
   if (loading) {
     return (
       <div className="booking-start-container">
-        <div className="loading">Loading package details...</div>
+        <div className="loading-container">Loading package details...</div>
       </div>
     );
   }
@@ -89,38 +133,40 @@ const BookingStartPage = () => {
   if (error || !packageData) {
     return (
       <div className="booking-start-container">
-        <div className="error-message">{error || "Package not found"}</div>
-        <button onClick={() => navigate("/packages")} className="back-button">
-          Back to Packages
-        </button>
+        <div className="error-container">
+          <h2>{error || "Package not found"}</h2>
+          <button onClick={() => navigate("/packages")} className="btn-secondary">
+            Back to Packages
+          </button>
+        </div>
       </div>
     );
   }
 
-  const totalPrice = packageData.price * travelers;
   const minDate = new Date().toISOString().split('T')[0];
 
   return (
     <div className="booking-start-container">
       <div className="booking-start-content">
-        <h1>Book Your Tour</h1>
+        <h1>Booking Details</h1>
 
         <div className="package-summary">
-          <img 
-            src={packageData.image_url || packageData.image} 
+          <img
+            src={packageData.image_url || packageData.image}
             alt={packageData.name}
             className="package-image"
           />
           <div className="package-info">
             <h2>{packageData.name}</h2>
-            <p className="package-duration">{packageData.duration}</p>
-            <p className="package-price">${packageData.price} per person</p>
+            <p className="package-duration">⏱️ {packageData.duration}</p>
+            <p className="package-duration">📍 {packageData.category} | {packageData.budget} budget</p>
           </div>
         </div>
 
         <form onSubmit={handleContinue} className="booking-form">
+
           <div className="form-group">
-            <label htmlFor="travelDate">Travel Date</label>
+            <label htmlFor="travelDate">Travel Start Date</label>
             <input
               type="date"
               id="travelDate"
@@ -131,47 +177,128 @@ const BookingStartPage = () => {
             />
           </div>
 
+          <div className="form-grid">
+            <div className="form-group">
+              <label htmlFor="adults">Adults (16+ yrs)</label>
+              <input
+                type="number"
+                id="adults"
+                value={adults}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Allow empty string for better typing experience
+                  if (val === "") {
+                    setAdults("");
+                    return;
+                  }
+                  const num = parseInt(val);
+                  setAdults(isNaN(num) ? 1 : num);
+                }}
+                onBlur={() => {
+                  // Ensure minimum of 1 on blur
+                  if (adults === "" || adults < 1) setAdults(1);
+                }}
+                min="1"
+                max="20"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="children">Children (Under 16)</label>
+              <input
+                type="number"
+                id="children"
+                value={children}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "") {
+                    setChildren("");
+                    return;
+                  }
+                  const num = parseInt(val);
+                  setChildren(isNaN(num) ? 0 : num);
+                }}
+                onBlur={() => {
+                  if (children === "" || children < 0) setChildren(0);
+                }}
+                min="0"
+                max="10"
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+              <span className="input-hint">50% discount applies</span>
+            </div>
+          </div>
+
           <div className="form-group">
-            <label htmlFor="travelers">Number of Travelers</label>
-            <input
-              type="number"
-              id="travelers"
-              value={travelers}
-              onChange={(e) => setTravelers(parseInt(e.target.value) || 1)}
-              min="1"
-              max="20"
-              required
+            <label htmlFor="roomType">Room Preference</label>
+            <select
+              id="roomType"
+              value={roomType}
+              onChange={(e) => setRoomType(e.target.value)}
+            >
+              <option value="single">Single Room</option>
+              <option value="double">Double Room (Standard)</option>
+              <option value="family">Family Room</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="specialRequests">Special Requests (Optional)</label>
+            <textarea
+              id="specialRequests"
+              value={specialRequests}
+              onChange={(e) => setSpecialRequests(e.target.value)}
+              placeholder="Dietary restrictions, flight details, or any other requests..."
             />
           </div>
 
-          <div className="price-summary">
-            <div className="price-row">
-              <span>Price per person:</span>
-              <span>${packageData.price}</span>
+          {/* Pricing Summary */}
+          {calculatedPrice && (
+            <div className="price-summary">
+              <div className="price-row">
+                <span>Adults ({adults} × ${calculatedPrice.adultPrice / adults}):</span>
+                <span>${calculatedPrice.adultPrice}</span>
+              </div>
+              {children > 0 && (
+                <div className="price-row">
+                  <span>Children ({children} × ${calculatedPrice.childPrice / children}):</span>
+                  <span>${calculatedPrice.childPrice}</span>
+                </div>
+              )}
+
+              {calculatedPrice.seasonLabel && calculatedPrice.seasonLabel !== 'Standard' && (
+                <div className="price-row">
+                  <span>Season Adjustment:</span>
+                  <span className="season-badge">{calculatedPrice.seasonLabel}</span>
+                </div>
+              )}
+
+              <div className="price-row total">
+                <span>Total Amount:</span>
+                <span>
+                  {calculating ? "Calculating..." : `$${calculatedPrice.totalPrice.toLocaleString()}`}
+                </span>
+              </div>
             </div>
-            <div className="price-row">
-              <span>Number of travelers:</span>
-              <span>{travelers}</span>
-            </div>
-            <div className="price-row total">
-              <span>Total Price:</span>
-              <span>${totalPrice}</span>
-            </div>
-          </div>
+          )}
 
           <div className="form-actions">
-            <button 
-              type="button" 
-              onClick={() => navigate(`/packages/${id}`)} 
+            <button
+              type="button"
+              onClick={() => navigate(`/packages/${id}`)}
               className="btn-secondary"
             >
               Back
             </button>
-            <button type="submit" className="btn-primary">
-              Continue to Payment
+            <button type="submit" className="btn-primary" disabled={!travelDate || calculating}>
+              Continue to Traveller Info →
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );

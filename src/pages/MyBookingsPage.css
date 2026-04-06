@@ -33,6 +33,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -259,14 +260,14 @@
 
 .booking-action-btn {
   flex: 1;
-  min-width: 120px;
+  min-width: 100px;
   padding: 0.625rem 1rem;
-  border: none;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
 .booking-action-view {
@@ -425,6 +426,34 @@
 .booking-action-cancel:hover {
   background: #fee2e2;
 }
+
+/* Invoice Download Button */
+.booking-action-invoice {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  color: white;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 3px 8px rgba(8, 145, 178, 0.25);
+}
+
+.booking-action-invoice:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+  box-shadow: 0 6px 14px rgba(8, 145, 178, 0.35);
+  transform: translateY(-2px);
+}
+
+.booking-action-invoice:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 
 /* Cancellation Modal */
 .modal-overlay {

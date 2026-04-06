@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Calendar, Clock, AlertCircle, Eye, Download } from "lucide-react";
-import { guideAPI } from "../../services/api";
+import { MapPin, Calendar, User, MessageCircle, Phone, CheckCircle } from "lucide-react";
+import { getGuideBookings, markTourCompleted } from "../../services/api";
+import TourChatWindow from "../../components/TourChatWindow";
 import "./GuideBookings.css";
 
 const GuideBookingsPage = () => {
@@ -9,7 +10,8 @@ const GuideBookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [submittingId, setSubmittingId] = useState(null);
+  const [activeChatBookingId, setActiveChatBookingId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -25,13 +27,14 @@ const GuideBookingsPage = () => {
 
   const fetchBookings = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await guideAPI.getBookings(token);
-      
+      const response = await getGuideBookings();
+
+      console.log("Guide bookings response:", response);
+
       if (response.success) {
         setBookings(response.bookings || []);
       } else {
-        setError("Failed to load bookings");
+        setError(response.message || "Failed to load bookings");
       }
     } catch (err) {
       console.error("Fetch bookings error:", err);
@@ -41,189 +44,236 @@ const GuideBookingsPage = () => {
     }
   };
 
-  const handleMarkInProgress = async (bookingId) => {
-    const token = localStorage.getItem("token");
-    const response = await guideAPI.updateBookingStatus(bookingId, "in_progress", token);
-    
-    if (response.success) {
-      fetchBookings(); // Refresh bookings
-    }
-  };
-
   const handleMarkCompleted = async (bookingId) => {
-    const token = localStorage.getItem("token");
-    const response = await guideAPI.updateBookingStatus(bookingId, "completed", token);
-    
-    if (response.success) {
-      fetchBookings(); // Refresh bookings
+    if (!window.confirm("Are you sure you want to mark this tour as completed?")) return;
+
+    setSubmittingId(bookingId);
+    try {
+      const response = await markTourCompleted(bookingId);
+      if (response.success) {
+        fetchBookings();
+      } else {
+        setError(response.message || "Failed to mark tour as completed");
+      }
+    } catch (err) {
+      console.error("Complete tour error:", err);
+      setError("Failed to mark tour as completed");
+    } finally {
+      setSubmittingId(null);
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    if (window.confirm("Are you sure you want to cancel this booking?")) {
-      const token = localStorage.getItem("token");
-      const response = await guideAPI.updateBookingStatus(bookingId, "cancelled", token);
-      
-      if (response.success) {
-        fetchBookings(); // Refresh bookings
+  const getStatusColor = (status) => {
+    const colors = {
+      confirmed: "#10b981",
+      pending: "#f59e0b",
+      completed: "#3b82f6",
+      cancelled: "#ef4444"
+    };
+    return colors[status] || "#6b7280";
+  };
+
+  const isTourComplete = (travelDateStr, durationStr) => {
+    const travelDate = new Date(travelDateStr);
+    let durationDays = 1;
+    if (durationStr) {
+      const durationMatch = String(durationStr).match(/\d+/);
+      if (durationMatch) {
+        durationDays = parseInt(durationMatch[0], 10);
       }
     }
-  };
+    const endDate = new Date(travelDate);
+    endDate.setDate(endDate.getDate() + durationDays - 1);
 
-  const handleViewItinerary = (booking) => {
-    // UI-only: Show itinerary details (backend integration pending)
-    alert(`Itinerary for ${booking.title}\n\nLocation: ${booking.location}\nDate: ${booking.date}\nTime: ${booking.time}\n\nFull itinerary details will be loaded from backend.`);
-  };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
 
-  const handleDownloadItinerary = (booking) => {
-    // UI-only: Download PDF placeholder (backend integration pending)
-    alert(`Downloading PDF itinerary for:\n${booking.title}\n\nPDF generation will be handled by backend.`);
+    return today >= endDate;
   };
-
-  // Filter bookings by status
-  const filteredBookings = statusFilter === "all" 
-    ? bookings 
-    : bookings.filter(b => b.status === statusFilter);
 
   if (loading) {
     return (
-      <main className="guide-bookings-page">
-        <div className="guide-bookings-loading">Loading...</div>
-      </main>
+      <div className="guide-bookings-page">
+        <div className="loading">Loading your assigned tours...</div>
+      </div>
     );
   }
 
   return (
-    <main className="guide-bookings-page">
-      <div className="guide-bookings-container">
-        <div className="guide-bookings-header">
-          <h1 className="guide-bookings-title">My Tours</h1>
-          <p className="guide-bookings-subtitle">Manage your upcoming and past tours</p>
+    <div className="guide-bookings-page">
+      <div className="page-header">
+        <h1>My Assigned Tours</h1>
+        <p className="subtitle">Manage your tour guide assignments</p>
+      </div>
+
+      {error && (
+        <div className="error-alert">
+          {error}
         </div>
+      )}
 
-        {/* Status Filter Tabs */}
-        <div className="guide-bookings-filters">
-          <button 
-            onClick={() => setStatusFilter("all")}
-            className={`guide-filter-tab ${statusFilter === "all" ? "active" : ""}`}
-          >
-            All Tours
-          </button>
-          <button 
-            onClick={() => setStatusFilter("assigned")}
-            className={`guide-filter-tab ${statusFilter === "assigned" ? "active" : ""}`}
-          >
-            Assigned
-          </button>
-          <button 
-            onClick={() => setStatusFilter("confirmed")}
-            className={`guide-filter-tab ${statusFilter === "confirmed" ? "active" : ""}`}
-          >
-            Confirmed
-          </button>
-          <button 
-            onClick={() => setStatusFilter("completed")}
-            className={`guide-filter-tab ${statusFilter === "completed" ? "active" : ""}`}
-          >
-            Completed
-          </button>
+      {bookings.length === 0 ? (
+        <div className="empty-state">
+          <MapPin size={64} color="#cbd5e1" />
+          <h3>No Tours Assigned Yet</h3>
+          <p>You don't have any assigned tours at the moment. Check back later!</p>
         </div>
+      ) : (
+        <div className="bookings-grid">
+          {bookings.map((booking) => (
+            <div key={booking.booking_id} className="booking-card">
+              <div className="booking-card-header">
+                <div className="package-info">
+                  <h3>{booking.package_name}</h3>
+                  <p className="booking-reference">Ref: #{booking.booking_id}</p>
+                </div>
+                <span
+                  className="status-badge"
+                  style={{ backgroundColor: getStatusColor(booking.status) }}
+                >
+                  {booking.status}
+                </span>
+              </div>
 
-        {filteredBookings.length === 0 ? (
-          <div className="guide-bookings-empty">
-            <MapPin size={48} />
-            <h2>No Tours Assigned Yet</h2>
-            <p>You don't have any assigned tour bookings yet. Wait for the admin to assign tours to you.</p>
-          </div>
-        ) : (
-          <div className="guide-bookings-list">
-            {filteredBookings.map((booking) => (
-              <div key={booking.booking_id} className="guide-booking-card">
-                <div className="guide-booking-card-header">
-                  <h3 className="guide-booking-title">{booking.package_name}</h3>
-                  <span className={`guide-booking-status ${booking.status}`}>
-                    {booking.status}
-                  </span>
+              <div className="booking-details">
+                <div className="detail-row">
+                  <Calendar size={18} />
+                  <div>
+                    <span className="detail-label">Travel Date</span>
+                    <span className="detail-value">
+                      {new Date(booking.travel_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="guide-booking-details">
-                  <div className="guide-booking-detail-item">
-                    <MapPin size={16} />
-                    <span>{booking.category || "Sri Lanka Tour"}</span>
-                  </div>
-                  <div className="guide-booking-detail-item">
-                    <Calendar size={16} />
-                    <span>{new Date(booking.travel_date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="guide-booking-detail-item">
-                    <Clock size={16} />
-                    <span>{booking.duration || "Full Day"}</span>
+                <div className="detail-row">
+                  <User size={18} />
+                  <div>
+                    <span className="detail-label">Travelers</span>
+                    <span className="detail-value">{booking.travelers} people</span>
                   </div>
                 </div>
 
-                <div className="tourist-info-section">
-                  <h4>Tourist Information:</h4>
-                  <p><strong>Name:</strong> {booking.tourist_name || "N/A"}</p>
-                  <p><strong>Email:</strong> {booking.tourist_email}</p>
-                  {booking.tourist_phone && <p><strong>Phone:</strong> {booking.tourist_phone}</p>}
-                  <p><strong>Travelers:</strong> {booking.travelers}</p>
-                </div>
-
-                <div className="guide-booking-actions">
-                  {booking.status === "assigned" && (
-                    <>
-                      <button 
-                        onClick={() => handleMarkInProgress(booking.booking_id)}
-                        className="guide-booking-action-btn accept-btn"
-                      >
-                        Accept & Start
-                      </button>
-                      <button 
-                        onClick={() => handleCancelBooking(booking.booking_id)}
-                        className="guide-booking-action-btn cancel-btn"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                  {booking.status === "in_progress" && (
-                    <button 
-                      onClick={() => handleMarkCompleted(booking.booking_id)}
-                      className="guide-booking-action-btn complete-btn"
-                    >
-                      Mark as Completed
-                    </button>
-                  )}
-                  {booking.status === "completed" && (
-                    <span className="guide-booking-completed">✓ Completed</span>
-                  )}
-                  
-                  {/* Itinerary Actions - Available for all bookings */}
-                  <div className="guide-booking-itinerary-actions">
-                    <button 
-                      onClick={() => handleViewItinerary(booking)}
-                      className="guide-booking-action-btn view-btn"
-                      title="View Itinerary"
-                    >
-                      <Eye size={16} />
-                      View Itinerary
-                    </button>
-                    <button 
-                      onClick={() => handleDownloadItinerary(booking)}
-                      className="guide-booking-action-btn download-btn"
-                      title="Download PDF"
-                    >
-                      <Download size={16} />
-                      Download PDF
-                    </button>
+                {booking.destination && (
+                  <div className="detail-row">
+                    <MapPin size={18} />
+                    <div>
+                      <span className="detail-label">Destination</span>
+                      <span className="detail-value">{booking.destination}</span>
+                    </div>
                   </div>
+                )}
+              </div>
+
+              <div className="tourist-info">
+                <h4>Tourist Information</h4>
+                <div className="tourist-details" style={{ flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                  <div className="detail-row">
+                    <User size={16} />
+                    <span>{booking.tourist_name || 'N/A'}</span>
+                  </div>
+                  <button
+                    onClick={() => setActiveChatBookingId(booking.booking_id)}
+                    className="chat-btn"
+                    style={{
+                      background: '#eff6ff',
+                      color: '#2563eb',
+                      border: '1px solid #bfdbfe',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      marginTop: '4px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = '#dbeafe';
+                      e.currentTarget.style.borderColor = '#93c5fd';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = '#eff6ff';
+                      e.currentTarget.style.borderColor = '#bfdbfe';
+                    }}
+                  >
+                    <MessageCircle size={16} />
+                    Chat with Tourist
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+
+              {booking.admin_notes && (
+                <div className="admin-notes">
+                  <strong>Admin Notes:</strong>
+                  <p>{booking.admin_notes}</p>
+                </div>
+              )}
+
+              {booking.special_requests && (
+                <div className="special-requests">
+                  <strong>Special Requests:</strong>
+                  <p>{booking.special_requests}</p>
+                </div>
+              )}
+
+              <div className="assignment-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
+                <small style={{ color: '#6b7280' }}>
+                  Assigned on {new Date(booking.guide_assigned_at).toLocaleDateString()}
+                </small>
+                {booking.status === 'confirmed' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                    <button
+                      onClick={() => handleMarkCompleted(booking.booking_id)}
+                      disabled={submittingId === booking.booking_id || !isTourComplete(booking.travel_date, booking.duration)}
+                      title={!isTourComplete(booking.travel_date, booking.duration) ? "Tour is not completed yet" : ""}
+                      style={{
+                        background: (!isTourComplete(booking.travel_date, booking.duration) || submittingId === booking.booking_id) ? '#9ca3af' : '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                        cursor: (!isTourComplete(booking.travel_date, booking.duration) || submittingId === booking.booking_id) ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        opacity: 1,
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <CheckCircle size={16} />
+                      {submittingId === booking.booking_id ? 'Updating...' : 'Mark as Completed'}
+                    </button>
+                    {!isTourComplete(booking.travel_date, booking.duration) && (
+                      <small style={{ color: '#ef4444', fontSize: '11px' }}>
+                        Tour not completed yet
+                      </small>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {activeChatBookingId && (
+        <TourChatWindow
+          bookingId={activeChatBookingId}
+          onClose={() => setActiveChatBookingId(null)}
+        />
+      )}
+    </div>
   );
 };
 

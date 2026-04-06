@@ -18,10 +18,8 @@ const HeroSection = () => {
       <div className="hero-content">
         <div className="hero-container">
           <h1 className="hero-title">
-            Discover your perfect
-            <span className="hero-title-accent">
-              Sri Lankan adventure
-            </span>
+            An Amazing
+            <span className="hero-title-accent"> Destination</span>
           </h1>
 
           <p className="hero-description">
@@ -40,7 +38,7 @@ const HeroSection = () => {
             </Link>
 
             <Link
-              to="/customize"
+              to="/custom-tour-chat"
               className="hero-cta-secondary"
             >
               Customize Your Trip

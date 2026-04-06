@@ -16,7 +16,7 @@ const ConfirmationPage = () => {
       navigate('/packages');
       return;
     }
-    
+
     if (!bookingData.bookingReference || bookingData.paymentStatus !== "completed") {
       navigate(`/booking/${packageId}`);
     }
@@ -42,7 +42,7 @@ const ConfirmationPage = () => {
 
       // Get existing bookings
       const existingBookings = JSON.parse(localStorage.getItem("userBookings") || "[]");
-      
+
       // Add new booking if it doesn't already exist
       const bookingExists = existingBookings.some(b => b.bookingReference === bookingData.bookingReference);
       if (!bookingExists) {
@@ -92,8 +92,8 @@ IMPORTANT NOTES:
 - Bring a valid ID and travel documents
 
 CONTACT INFORMATION:
-Email: info@igolankatours.com
-Phone: +94 77 123 4567
+Email: tours.igolanka@gmail.com
+Phone: +94 77 763 9196
 Website: www.igolankatours.com
 
 Thank you for choosing I GO LANKA TOURS!
@@ -245,7 +245,7 @@ We look forward to showing you the beauty of Sri Lanka.
                 <span className="notification-status">✓ Delivered</span>
               </div>
             </div>
-            
+
             <div className="notification-item notification-sent">
               <div className="notification-icon">
                 <CreditCard size={24} />
@@ -256,7 +256,7 @@ We look forward to showing you the beauty of Sri Lanka.
                 <span className="notification-status">✓ Delivered</span>
               </div>
             </div>
-            
+
             <div className="notification-item notification-pending">
               <div className="notification-icon">
                 <Send size={24} />
@@ -271,7 +271,7 @@ We look forward to showing you the beauty of Sri Lanka.
         </div>
 
         <div className="confirmation-actions">
-          <button 
+          <button
             onClick={handleDownloadItinerary}
             className="confirmation-btn confirmation-btn-primary"
           >

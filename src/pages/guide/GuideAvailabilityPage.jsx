@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, X } from "lucide-react";
-import { guideAPI } from "../../services/api";
+import { CheckCircle, XCircle, X, Loader, Calendar as CalendarIcon, Save } from "lucide-react";
+import Calendar from "react-calendar";
+import { availabilityAPI } from "../../services/api";
+import "react-calendar/dist/Calendar.css";
 import "./GuideAvailability.css";
 
 const GuideAvailabilityPage = () => {
   const navigate = useNavigate();
-  const [isAvailable, setIsAvailable] = useState(true);
-  const [selectedDates, setSelectedDates] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [selectedDates, setSelectedDates] = useState(new Map()); // Map<dateStr, status>
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -19,150 +21,241 @@ const GuideAvailabilityPage = () => {
       navigate("/login");
       return;
     }
+
+    fetchAvailability();
   }, [navigate]);
 
-  const handleDateSelect = (date) => {
-    const dateStr = date.toISOString().split("T")[0];
-    if (selectedDates.includes(dateStr)) {
-      setSelectedDates(selectedDates.filter((d) => d !== dateStr));
-    } else {
-      setSelectedDates([...selectedDates, dateStr]);
-    }
-  };
-
-  const handleRemoveDate = (dateStr) => {
-    setSelectedDates(selectedDates.filter((d) => d !== dateStr));
-  };
-
-  const handleSaveAvailability = async () => {
+  const fetchAvailability = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      
-      const response = await guideAPI.setAvailability({
-        is_available: isAvailable,
-        dates: selectedDates,
-      }, token);
+      const response = await availabilityAPI.getAvailability(token);
 
       if (response.success) {
-        setMessage("Availability updated successfully!");
+        const dateMap = new Map();
+        (response.availability || []).forEach(item => {
+          dateMap.set(item.date, item.status);
+        });
+        setSelectedDates(dateMap);
       } else {
-        setMessage("Error: " + response.message);
+        showMessage("Error loading availability: " + (response.message || "Unknown error"), "error");
       }
-      
-      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage("Error updating availability: " + err.message);
+      showMessage("Network error loading availability.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const getNextDays = (count = 30) => {
-    const days = [];
-    const today = new Date();
-    for (let i = 0; i < count; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      days.push(date);
-    }
-    return days;
+  const showMessage = (text, type = "success") => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: "", type: "" }), 5000);
   };
 
-  const nextDays = getNextDays();
+  const handleDateClick = (date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    const newMap = new Map(selectedDates);
+
+    if (newMap.has(dateStr)) {
+      const current = newMap.get(dateStr);
+      if (current === "available") {
+        newMap.set(dateStr, "unavailable");
+      } else {
+        newMap.delete(dateStr);
+      }
+    } else {
+      newMap.set(dateStr, "available");
+    }
+
+    setSelectedDates(newMap);
+  };
+
+  const handleRemoveDate = (dateStr) => {
+    const newMap = new Map(selectedDates);
+    newMap.delete(dateStr);
+    setSelectedDates(newMap);
+  };
+
+  const handleSave = async () => {
+    if (selectedDates.size === 0) {
+      showMessage("Please select at least one date.", "error");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      const updates = Array.from(selectedDates.entries());
+
+      const results = await Promise.allSettled(
+        updates.map(([date, status]) => availabilityAPI.setAvailability(date, status, token))
+      );
+
+      const successful = results.filter(r => r.status === "fulfilled" && r.value.success).length;
+      const failed = results.length - successful;
+
+      if (failed === 0) {
+        showMessage(`✅ ${successful} date(s) updated successfully!`, "success");
+        await fetchAvailability();
+      } else {
+        showMessage(`⚠️ ${successful} updated, ${failed} failed. Please try again.`, "error");
+      }
+    } catch (err) {
+      showMessage("❌ Error saving availability: " + err.message, "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const tileClassName = ({ date, view }) => {
+    if (view === "month") {
+      const dateStr = date.toISOString().split("T")[0];
+      const status = selectedDates.get(dateStr);
+      if (status === "available") return "tile--available";
+      if (status === "unavailable") return "tile--unavailable";
+    }
+    return null;
+  };
+
+  const availableCount = Array.from(selectedDates.values()).filter(s => s === "available").length;
+  const unavailableCount = Array.from(selectedDates.values()).filter(s => s === "unavailable").length;
+
+  if (loading) {
+    return (
+      <main className="guide-availability-page">
+        <div className="guide-availability-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading your availability...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="guide-availability-page">
       <div className="guide-availability-container">
+
+        {/* Header */}
         <div className="guide-availability-header">
-          <h1 className="guide-availability-title">Your Availability</h1>
-          <p className="guide-availability-subtitle">Set when you're available to guide tours</p>
+          <div className="header-left">
+            <div className="header-icon">
+              <CalendarIcon size={28} />
+            </div>
+            <div>
+              <h1 className="guide-availability-title">Manage Availability</h1>
+              <p className="guide-availability-subtitle">Set your schedule for upcoming tours</p>
+            </div>
+          </div>
+          <div className="header-stats">
+            <div className="header-stat available">
+              <CheckCircle size={16} />
+              <span>{availableCount} Available</span>
+            </div>
+            <div className="header-stat unavailable">
+              <XCircle size={16} />
+              <span>{unavailableCount} Unavailable</span>
+            </div>
+          </div>
         </div>
 
-        {message && (
-          <div className={`guide-availability-message ${message.includes("Error") ? "error" : "success"}`}>
-            {message}
+        {/* Message */}
+        {message.text && (
+          <div className={`guide-availability-message ${message.type}`}>
+            {message.text}
           </div>
         )}
 
-        {/* Availability Toggle */}
-        <div className="guide-availability-toggle-section">
-          <div className="guide-availability-toggle-card">
-            <div className="guide-availability-toggle-content">
-              <h2 className="guide-availability-toggle-title">Overall Status</h2>
-              <p className="guide-availability-toggle-text">
-                {isAvailable ? "You're available for tours" : "You're currently unavailable"}
+        <div className="guide-availability-main">
+          {/* Left: Calendar */}
+          <div className="guide-availability-calendar-section">
+            <div className="section-card">
+              <div className="section-card-header">
+                <h2>Select Dates</h2>
+                <div className="legend">
+                  <span className="legend-item available"><span className="legend-dot"></span>Available</span>
+                  <span className="legend-item unavailable"><span className="legend-dot"></span>Unavailable</span>
+                </div>
+              </div>
+              <Calendar
+                onClickDay={handleDateClick}
+                tileClassName={tileClassName}
+                minDate={new Date()}
+                value={null}
+              />
+              <p className="calendar-hint">
+                Click once → <strong>Available</strong> · Click again → <strong>Unavailable</strong> · Click again to <strong>clear</strong>
               </p>
             </div>
-            <div className="guide-availability-toggle">
-              <label className="guide-availability-switch">
-                <input
-                  type="checkbox"
-                  checked={isAvailable}
-                  onChange={(e) => setIsAvailable(e.target.checked)}
-                  disabled={loading}
-                />
-                <span className="guide-availability-slider"></span>
-              </label>
-            </div>
           </div>
-        </div>
 
-        {/* Date Selection */}
-        <div className="guide-availability-dates-section">
-          <h2 className="guide-availability-section-title">Select Available Dates</h2>
-          <div className="guide-availability-calendar">
-            {nextDays.map((date) => {
-              const dateStr = date.toISOString().split("T")[0];
-              const isSelected = selectedDates.includes(dateStr);
-              const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-              const dayNum = date.getDate();
+          {/* Right: Schedule list */}
+          <div className="guide-availability-schedule-section">
+            <div className="section-card">
+              <div className="section-card-header">
+                <h2>Your Schedule</h2>
+                <span className="badge">{selectedDates.size} dates</span>
+              </div>
 
-              return (
-                <button
-                  key={dateStr}
-                  onClick={() => handleDateSelect(date)}
-                  className={`guide-availability-date ${isSelected ? "selected" : ""}`}
-                >
-                  <div className="guide-availability-date-day">{dayName}</div>
-                  <div className="guide-availability-date-num">{dayNum}</div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Selected Dates List */}
-        {selectedDates.length > 0 && (
-          <div className="guide-availability-selected-section">
-            <h2 className="guide-availability-section-title">
-              Selected Dates ({selectedDates.length})
-            </h2>
-            <div className="guide-availability-selected-list">
-              {selectedDates.map((dateStr) => (
-                <div key={dateStr} className="guide-availability-selected-item">
-                  <span className="guide-availability-selected-date">{dateStr}</span>
-                  <button
-                    onClick={() => handleRemoveDate(dateStr)}
-                    className="guide-availability-remove-btn"
-                  >
-                    <X size={16} />
-                  </button>
+              {selectedDates.size === 0 ? (
+                <div className="empty-schedule">
+                  <CalendarIcon size={48} />
+                  <p>No dates selected yet.</p>
+                  <p className="empty-hint">Click on the calendar to add dates.</p>
                 </div>
-              ))}
+              ) : (
+                <div className="schedule-list">
+                  {Array.from(selectedDates.entries())
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([dateStr, status]) => (
+                      <div key={dateStr} className={`schedule-item ${status}`}>
+                        <div className="schedule-item-info">
+                          <span className={`schedule-status-dot ${status}`}></span>
+                          <div>
+                            <span className="schedule-date">
+                              {new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                            <span className={`schedule-badge ${status}`}>
+                              {status === "available" ? "Available" : "Unavailable"}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          className="schedule-remove-btn"
+                          onClick={() => handleRemoveDate(dateStr)}
+                          title="Remove"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
 
-        {/* Save Button */}
-        <div className="guide-availability-actions">
-          <button
-            onClick={handleSaveAvailability}
-            disabled={loading}
-            className="guide-availability-save-btn"
-          >
-            {loading ? "Saving..." : "Save Availability"}
-          </button>
+            {/* Save Button */}
+            <button
+              className="guide-availability-save-btn"
+              onClick={handleSave}
+              disabled={saving || selectedDates.size === 0}
+            >
+              {saving ? (
+                <>
+                  <Loader className="spin" size={18} />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Save {selectedDates.size > 0 ? `${selectedDates.size} Date${selectedDates.size !== 1 ? "s" : ""}` : "Changes"}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </main>

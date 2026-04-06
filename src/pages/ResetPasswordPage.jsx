@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Lock, ArrowLeft, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { validatePassword } from "../utils/passwordValidation";
+import { Button, Card } from "../components/shared";
 import "./ResetPasswordPage.css";
 
 const ResetPasswordPage = () => {
@@ -18,6 +19,7 @@ const ResetPasswordPage = () => {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (!token) {
@@ -32,6 +34,7 @@ const ResetPasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
 
     if (!formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields");
@@ -73,7 +76,12 @@ const ResetPasswordPage = () => {
         setSuccess(true);
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(data.message || "Failed to reset password. Please try again.");
+        if (data.errors) {
+          setFieldErrors(data.errors);
+          setError("Please correct the highlighted errors.");
+        } else {
+          setError(data.message || "Failed to reset password. Please try again.");
+        }
       }
     } catch (err) {
       console.error("Reset password error:", err);
@@ -87,7 +95,7 @@ const ResetPasswordPage = () => {
     return (
       <main className="reset-password-page">
         <div className="reset-password-container">
-          <div className="reset-password-card success-card">
+          <Card className="reset-password-card success-card" padding="large">
             <div className="success-icon">
               <CheckCircle size={48} />
             </div>
@@ -98,10 +106,10 @@ const ResetPasswordPage = () => {
             <div className="countdown">
               Redirecting to login in 3 seconds...
             </div>
-            <Link to="/login" className="btn-primary">
+            <Button variant="primary" onClick={() => navigate("/login")}>
               Go to Login
-            </Link>
-          </div>
+            </Button>
+          </Card>
         </div>
       </main>
     );
@@ -110,7 +118,7 @@ const ResetPasswordPage = () => {
   return (
     <main className="reset-password-page">
       <div className="reset-password-container">
-        <div className="reset-password-card">
+        <Card className="reset-password-card" padding="large">
           <Link to="/login" className="back-link">
             <ArrowLeft size={18} />
             Back to Login
@@ -132,7 +140,7 @@ const ResetPasswordPage = () => {
             <div className="form-group">
               <label htmlFor="password">
                 <Lock size={18} />
-                New Password *
+                New Password
               </label>
               <div className="input-wrapper">
                 <input
@@ -142,6 +150,8 @@ const ResetPasswordPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a strong password"
+                  className="form-input"
+                  autoComplete="new-password"
                   required
                   disabled={loading}
                 />
@@ -149,11 +159,13 @@ const ResetPasswordPage = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="toggle-password"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   disabled={loading}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {fieldErrors.newPassword && <span className="field-error-message">{fieldErrors.newPassword}</span>}
               <small className="password-hint">
                 Must contain: 8+ characters, uppercase, lowercase, number, special character
               </small>
@@ -162,7 +174,7 @@ const ResetPasswordPage = () => {
             <div className="form-group">
               <label htmlFor="confirmPassword">
                 <Lock size={18} />
-                Confirm Password *
+                Confirm Password
               </label>
               <div className="input-wrapper">
                 <input
@@ -172,6 +184,8 @@ const ResetPasswordPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm your password"
+                  className="form-input"
+                  autoComplete="new-password"
                   required
                   disabled={loading}
                 />
@@ -179,6 +193,7 @@ const ResetPasswordPage = () => {
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
                   className="toggle-password"
+                  aria-label={showConfirm ? "Hide password" : "Show password"}
                   disabled={loading}
                 >
                   {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -198,15 +213,20 @@ const ResetPasswordPage = () => {
               </ul>
             </div>
 
-            <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? "Resetting..." : "Reset Password"}
-            </button>
+            <Button
+              type="submit"
+              variant="primary"
+              loading={loading}
+              className="btn-submit-full"
+            >
+              Reset Password
+            </Button>
           </form>
 
           <div className="form-footer">
             <p>Remember your password? <Link to="/login">Sign in here</Link></p>
           </div>
-        </div>
+        </Card>
       </div>
     </main>
   );

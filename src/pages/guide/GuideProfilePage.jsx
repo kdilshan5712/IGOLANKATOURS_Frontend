@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, CheckCircle, AlertCircle, Camera, Upload, X } from "lucide-react";
+import { User, Mail, Phone, CheckCircle, AlertCircle, Camera, Upload, X, Edit } from "lucide-react";
 import { guideAPI } from "../../services/api";
 import "./GuideProfile.css";
 
@@ -10,13 +10,33 @@ const GuideProfilePage = () => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   // Profile photo states
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoMessage, setPhotoMessage] = useState("");
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+
+  // Edit profile states
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    full_name: "",
+    contact_number: ""
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editMessage, setEditMessage] = useState("");
+ 
+  // Bank details states
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [bankFormData, setBankFormData] = useState({
+    bank_name: "",
+    account_no: "",
+    account_name: "",
+    branch_name: ""
+  });
+  const [bankLoading, setBankLoading] = useState(false);
+  const [bankMessage, setBankMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,7 +51,7 @@ const GuideProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const response = await guideAPI.getProfile(token);
-        
+
         if (response.success && response.guide) {
           setProfile({
             name: response.guide.full_name || "Guide",
@@ -43,12 +63,30 @@ const GuideProfilePage = () => {
             photo: response.guide.profile_photo || null,
             rejectionReason: response.guide.rejection_reason || null,
             rejectedAt: response.guide.rejected_at || null,
+            bank_name: response.guide.bank_name || null,
+            account_no: response.guide.account_no || null,
+            account_name: response.guide.account_name || null,
+            branch_name: response.guide.branch_name || null
           });
 
           // Set initial photo preview if exists
           if (response.guide.profile_photo) {
             setPhotoPreview(response.guide.profile_photo);
           }
+
+          // Initialize edit form data
+          setEditFormData({
+            full_name: response.guide.full_name || "",
+            contact_number: response.guide.contact_number || ""
+          });
+
+          // Initialize bank form data
+          setBankFormData({
+            bank_name: response.guide.bank_name || "",
+            account_no: response.guide.account_no || "",
+            account_name: response.guide.account_name || "",
+            branch_name: response.guide.branch_name || ""
+          });
 
           setDocuments(response.guide.documents || []);
         } else {
@@ -83,7 +121,7 @@ const GuideProfilePage = () => {
       }
 
       setProfilePhoto(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -105,22 +143,23 @@ const GuideProfilePage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const formData = new FormData();
-      formData.append("profile_photo", profilePhoto);
 
-      // UI-only: Simulate upload (backend will handle actual upload)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call real backend API
+      const result = await guideAPI.uploadProfilePhoto(profilePhoto, token);
 
-      setPhotoMessage("Profile photo uploaded successfully!");
-      setShowPhotoUpload(false);
-      setProfilePhoto(null);
-      
-      // Update profile state
-      setProfile({ ...profile, photo: photoPreview });
+      if (result.success) {
+        setPhotoMessage("Profile photo uploaded successfully!");
+        setShowPhotoUpload(false);
+        setProfilePhoto(null);
+
+        // Update profile state with new photo URL
+        setProfile({ ...profile, photo: result.profile_photo });
+        setPhotoPreview(result.profile_photo);
+      } else {
+        setPhotoMessage(result.message || "Failed to upload photo");
+      }
 
       setTimeout(() => setPhotoMessage(""), 3000);
-      
-      console.log("📸 Photo uploaded:", profilePhoto.name);
     } catch (err) {
       console.error("Photo upload error:", err);
       setPhotoMessage("Failed to upload photo. Please try again.");
@@ -136,22 +175,122 @@ const GuideProfilePage = () => {
       setUploadingPhoto(true);
       const token = localStorage.getItem("token");
 
-      // UI-only: Simulate removal (backend will handle actual removal)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call real backend API
+      const result = await guideAPI.deleteProfilePhoto(token);
 
-      setPhotoPreview(null);
-      setProfilePhoto(null);
-      setProfile({ ...profile, photo: null });
-      setPhotoMessage("Profile photo removed");
-      
+      if (result.success) {
+        setPhotoPreview(null);
+        setProfilePhoto(null);
+        setProfile({ ...profile, photo: null });
+        setPhotoMessage("Profile photo removed");
+      } else {
+        setPhotoMessage(result.message || "Failed to remove photo");
+      }
+
       setTimeout(() => setPhotoMessage(""), 3000);
-      
-      console.log("🗑️ Photo removed");
     } catch (err) {
       console.error("Photo removal error:", err);
       setPhotoMessage("Failed to remove photo");
     } finally {
       setUploadingPhoto(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    setShowEditModal(true);
+    setEditMessage("");
+  };
+
+  const handleEditFormChange = (e) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSaveProfile = async () => {
+    if (!editFormData.full_name.trim()) {
+      setEditMessage("Full name is required");
+      return;
+    }
+
+    setEditLoading(true);
+    setEditMessage("");
+
+    try {
+      const token = localStorage.getItem("token");
+      const result = await guideAPI.updateProfile({
+        full_name: editFormData.full_name,
+        contact_number: editFormData.contact_number
+      }, token);
+
+      if (result.success) {
+        setEditMessage("Profile updated successfully!");
+        setProfile({
+          ...profile,
+          name: result.guide.full_name,
+          phone: result.guide.contact_number || "N/A"
+        });
+
+        setTimeout(() => {
+          setShowEditModal(false);
+          setEditMessage("");
+        }, 1500);
+      } else {
+        setEditMessage(result.message || "Failed to update profile");
+      }
+    } catch (err) {
+      console.error("Profile update error:", err);
+      setEditMessage("Failed to update profile. Please try again.");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleBankFormChange = (e) => {
+    setBankFormData({
+      ...bankFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSaveBankDetails = async () => {
+    if (!bankFormData.bank_name.trim() || !bankFormData.account_no.trim() || !bankFormData.account_name.trim()) {
+      setBankMessage("Bank name, account number, and account name are required");
+      return;
+    }
+
+    setBankLoading(true);
+    setBankMessage("");
+
+    try {
+      const token = localStorage.getItem("token");
+      const result = await guideAPI.updateBankDetails(bankFormData, token);
+
+      if (result.success) {
+        setBankMessage("Bank details updated successfully!");
+        
+        // Update local profile state if needed (though bank info isn't displayed in main card)
+        setProfile(prev => ({
+          ...prev,
+          bank_name: bankFormData.bank_name,
+          account_no: bankFormData.account_no,
+          account_name: bankFormData.account_name,
+          branch_name: bankFormData.branch_name
+        }));
+
+        setTimeout(() => {
+          setShowBankModal(false);
+          setBankMessage("");
+        }, 1500);
+      } else {
+        setBankMessage(result.message || "Failed to update bank details");
+      }
+    } catch (err) {
+      console.error("Bank update error:", err);
+      setBankMessage("Failed to update bank details. Please try again.");
+    } finally {
+      setBankLoading(false);
     }
   };
 
@@ -383,7 +522,7 @@ const GuideProfilePage = () => {
                 <div className="guide-rejection-actions">
                   <p className="guide-rejection-help">
                     Please address the issues mentioned above and contact support at{' '}
-                    <a href="mailto:support@igolankatours.com">support@igolankatours.com</a> to reapply.
+                    <a href="mailto:tours.igolanka@gmail.com">tours.igolanka@gmail.com</a> to reapply.
                   </p>
                 </div>
               </div>
@@ -401,7 +540,7 @@ const GuideProfilePage = () => {
               </div>
               <div className="guide-pending-content">
                 <p>
-                  Your application is currently being reviewed by our admin team. 
+                  Your application is currently being reviewed by our admin team.
                   You will receive an email notification once your application is approved or if any additional information is needed.
                 </p>
               </div>
@@ -420,18 +559,65 @@ const GuideProfilePage = () => {
           ) : (
             <div className="guide-profile-documents">
               {documents.map((doc) => (
-                <div key={doc.id} className="guide-profile-document">
+                <div key={doc.document_id} className="guide-profile-document">
                   <div className="guide-profile-document-info">
-                    <h3 className="guide-profile-document-name">{doc.name}</h3>
+                    <h3 className="guide-profile-document-name">
+                      {doc.document_type ? doc.document_type.replace(/_/g, ' ').toUpperCase() : 'Document'}
+                    </h3>
                     <p className="guide-profile-document-uploaded">
-                      Uploaded: {doc.uploadedAt}
+                      Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <span className={`guide-profile-document-status ${doc.status}`}>
-                    {doc.status === "approved" ? "✓ Approved" : "Pending"}
+                  <span className={`guide-profile-document-status ${doc.verified ? 'approved' : 'pending'}`}>
+                    {doc.verified ? "✓ Approved" : "⏳ Pending Review"}
                   </span>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bank Details Section */}
+        <div className="guide-profile-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 className="guide-profile-section-title" style={{ margin: 0 }}>Bank Details</h2>
+            <button 
+              onClick={() => { setShowBankModal(true); setBankMessage(""); }} 
+              className="guide-profile-edit-btn"
+              style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+            >
+              <Edit size={16} />
+              {profile.bank_name ? "Edit Bank Info" : "Add Bank Info"}
+            </button>
+          </div>
+
+          {!profile.bank_name ? (
+            <div className="guide-profile-empty">
+              <AlertCircle size={20} style={{ color: '#f59e0b', marginBottom: '0.5rem' }} />
+              <p>Requested payouts require verified bank details. Please add your bank information.</p>
+            </div>
+          ) : (
+            <div className="guide-bank-details">
+              <div className="guide-bank-grid">
+                <div className="guide-bank-item">
+                  <span className="guide-bank-label">Bank Name</span>
+                  <span className="guide-bank-value">{profile.bank_name}</span>
+                </div>
+                <div className="guide-bank-item">
+                  <span className="guide-bank-label">Account Number</span>
+                  <span className="guide-bank-value">{profile.account_no}</span>
+                </div>
+                <div className="guide-bank-item">
+                  <span className="guide-bank-label">Account Holder</span>
+                  <span className="guide-bank-value">{profile.account_name}</span>
+                </div>
+                {profile.branch_name && (
+                  <div className="guide-bank-item">
+                    <span className="guide-bank-label">Branch</span>
+                    <span className="guide-bank-value">{profile.branch_name}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -457,9 +643,172 @@ const GuideProfilePage = () => {
 
         {/* Settings Link */}
         <div className="guide-profile-actions">
-          <button className="guide-profile-edit-btn">Edit Profile</button>
+          <button onClick={handleEditProfile} className="guide-profile-edit-btn">
+            <Edit size={18} />
+            Edit Profile
+          </button>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="guide-modal-overlay">
+          <div className="guide-modal">
+            <div className="guide-modal-header">
+              <h2>Edit Profile</h2>
+              <button onClick={() => setShowEditModal(false)} className="guide-modal-close">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="guide-modal-body">
+              {editMessage && (
+                <div className={`guide-modal-message ${editMessage.includes('success') ? 'success' : 'error'}`}>
+                  {editMessage}
+                </div>
+              )}
+
+              <div className="guide-modal-form-group">
+                <label>Full Name *</label>
+                <input
+                  type="text"
+                  name="full_name"
+                  value={editFormData.full_name}
+                  onChange={handleEditFormChange}
+                  className="guide-modal-input"
+                  placeholder="Enter your full name"
+                  disabled={editLoading}
+                />
+              </div>
+
+              <div className="guide-modal-form-group">
+                <label>Contact Number</label>
+                <input
+                  type="tel"
+                  name="contact_number"
+                  value={editFormData.contact_number}
+                  onChange={handleEditFormChange}
+                  className="guide-modal-input"
+                  placeholder="+94 71 234 5678"
+                  disabled={editLoading}
+                />
+              </div>
+
+              <div className="guide-modal-actions">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="guide-modal-btn guide-modal-btn-cancel"
+                  disabled={editLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  className="guide-modal-btn guide-modal-btn-save"
+                  disabled={editLoading}
+                >
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Bank Details Modal */}
+      {showBankModal && (
+        <div className="guide-modal-overlay">
+          <div className="guide-modal">
+            <div className="guide-modal-header">
+              <h2>Bank Information</h2>
+              <button onClick={() => setShowBankModal(false)} className="guide-modal-close">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="guide-modal-body">
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1.5rem' }}>
+                Enter your bank details accurately. This information will be used for earnings payouts.
+              </p>
+
+              {bankMessage && (
+                <div className={`guide-modal-message ${bankMessage.includes('success') ? 'success' : 'error'}`}>
+                  {bankMessage}
+                </div>
+              )}
+
+              <div className="guide-modal-form-group">
+                <label>Bank Name *</label>
+                <input
+                  type="text"
+                  name="bank_name"
+                  value={bankFormData.bank_name}
+                  onChange={handleBankFormChange}
+                  className="guide-modal-input"
+                  placeholder="e.g. Bank of Ceylon"
+                  disabled={bankLoading}
+                />
+              </div>
+
+              <div className="guide-modal-form-group">
+                <label>Account Number *</label>
+                <input
+                  type="text"
+                  name="account_no"
+                  value={bankFormData.account_no}
+                  onChange={handleBankFormChange}
+                  className="guide-modal-input"
+                  placeholder="Enter your account number"
+                  disabled={bankLoading}
+                />
+              </div>
+
+              <div className="guide-modal-form-group">
+                <label>Account Holder Name *</label>
+                <input
+                  type="text"
+                  name="account_name"
+                  value={bankFormData.account_name}
+                  onChange={handleBankFormChange}
+                  className="guide-modal-input"
+                  placeholder="Name as it appears on bank statement"
+                  disabled={bankLoading}
+                />
+              </div>
+
+              <div className="guide-modal-form-group">
+                <label>Branch Name</label>
+                <input
+                  type="text"
+                  name="branch_name"
+                  value={bankFormData.branch_name}
+                  onChange={handleBankFormChange}
+                  className="guide-modal-input"
+                  placeholder="e.g. Colombo Fort"
+                  disabled={bankLoading}
+                />
+              </div>
+
+              <div className="guide-modal-actions">
+                <button
+                  onClick={() => setShowBankModal(false)}
+                  className="guide-modal-btn guide-modal-btn-cancel"
+                  disabled={bankLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveBankDetails}
+                  className="guide-modal-btn guide-modal-btn-save"
+                  disabled={bankLoading}
+                >
+                  {bankLoading ? "Saving..." : "Save Bank Info"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './TourMap.css';
@@ -21,6 +21,24 @@ const createCustomIcon = (color = '#d97706') => {
     iconAnchor: [15, 30],
     popupAnchor: [0, -30]
   });
+};
+
+// Component to automatically fit map bounds to route
+const ChangeView = ({ locations }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (locations && locations.length > 0) {
+      if (locations.length === 1) {
+        map.setView([locations[0].lat, locations[0].lng], 10);
+      } else {
+        const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]));
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+      }
+    }
+  }, [locations, map]);
+
+  return null;
 };
 
 const TourMap = ({ locations, routePath = true, height = '400px' }) => {
@@ -56,7 +74,8 @@ const TourMap = ({ locations, routePath = true, height = '400px' }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+        <ChangeView locations={tourLocations} />
+
         {/* Route line connecting locations */}
         {routePath && tourLocations.length > 1 && (
           <Polyline

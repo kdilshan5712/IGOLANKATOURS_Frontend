@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
+import { Button, Card } from "../components/shared";
 import "./ForgotPasswordPage.css";
 
 const ForgotPasswordPage = () => {
@@ -47,31 +48,31 @@ const ForgotPasswordPage = () => {
     return (
       <main className="forgot-password-page">
         <div className="forgot-password-container">
-          <div className="forgot-password-card success-card">
+          <Card className="forgot-password-card success-card" padding="large">
             <div className="success-icon">
               <CheckCircle size={48} />
             </div>
             <h1>Check Your Email</h1>
             <p className="success-message">
-              We've sent a password reset link to <strong>{email}</strong>. 
+              We've sent a password reset link to <strong>{email}</strong>.
               Click the link in the email to reset your password.
             </p>
             <p className="success-note">
-              The reset link will expire in 1 hour. If you don't see the email, 
+              The reset link will expire in 1 hour. If you don't see the email,
               check your spam folder.
             </p>
             <div className="success-actions">
-              <button onClick={() => navigate("/login")} className="btn-primary">
+              <Button variant="primary" onClick={() => navigate("/login")}>
                 Back to Login
-              </button>
-              <button 
-                onClick={() => { setSubmitted(false); setEmail(""); }} 
-                className="btn-secondary"
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => { setSubmitted(false); setEmail(""); }}
               >
                 Try Another Email
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       </main>
     );
@@ -80,7 +81,7 @@ const ForgotPasswordPage = () => {
   return (
     <main className="forgot-password-page">
       <div className="forgot-password-container">
-        <div className="forgot-password-card">
+        <Card className="forgot-password-card" padding="large">
           <Link to="/login" className="back-link">
             <ArrowLeft size={18} />
             Back to Login
@@ -102,7 +103,7 @@ const ForgotPasswordPage = () => {
             <div className="form-group">
               <label htmlFor="email">
                 <Mail size={18} />
-                Email Address *
+                Email Address
               </label>
               <input
                 id="email"
@@ -110,21 +111,28 @@ const ForgotPasswordPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
+                className="form-input"
+                autoComplete="email"
                 required
                 disabled={loading}
               />
             </div>
 
-            <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? "Sending..." : "Send Reset Link"}
-            </button>
+            <Button
+              type="submit"
+              variant="primary"
+              loading={loading}
+              className="btn-submit-full"
+            >
+              Send Reset Link
+            </Button>
           </form>
 
           <div className="form-footer">
             <p>Remember your password? <Link to="/login">Sign in here</Link></p>
             <p>Don't have an account? <Link to="/register">Create one</Link></p>
           </div>
-        </div>
+        </Card>
       </div>
     </main>
   );

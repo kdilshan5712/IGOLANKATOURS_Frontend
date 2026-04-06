@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #1e293b;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .success {
+            color: #10b981;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Dashboard API Test</h1>
+        <p>Test the admin dashboard API endpoints</p>
+        
+        <div>
+            <label><strong>Admin Token (from localStorage):</strong></label>
+            <input type="text" id="token" placeholder="Paste your admin token here">
+            <small>Or press "Use Current Token" if you're logged in</small>
+        </div>
+        
+        <div>
+            <button onclick="useCurrentToken()">Use Current Token</button>
+            <button onclick="testDashboard()">Test Dashboard Stats</button>
+            <button onclick="testBookings()">Test Recent Bookings</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function useCurrentToken() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('token').value = token;
+                output('✅ Token loaded from localStorage', 'success');
+            } else {
+                output('❌ No token found in localStorage. Please login first.', 'error');
+            }
+        }
+
+        function output(message, type = '') {
+            const outputDiv = document.getElementById('output');
+            const pre = document.createElement('pre');
+            pre.className = type;
+            pre.textContent = message;
+            outputDiv.appendChild(pre);
+        }
+
+        async function testDashboard() {
+            const token = document.getElementById('token').value;
+            if (!token) {
+                output('❌ Please provide a token', 'error');
+                return;
+            }
+
+            try {
+                output('📡 Calling: http://localhost:5000/api/admin/dashboard');
+                
+                const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                output(`Status: ${response.status} ${response.statusText}`);
+                
+                const data = await response.json();
+                output(JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                output(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBookings() {
+            const token = document.getElementById('token').value;
+            if (!token) {
+                output('❌ Please provide a token', 'error');
+                return;
+            }
+
+            try {
+                output('📡 Calling: http://localhost:5000/api/admin/dashboard/recent-bookings');
+                
+                const response = await fetch('http://localhost:5000/api/admin/dashboard/recent-bookings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                output(`Status: ${response.status} ${response.statusText}`);
+                
+                const data = await response.json();
+                output(JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                output(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-load token on page load
+        window.onload = () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('token').value = token;
+            }
+        };
+    </script>
+</body>
+</html>

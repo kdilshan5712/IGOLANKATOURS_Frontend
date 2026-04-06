@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wake Database & Test Connection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        .loading {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        pre {
+            background: #1e293b;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .steps {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .steps ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .steps li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Wake Database & Test Connection</h1>
+        <p class="subtitle">This tool will wake up the Supabase database and test all admin dashboard endpoints</p>
+        
+        <div class="steps">
+            <strong>📋 What this does:</strong>
+            <ol>
+                <li>Tests server connectivity (ping)</li>
+                <li>Wakes up the Supabase database</li>
+                <li>Tests dashboard stats endpoint</li>
+                <li>Tests recent bookings endpoint</li>
+                <li>Shows you the actual data returned</li>
+            </ol>
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button onclick="runAllTests()" id="testBtn">▶️ Run All Tests</button>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let testInProgress = false;
+
+        function addStatus(message, type = 'info') {
+            const outputDiv = document.getElementById('output');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            outputDiv.appendChild(statusDiv);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        function addJson(data) {
+            const outputDiv = document.getElementById('output');
+            const pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(data, null, 2);
+            outputDiv.appendChild(pre);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        async function testPing() {
+            addStatus('📡 Testing server ping...', 'loading');
+            try {
+                const response = await fetch('http://localhost:5000/ping');
+                const data = await response.json();
+                addStatus('✅ Server is running!', 'success');
+                addJson(data);
+                return true;
+            } catch (error) {
+                addStatus(`❌ Server not responding: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testDashboardStats() {
+            addStatus('📊 Testing dashboard stats endpoint (this will wake the database)...', 'loading');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                addStatus('⚠️ No token found. Please login first, then come back here.', 'error');
+                return false;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    addStatus(`❌ Request failed: ${response.status} ${response.statusText}`, 'error');
+                    const data = await response.json();
+                    addJson(data);
+                    return false;
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    addStatus('✅ Dashboard stats loaded successfully!', 'success');
+                    addJson(data);
+                    
+                    // Show summary
+                    const stats = data.stats;
+                    addStatus(`📦 ${stats.total_packages} Packages | 📅 ${stats.total_bookings} Bookings | ⭐ ${stats.total_reviews} Reviews | 👥 ${stats.total_users} Users`, 'info');
+                    return true;
+                } else {
+                    addStatus('⚠️ Unexpected response format', 'error');
+                    addJson(data);
+                    return false;
+                }
+            } catch (error) {
+                addStatus(`❌ Error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testRecentBookings() {
+            addStatus('📅 Testing recent bookings endpoint...', 'loading');
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/dashboard/recent-bookings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    addStatus(`❌ Request failed: ${response.status} ${response.statusText}`, 'error');
+                    return false;
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addStatus(`✅ Found ${data.bookings.length} recent bookings`, 'success');
+                    addJson(data);
+                    return true;
+                } else {
+                    addStatus('⚠️ Unexpected response format', 'error');
+                    addJson(data);
+                    return false;
+                }
+            } catch (error) {
+                addStatus(`❌ Error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            if (testInProgress) return;
+            
+            testInProgress = true;
+            document.getElementById('testBtn').disabled = true;
+            clearOutput();
+            
+            addStatus('🚀 Starting connection tests...', 'info');
+            
+            // Test 1: Ping
+            const pingOk = await testPing();
+            if (!pingOk) {
+                addStatus('⚠️ Server is not running. Please start the backend server.', 'error');
+                testInProgress = false;
+                document.getElementById('testBtn').disabled = false;
+                return;
+            }
+            
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Test 2: Dashboard Stats (this wakes the database)
+            const statsOk = await testDashboardStats();
+            
+            if (!statsOk) {
+                addStatus('ℹ️ If database is waking up, wait 30 seconds and try again.', 'info');
+                testInProgress = false;
+                document.getElementById('testBtn').disabled = false;
+                return;
+            }
+            
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Test 3: Recent Bookings
+            await testRecentBookings();
+            
+            addStatus('✅ All tests completed! Your dashboard should now work.', 'success');
+            addStatus('💡 Tip: Refresh your admin dashboard page to see the data.', 'info');
+            
+            testInProgress = false;
+            document.getElementById('testBtn').disabled = false;
+        }
+
+        // Auto-run on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                addStatus('✅ Token found in localStorage', 'success');
+            } else {
+                addStatus('⚠️ No admin token found. Please login first.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

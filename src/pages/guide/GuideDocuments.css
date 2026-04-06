@@ -1,365 +1,342 @@
-/* Guide Documents Page Styles */
+/* Guide Documents Page - Modern Glassmorphism Design */
+
+/* Import Admin Theme Variables */
+@import '../../styles/AdminTheme.css';
+
+/* Page Container */
 .guide-documents-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 40px 20px;
   padding-top: 7rem;
 }
 
 .guide-documents-container {
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.guide-documents-header {
-  margin-bottom: 40px;
-}
-
-.guide-documents-title {
-  font-size: 32px;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-  color: #111827;
-}
-
-.guide-documents-subtitle {
-  font-size: 16px;
-  color: #6b7280;
-  margin: 0;
-}
-
-.guide-documents-progress {
-  display: flex;
-  gap: 10px;
-  margin-top: 30px;
-}
-
-.guide-documents-progress-step {
-  flex: 1;
-  height: 4px;
-  background-color: #e5e7eb;
-  border-radius: 2px;
+/* Glass Card */
+.guide-documents-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid white;
+  border-radius: var(--radius-xl, 1.5rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
   overflow: hidden;
 }
 
-.guide-documents-progress-step.completed {
-  background-color: #e74c3c;
+/* Header */
+.guide-documents-header {
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
 }
 
-.guide-documents-progress-step.active {
-  background-color: #e74c3c;
+.guide-documents-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: #0f172a;
+  letter-spacing: -0.025em;
 }
 
-/* Document Form */
+.guide-documents-subtitle {
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Alerts */
+.guide-documents-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 2.5rem;
+  border-radius: var(--radius-md, 0.5rem);
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-alert {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.success-alert {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Form */
 .guide-documents-form {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
+  padding: 2.5rem;
 }
 
 .guide-documents-form-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .guide-documents-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: #475569;
+  margin-left: 0.25rem;
 }
 
 .guide-documents-select {
-  padding: 12px 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md, 0.5rem);
+  font-size: 0.95rem;
   font-family: inherit;
+  background: #f8fafc;
+  color: #0f172a;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #fff;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.guide-documents-select:hover {
+  border-color: #cbd5e1;
+  background: #ffffff;
 }
 
 .guide-documents-select:focus {
   outline: none;
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
-/* File Upload */
-.guide-documents-upload-section {
+/* File Upload Area */
+.guide-documents-upload {
+  position: relative;
+}
+
+.guide-documents-file-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.guide-documents-upload-area {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.guide-documents-dropzone {
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 40px 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-lg, 1rem);
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+  cursor: pointer;
+  transition: all 0.3s ease;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #f9fafb;
 }
 
-.guide-documents-dropzone:hover {
-  border-color: #e74c3c;
-  background-color: #ffe8e8;
+.guide-documents-upload-area:hover {
+  border-color: #4f46e5;
+  background: linear-gradient(to bottom, #eef2ff, #ffffff);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
 }
 
-.guide-documents-dropzone.drag-over {
-  border-color: #e74c3c;
-  background-color: #ffe8e8;
+.guide-documents-upload-area svg {
+  color: #4f46e5;
+  opacity: 0.8;
 }
 
-.guide-documents-dropzone-icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 12px;
-  color: #e74c3c;
-}
-
-.guide-documents-dropzone-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 8px 0;
-}
-
-.guide-documents-dropzone-hint {
-  font-size: 12px;
-  color: #6b7280;
+.guide-documents-upload-area p {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
   margin: 0;
 }
 
-.guide-documents-input {
-  display: none;
+.guide-documents-upload-area small {
+  font-size: 0.75rem;
+  color: #94a3b8;
 }
 
-/* Uploaded Documents */
-.guide-documents-uploaded {
-  margin-bottom: 24px;
-}
-
-.guide-documents-uploaded-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 12px 0;
-}
-
-.guide-documents-uploaded-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.guide-documents-uploaded-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background-color: #e8f5e9;
-  border-radius: 8px;
-  border-left: 4px solid #4caf50;
-}
-
-.guide-documents-uploaded-item-icon {
-  width: 40px;
-  height: 40px;
-  background-color: #4caf50;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.guide-documents-uploaded-item-info {
-  flex: 1;
-}
-
-.guide-documents-uploaded-item-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-}
-
-.guide-documents-uploaded-item-type {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0;
-}
-
-.guide-documents-uploaded-item-remove {
-  background: none;
-  border: none;
-  color: #4caf50;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.guide-documents-uploaded-item-remove:hover {
-  transform: scale(1.2);
-}
-
-/* Error Message */
-.guide-documents-error {
-  padding: 12px 15px;
-  background-color: #ffebee;
-  border: 1px solid #ffcdd2;
-  border-radius: 8px;
-  color: #c62828;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.guide-documents-error svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-/* Success Message */
-.guide-documents-success {
-  padding: 12px 15px;
-  background-color: #e8f5e9;
-  border: 1px solid #c8e6c9;
-  border-radius: 8px;
-  color: #2e7d32;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.guide-documents-success svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-/* Info Box */
-.guide-documents-info {
-  background-color: #e3f2fd;
-  border-left: 4px solid #2196f3;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 24px;
-}
-
-.guide-documents-info-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1565c0;
-  margin: 0 0 8px 0;
-}
-
-.guide-documents-info-text {
-  font-size: 13px;
-  color: #0d47a1;
-  margin: 0;
-}
-
-.guide-documents-info-list {
-  margin: 8px 0 0 20px;
-  padding: 0;
-}
-
-.guide-documents-info-list li {
-  font-size: 12px;
-  color: #0d47a1;
-  margin-bottom: 4px;
-}
-
-/* Actions */
-.guide-documents-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
+/* Submit Button */
 .guide-documents-button {
-  padding: 12px 24px;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: var(--radius-md, 0.5rem);
+  font-size: 0.95rem;
   font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2), 0 2px 4px -1px rgba(79, 70, 229, 0.1);
+  margin-top: 0.5rem;
 }
 
-.guide-documents-button.primary {
-  background-color: #e74c3c;
-  color: #fff;
-}
-
-.guide-documents-button.primary:hover:not(:disabled) {
-  background-color: #c0392b;
-}
-
-.guide-documents-button.secondary {
-  background-color: #f0f0f0;
-  color: #666;
-}
-
-.guide-documents-button.secondary:hover {
-  background-color: #e0e0e0;
+.guide-documents-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3), 0 4px 6px -2px rgba(79, 70, 229, 0.15);
+  transform: translateY(-1px);
 }
 
 .guide-documents-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Loading State */
-.guide-documents-loading {
+/* Uploaded Documents Section */
+.guide-documents-uploaded {
+  padding: 2.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.guide-documents-uploaded-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  font-size: 16px;
-  color: #999;
+  gap: 0.5rem;
 }
 
-/* Responsive */
+.guide-documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.guide-documents-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md, 0.5rem);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.guide-documents-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transform: translateX(4px);
+}
+
+.guide-documents-item svg {
+  color: #4f46e5;
+  flex-shrink: 0;
+}
+
+.guide-documents-item span:first-of-type {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0f172a;
+  text-transform: capitalize;
+}
+
+.guide-doc-status {
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(251, 191, 36, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Continue Button */
+.guide-documents-continue-button {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md, 0.5rem);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
+}
+
+.guide-documents-continue-button:hover {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .guide-documents-page {
     padding: 20px 10px;
+    padding-top: 6rem;
+  }
+
+  .guide-documents-header {
+    padding: 1.5rem 1.25rem;
   }
 
   .guide-documents-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
-  .guide-documents-form {
-    padding: 24px;
+  .guide-documents-form,
+  .guide-documents-uploaded {
+    padding: 1.5rem 1.25rem;
   }
 
-  .guide-documents-dropzone {
-    padding: 30px 20px;
+  .guide-documents-upload-area {
+    padding: 2rem 1rem;
   }
 
-  .guide-documents-actions {
-    flex-direction: column;
+  .guide-documents-alert {
+    margin: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .guide-documents-title {
+    font-size: 1.25rem;
   }
 
-  .guide-documents-button {
-    width: 100%;
+  .guide-documents-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .guide-documents-upload-area {
+    padding: 1.5rem 1rem;
   }
 }
