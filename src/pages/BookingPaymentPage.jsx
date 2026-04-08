@@ -280,13 +280,16 @@ const BookingPaymentPage = () => {
         )}
 
         {(() => {
-          const travelDate = new Date(step1Data.travel_date);
+          if (!step1Data) return <div className="loading-small">Loading Summary...</div>;
+          
+          const travelDate = step1Data.travel_date ? new Date(step1Data.travel_date) : new Date();
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
           const isCloseIn = daysUntilTravel <= 30;
-          const depositAmount = isCloseIn ? step1Data.total_price : (step1Data.total_price * 0.3);
-          const balanceAmount = isCloseIn ? 0 : (step1Data.total_price * 0.7);
+          const totalPrice = parseFloat(step1Data.total_price) || 0;
+          const depositAmount = isCloseIn ? totalPrice : (totalPrice * 0.3);
+          const balanceAmount = isCloseIn ? 0 : (totalPrice * 0.7);
 
           return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
@@ -302,15 +305,15 @@ const BookingPaymentPage = () => {
                   </div>
                   <div className="summary-item">
                     <span>Date:</span>
-                    <strong>{step1Data.travel_date}</strong>
+                    <strong>{step1Data.travel_date || "TBD"}</strong>
                   </div>
                   <div className="summary-item">
                     <span>Guests:</span>
-                    <strong>{step1Data.adults} Adults, {step1Data.children} Children</strong>
+                    <strong>{step1Data.adults || 0} Adults, {step1Data.children || 0} Children</strong>
                   </div>
                   <div className="summary-item">
                     <span>Room:</span>
-                    <strong style={{ textTransform: 'capitalize' }}>{isDirectBooking ? "Tailored" : step1Data.room_type}</strong>
+                    <strong style={{ textTransform: 'capitalize' }}>{isDirectBooking ? "Tailored" : (step1Data.room_type || "Standard")}</strong>
                   </div>
 
                   {travellers.length > 0 && (
@@ -328,13 +331,13 @@ const BookingPaymentPage = () => {
 
                   <div className="summary-item total" style={{ borderTop: 'double #ddd', marginTop: '1rem', paddingTop: '1rem' }}>
                     <span>Total Package Price:</span>
-                    <span>${step1Data.total_price}</span>
+                    <span>${totalPrice}</span>
                   </div>
 
                   {isCloseIn ? (
                     <div className="summary-item full-payment" style={{ color: '#c53030', fontWeight: 'bold', fontSize: '1.2rem', marginTop: '1rem' }}>
                       <span>Full Payment Required:</span>
-                      <span>${step1Data.total_price}</span>
+                      <span>${totalPrice}</span>
                     </div>
                   ) : (
                     <>

@@ -336,40 +336,46 @@ function AdminCustomToursPage() {
                       <div className="note-group full-width">
                         <label className="text-primary font-bold mb-2 block">AI Generated Itinerary:</label>
                         <div className="itinerary-details-view" style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--admin-glass-border)' }}>
-                          {(Array.isArray(selectedRequest.recommendations) ? selectedRequest.recommendations : 
-                            (typeof selectedRequest.recommendations === 'string' ? JSON.parse(selectedRequest.recommendations || '[]') :
-                            (selectedRequest.preferences?.itinerary || []))).map((day, idx) => (
-                            <div key={idx} className="itinerary-day-row" style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: idx === ((Array.isArray(selectedRequest.recommendations) ? selectedRequest.recommendations.length : (selectedRequest.preferences?.itinerary?.length || 0)) - 1) ? 'none' : '1px solid var(--admin-glass-border)' }}>
-                              <div style={{ display: 'flex', gap: '1rem' }}>
-                                <div style={{ 
-                                  background: 'var(--admin-primary)', 
-                                  color: 'white', 
-                                  width: '32px', 
-                                  height: '32px', 
-                                  borderRadius: '50%', 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  justifyContent: 'center',
-                                  fontSize: '0.8rem',
-                                  fontWeight: 'bold',
-                                  flexShrink: 0
-                                }}>
-                                  {day.day}
-                                </div>
-                                <div>
-                                  <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--admin-text-primary)', fontSize: '1rem' }}>{day.location}</h4>
-                                  <p style={{ margin: '0 0 0.5rem 0', color: 'var(--admin-text-secondary)', fontSize: '0.9rem' }}>
-                                    <strong>Activities:</strong> {Array.isArray(day.activities) ? day.activities.join(' • ') : day.activities}
-                                  </p>
-                                  {(day.accommodation_type || day.stay) && (
-                                    <p style={{ margin: 0, color: 'var(--admin-text-muted)', fontSize: '0.85rem', fontStyle: 'italic', opacity: 0.7 }}>
-                                      Stay: {day.accommodation_type || day.stay}
+                          {(() => {
+                            let rawData = selectedRequest.recommendations || selectedRequest.preferences?.itinerary || [];
+                            if (typeof rawData === 'string') {
+                              try { rawData = JSON.parse(rawData); } catch(e) { rawData = []; }
+                            }
+                            const plan = Array.isArray(rawData) ? rawData : (rawData.daily_plan || []);
+                            
+                            return plan.map((day, idx) => (
+                              <div key={idx} className="itinerary-day-row" style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: idx === (plan.length - 1) ? 'none' : '1px solid var(--admin-glass-border)' }}>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                  <div style={{ 
+                                    background: 'var(--admin-primary)', 
+                                    color: 'white', 
+                                    width: '32px', 
+                                    height: '32px', 
+                                    borderRadius: '50%', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    flexShrink: 0
+                                  }}>
+                                    {day.day}
+                                  </div>
+                                  <div>
+                                    <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--admin-text-primary)', fontSize: '1rem' }}>{day.location}</h4>
+                                    <p style={{ margin: '0 0 0.5rem 0', color: 'var(--admin-text-secondary)', fontSize: '0.9rem' }}>
+                                      <strong>Activities:</strong> {Array.isArray(day.activities) ? day.activities.join(' • ') : day.activities}
                                     </p>
-                                  )}
+                                    {(day.accommodation_type || day.stay) && (
+                                      <p style={{ margin: 0, color: 'var(--admin-text-muted)', fontSize: '0.85rem', fontStyle: 'italic', opacity: 0.7 }}>
+                                        Stay: {day.accommodation_type || day.stay}
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ));
+                          })()}
                         </div>
                       </div>
                     )}

@@ -113,6 +113,24 @@ export const chatAPI = {
       console.error("Chat sendSessionMessage Error:", error);
       return { success: false, message: error.message || "Failed to send session message." };
     }
+  },
+
+  // Sync entire chat history for a session (AI generation journey)
+  syncHistory: async (sessionId, messages, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai/sync-history`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ sessionId, messages })
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Chat syncHistory Error:", error);
+      return { success: false, message: error.message || "Failed to sync history." };
+    }
   }
 };
 

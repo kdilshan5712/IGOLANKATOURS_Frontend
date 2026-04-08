@@ -8,9 +8,10 @@ import {
   Users, Plane, Star, Hotel, Info,
   Zap, Award, ShieldCheck, Image as ImageIcon, Heart, Camera,
   ThumbsUp, MessageSquare, Save, Edit3, ChevronRight, Activity,
-  ChevronDown, ChevronUp, Mail, Phone, User
+  ChevronDown, ChevronUp, Mail, Phone, User, X
 } from "lucide-react";
 import axios from "axios";
+import { chatAPI } from "../services/api";
 import "./ChatAgentPage.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -27,6 +28,18 @@ const HERO_IMAGES = {
   default: "/ai-tours/sigiriya.png"
 };
 
+// ─── Signature Seal Component ──────────────────────────────────────────────────
+const SignatureSeal = () => (
+    <div className="signature-seal">
+        <div className="seal-outer">
+            <div className="seal-inner">
+                <span className="seal-text">IGO LANKA</span>
+                <Sparkles size={10} className="seal-sparkle" />
+            </div>
+        </div>
+    </div>
+);
+
 const getHeroImage = (route = []) => {
   if (!route || route.length === 0) return HERO_IMAGES.default;
   const firstCity = route[0].toLowerCase();
@@ -36,69 +49,59 @@ const getHeroImage = (route = []) => {
   return HERO_IMAGES.default;
 };
 
-// ─── Lead Capture Modal ────────────────────────────────────────────────────────
-const LeadCaptureModal = ({ isOpen, onClose, onConfirm, draft, selectedTier }) => {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
-  const [loading, setLoading] = useState(false);
+/**
+ * 🔒 AuthGatewayModal — Replaces Lead Capture with Signature Membership Requirement
+ */
+const AuthGatewayModal = ({ isOpen, onClose, draft, selectedTier }) => {
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    await onConfirm(formData);
-    setLoading(false);
+  const handleRedirect = (path) => {
+    // Save current draft context to localStorage for auto-resume
+    localStorage.setItem("pending_signature_submission", JSON.stringify({
+      draft,
+      selectedTier,
+      timestamp: Date.now()
+    }));
+    navigate(path, { state: { from: "/custom-tour-chat" } });
   };
 
   return (
-    <div className="anonymous-form-overlay">
-      <div className="anonymous-form-card">
-        <button className="form-close" onClick={onClose}><XCircle size={20} /></button>
-        <div className="form-head">
-          <div className="form-icon"><Sparkles size={24} /></div>
-          <h3>Secure Your Signature Tour</h3>
-          <p>Please provide your contact details. Our elite travel designers will finalize this {draft.duration_days}-day journey specifically for you.</p>
+    <div className="modal-overlay-v3" onClick={onClose}>
+      <div className="auth-gateway-card glass-panel-v3" onClick={e => e.stopPropagation()}>
+        <div className="auth-header-v3">
+          <div className="signature-medal">
+            <Award size={32} color="#c5a059" />
+          </div>
+          <h2>Signature Membership Required</h2>
+          <p>Join our elite travel community to finalize your custom itinerary and receive designer pricing.</p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="lead-form">
-          <div className="form-group">
-            <label><User size={14} /> Full Name</label>
-            <input 
-              required 
-              type="text" 
-              placeholder="e.g. Kavindu Dilshan"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-            />
+
+        <div className="auth-options-v3">
+          <div className="auth-option primary">
+            <h3>New to IGO LANKA?</h3>
+            <p>Create an account to track your Signature requests and chat directly with our travel designers.</p>
+            <button className="auth-btn-v3 register" onClick={() => handleRedirect("/register")}>
+              Become a Signature Member
+            </button>
           </div>
-          <div className="form-group">
-            <label><Mail size={14} /> Email Address</label>
-            <input 
-              required 
-              type="email" 
-              placeholder="e.g. kavindu@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-            />
+
+          <div className="auth-divider-v3">
+            <span>OR</span>
           </div>
-          <div className="form-group">
-            <label><Phone size={14} /> WhatsApp / Phone</label>
-            <input 
-              required 
-              type="tel" 
-              placeholder="+94 77 123 4567"
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            />
+
+          <div className="auth-option secondary">
+            <h3>Already a Member?</h3>
+            <button className="auth-btn-v3 login" onClick={() => handleRedirect("/login")}>
+              Log In to Submit
+            </button>
           </div>
-          
-          <div className="form-footer">
-             <button type="submit" className="btn-primary" disabled={loading}>
-               <Send size={18} /> {loading ? "Connecting to Concierge..." : "Confirm & Send to Experts"}
-             </button>
-             <p className="privacy-note">Privacy Guaranteed. Only Elite Travel Design.</p>
-          </div>
-        </form>
+        </div>
+
+        <button className="modal-close-v3" onClick={onClose}>
+          <X size={20} />
+        </button>
       </div>
     </div>
   );
@@ -154,8 +157,11 @@ const stripJsonFromText = (text, hasDraft = false) => {
   if (rawJsonMatched) cleaned = cleaned.replace(rawJsonMatched, "");
   cleaned = cleaned.replace(/```json[\s\S]*?```/gi, "").trim();
   cleaned = cleaned.replace(/👉\s*"You can send.*?booking\."/gi, "").trim();
+  
+  // Also remove the "and more exciting stops ahead" if it exists as a fallback
+  cleaned = cleaned.replace(/\.\.\.and more exciting stops ahead!/gi, "").trim();
+
   if (hasDraft) {
-    // If we have a draft, remove parts of the text that look like a manual itinerary
     const sectionBreak = cleaned.search(/\n\s*(Tour Overview|Experience Highlights|Pricing Overview|Day-by-Day Plan)/i);
     if (sectionBreak > 0) cleaned = cleaned.slice(0, sectionBreak).trim();
   }
@@ -163,11 +169,11 @@ const stripJsonFromText = (text, hasDraft = false) => {
 };
 
 // ─── RenderText Component ──────────────
-const RenderText = ({ text }) => {
+const RenderText = ({ text, sender }) => {
   if (!text) return null;
   const lines = text.split("\n");
   return (
-    <div className="message-text">
+    <div className={`message-text ${sender === 'assistant' ? 'luxury-font' : ''}`}>
       {lines.map((line, i) => {
         const trimmed = line.trim();
         if (!trimmed) return <br key={i} />;
@@ -190,24 +196,32 @@ const RenderText = ({ text }) => {
   );
 };
 
-// ─── Signature Seal SVG ──────────────
-const SignatureSeal = () => (
-  <svg width="100" height="100" viewBox="0 0 100 100" className="signature-seal">
-    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" />
-    <path id="curve" fill="none" d="M 20,50 A 30,30 0 1,1 80,50 A 30,30 0 1,1 20,50" />
-    <text fontSize="8" fontWeight="900" letterSpacing="2">
-      <textPath xlinkHref="#curve">IGOLANKA SIGNATURE • ELITE DESIGN • </textPath>
-    </text>
-    <path d="M35 50 L45 60 L65 40" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+// ─── Experience Icon Mapping ───────────────────────────────────────────────────
+const EXPERIENCE_ICONS = {
+  beach: Sun,
+  wildlife: Activity,
+  safari: Activity,
+  culture: Landmark,
+  nature: Palmtree,
+  luxury: Sparkles,
+  adventure: Zap,
+  romance: Heart,
+  surfing: Waves,
+  hiking: Footprints,
+  default: MapPin
+};
+
+import { 
+  Landmark, Palmtree, Waves, Footprints, Share2, 
+  Download, CreditCard, Settings2 
+} from "lucide-react";
 
 // ─── Proposal Card Component ──────────────
 const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
   const [isItineraryExpanded, setIsItineraryExpanded] = useState(false);
   const [selectedTier, setSelectedTier] = useState('standard');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const pricing = draft.pricing_estimate || { budget: 350, standard: 650, luxury: 1200 };
   const dailyPlan = draft.daily_plan || [];
@@ -216,16 +230,16 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
   const handleInitiateSend = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-        setShowLeadModal(true);
+        setShowAuthModal(true);
     } else {
         handleConfirmSend();
     }
   };
 
-  const handleConfirmSend = async (contactData = null) => {
+  const handleConfirmSend = async () => {
     setIsSubmitted(true);
-    setShowLeadModal(false);
-    await onSendToTeam(draft, selectedTier, contactData);
+    setShowAuthModal(false);
+    await onSendToTeam(draft, selectedTier);
   };
 
   if (isSubmitted) {
@@ -245,13 +259,11 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
     );
   }
 
-  const inclusions = [
-    "Private Chauffeur-Guide throughout",
-    "Luxury Handpicked Accommodations",
-    "Daily Gourmet Breakfast & Select Dinners",
-    "All Entrance Fees & Private Logistics",
-    "24/7 Elite Concierge Support"
-  ];
+  const getExpIcon = (tag) => {
+    const key = tag.toLowerCase().trim();
+    const Icon = EXPERIENCE_ICONS[key] || EXPERIENCE_ICONS.default;
+    return <Icon size={14} />;
+  };
 
   return (
     <>
@@ -263,99 +275,94 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
         {/* 1. Cinematic Hero */}
         <div className="hero-section">
           <img src={getHeroImage(draft.route)} alt="Tour Hero" className="hero-image" />
-          <div className="hero-gradient"></div>
+          <div className="hero-overlay"></div>
           <div className="hero-content">
             <div className="hero-badge"><Sparkles size={12} /> SIGNATURE AI DESIGN</div>
             <h2 className="hero-title">{draft.title || `${days}-Day Sri Lanka Experience`}</h2>
             <div className="hero-meta">
-              <span><Clock size={16} /> {days} Days</span>
-              <span><ShieldCheck size={16} /> {draft.travel_style || "Standard"}</span>
-              <span><Users size={16} /> {draft.group_type || "Couple"}</span>
+              <span className="meta-item"><Clock size={16} /> {days} Days</span>
+              <span className="meta-item"><Users size={16} /> {draft.group_type || "Couple"}</span>
             </div>
           </div>
         </div>
 
-        {/* 2. Route Timeline */}
-        <div className="route-timeline">
-           {draft.route?.map((city, idx) => (
-             <React.Fragment key={idx}>
-               <span className="route-city">{city}</span>
-               {idx < draft.route.length - 1 && <ArrowRight size={14} className="route-arrow" />}
-             </React.Fragment>
-           ))}
-        </div>
-
-        {/* 3. Summary & Tags */}
-        <div className="details-grid">
-          <div className="summary-col">
-             <h4>The Vision</h4>
-             <p>{draft.summary || "A bespoke journey designed to reveal the hidden gems of Sri Lanka."}</p>
-             <div className="experience-pills">
-                {draft.experience_tags?.map((tag, i) => (
-                  <span key={i} className="exp-pill">✦ {tag}</span>
-                ))}
-             </div>
+        {/* 2. Experience Tags & Route */}
+        <div className="proposal-body-v3">
+          <div className="experience-pills-v3">
+            {draft.experience_tags?.slice(0, 4).map((tag, i) => (
+              <span key={i} className="exp-pill-v3">
+                {getExpIcon(tag)}
+                {tag}
+              </span>
+            ))}
           </div>
-          <div className="inclusions-col">
-             <h4>What's Included</h4>
-             <ul className="incl-list">
-                {inclusions.map((item, i) => (
-                  <li key={i}><CheckCircle2 size={14} /> {item}</li>
-                ))}
-             </ul>
+
+          <div className="route-timeline-v3">
+             {draft.route?.map((city, idx) => (
+               <React.Fragment key={idx}>
+                 <span className="route-city-v3">{city}</span>
+                 {idx < draft.route.length - 1 && <ChevronRight size={10} className="route-arrow-v3" />}
+               </React.Fragment>
+             ))}
           </div>
         </div>
 
-        {/* 4. Pricing Selection */}
-        <div className="pricing-grid-wrapper">
-           <div className="pricing-header">
-              <span>SELECT YOUR TRAVEL TIER</span>
-              <Info size={14} />
-           </div>
-           <div className="pricing-grid">
+        {/* 3. Pricing Tabs */}
+        <div className="pricing-tabs-container">
+           <div className="pricing-tabs-header">
               {['budget', 'standard', 'luxury'].map((tier) => (
-                <div 
+                <button 
                   key={tier}
-                  className={`tier-card ${tier} ${selectedTier === tier ? 'active' : ''}`}
+                  className={`pricing-tab-btn ${selectedTier === tier ? 'active' : ''}`}
                   onClick={() => setSelectedTier(tier)}
                 >
-                  {tier === 'standard' && <div className="tier-tag">Recommended</div>}
-                  <div className="tier-name">{tier.toUpperCase()}</div>
-                  <div className="tier-price">${pricing[tier]}<small>/pp</small></div>
-                </div>
+                  {tier.toUpperCase()}
+                </button>
               ))}
+           </div>
+           
+           <div className="tier-display-v3">
+              <div className="tier-price-main">
+                <span className="currency">$</span>
+                <span className="amount">{pricing[selectedTier]}</span>
+                <span className="per-pp">/ total per person</span>
+              </div>
+              <p className="tier-description">
+                {selectedTier === 'luxury' 
+                  ? "Hand-picked 5-star boutiques, private premier chauffeur, and exclusive VIP access."
+                  : selectedTier === 'standard'
+                  ? "Charming 3-4 star villas, private A/C transport, and iconic highlights."
+                  : "Authentic guesthouses, local transport options, and essential Sri Lankan soul."
+                }
+              </p>
            </div>
         </div>
 
-        {/* 5. Collapsible Itinerary */}
-        <div className="itinerary-section-v2">
+        {/* 4. Collapsible Itinerary */}
+        <div className="itinerary-section-v3">
           <button 
-            className="itinerary-expand-btn"
+            className="itinerary-toggle-v3"
             onClick={() => setIsItineraryExpanded(!isItineraryExpanded)}
           >
-            {isItineraryExpanded ? "Hide Full Journey" : "Explore Day-by-Day Journey"}
-            {isItineraryExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            <Calendar size={18} />
+            {isItineraryExpanded ? "Hide Full Itinerary" : "Explore Day-by-Day Journey"}
+            <div className={`toggle-icon ${isItineraryExpanded ? 'open' : ''}`}>
+               <ChevronDown size={20} />
+            </div>
           </button>
           
           {isItineraryExpanded && (
-            <div className="itinerary-v2-grid">
+            <div className="itinerary-scroll-v3">
               {dailyPlan.map((day, idx) => (
-                <div key={idx} className="day-card-v2">
-                  <div className="day-header">
-                    <span className="day-ordinal">DAY {idx + 1}</span>
+                <div key={idx} className="day-card-v3">
+                  <div className="day-label-v3">DAY {idx + 1}</div>
+                  <div className="day-info-v3">
                     <h5>{day.location}</h5>
-                  </div>
-                  <div className="day-body">
-                    <p>{day.description}</p>
-                    <div className="day-tags">
+                    <div className="day-acts-v3">
                        {day.activities?.map((act, i) => (
-                         <span key={i} className="day-act">✦ {act}</span>
+                         <span key={i} className="act-dot">✦ {act}</span>
                        ))}
                     </div>
-                  </div>
-                  <div className="day-footer-meta">
-                     {day.stay && <span><Hotel size={12} /> {day.stay}</span>}
-                     {day.travel_notes && <span><Plane size={12} /> {day.travel_notes}</span>}
                   </div>
                 </div>
               ))}
@@ -363,29 +370,39 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
           )}
         </div>
 
-        {/* 6. Elite Actions */}
-        <div className="card-actions-v2">
-           <button className="primary-action-btn" onClick={handleInitiateSend}>
-              <Zap size={20} />
-              Finalize Proposal with Humans
-           </button>
-           <div className="secondary-buttons">
-              <button className="sec-btn" onClick={onModify}><Edit3 size={16} /> Refine Plan</button>
-              <button className="sec-btn" onClick={onChange}><RefreshCw size={16} /> Start Over</button>
+        {/* 5. Master Actions */}
+         <div className="proposal-footer-v3">
+            <div className="footer-top-v3 centered-actions">
+               <button className="cta-btn primary-v3 full-width" onClick={handleInitiateSend}>
+                 <Send size={18} />
+                 Send to Admin for Approval
+               </button>
+            </div>
+           
+           <div className="footer-bottom-v3">
+              <button className="mini-btn-v3" onClick={onModify}>
+                 <Settings2 size={14} />
+                 Customize This Tour
+              </button>
+              <div className="share-actions-v3">
+                 <button className="icon-btn-v3" title="Save Itinerary"><Download size={16} /></button>
+                 <button className="icon-btn-v3" title="Share Journey"><Share2 size={16} /></button>
+              </div>
            </div>
         </div>
       </div>
 
-      <LeadCaptureModal 
-        isOpen={showLeadModal} 
-        onClose={() => setShowLeadModal(false)}
-        onConfirm={handleConfirmSend}
+      <AuthGatewayModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
         draft={draft}
         selectedTier={selectedTier}
       />
     </>
   );
 };
+
+// ─── Weather Card ─────────────────────────────────────────────────────────────
 
 // ─── Weather Card ─────────────────────────────────────────────────────────────
 const WeatherCard = ({ weather }) => {
@@ -425,8 +442,37 @@ const ChatAgentPage = () => {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [history, setHistory] = useState([]);
+  const [resumeData, setResumeData] = useState(null);
   const messagesEndRef = useRef(null);
   const location = useLocation();
+
+  // Check for auto-resume on mount
+  useEffect(() => {
+    const pending = localStorage.getItem("pending_signature_submission");
+    const token = localStorage.getItem("token");
+    
+    if (pending && token) {
+      try {
+        const parsed = JSON.parse(pending);
+        // Only resume if it's recent (within 2 hours)
+        if (Date.now() - parsed.timestamp < 2 * 60 * 60 * 1000) {
+          setResumeData(parsed);
+          
+          // Add a resume prompt to the chat
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            sender: "assistant",
+            text: `Welcome back, Signature Member! 🥂 I have preserved your custom itinerary. Would you like to submit it for final approval now?`,
+            tourDraft: parsed.draft,
+            timestamp: new Date()
+          }]);
+        }
+        localStorage.removeItem("pending_signature_submission");
+      } catch (e) {
+        localStorage.removeItem("pending_signature_submission");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const savedMsg = sessionStorage.getItem("chat_messages");
@@ -469,7 +515,7 @@ const ChatAgentPage = () => {
       const token = localStorage.getItem("token");
       const res = await axios.post(`${API_BASE}/ai/chat`, { 
         message: text, 
-        history: updatedHistory.slice(-10) 
+        history: updatedHistory.slice(-5) 
       }, {
         headers: { ...(token && { Authorization: `Bearer ${token}` }) }
       });
@@ -505,14 +551,16 @@ const ChatAgentPage = () => {
     }
   };
 
-  const handleSendToTeam = async (draft, tier, contactData = null) => {
+  const handleSendToTeam = async (draft, tier) => {
     try {
       const token = localStorage.getItem("token");
+      if (!token) return;
+
       const pricing = draft.pricing_estimate || {};
       const selectedPrice = pricing[tier] || 0;
 
-      // Extract user info if authenticated
-      const userName = localStorage.getItem("userName");
+      // Extract user info from Signature account
+      const userName = localStorage.getItem("userName") || "Signature Member";
       const userEmail = localStorage.getItem("userEmail");
 
       const payload = {
@@ -524,16 +572,32 @@ const ChatAgentPage = () => {
         estimated_price_min: selectedPrice,
         estimated_price_max: selectedPrice * 1.2,
         recommendations: draft,
-        // Use contactData if provided (anonymous flow) or fall back to localStorage (auth flow)
-        tourist_name: contactData?.name || userName || "Authenticated User",
-        tourist_email: contactData?.email || userEmail || "authenticated@example.com",
-        tourist_phone: contactData?.phone || "N/A"
+        tourist_name: userName,
+        tourist_email: userEmail,
+        tourist_phone: localStorage.getItem("userPhone") || "N/A"
       };
 
-      await axios.post(`${API_BASE}/ai/submit-custom-tour`, payload, {
+      const res = await axios.post(`${API_BASE}/ai/submit-custom-tour`, payload, {
         headers: { ...(token && { Authorization: `Bearer ${token}` }) }
       });
-      console.log("✅ Custom tour submitted successfully");
+      
+      const sessionId = res.data?.session?.session_id || res.data?.session_id;
+
+      if (sessionId) {
+        // Prepare history for admin sync
+        // Add a system notification as the final entry to clearly show the choice to the admin
+        const systemFinalMsg = {
+          id: Date.now(),
+          sender: "assistant", 
+          text: `[SYSTEM NOTIFICATION]: User has submitted this "${draft.title}" for approval. Selected Tier: ${tier.toUpperCase()} ($${selectedPrice}).`,
+          timestamp: new Date()
+        };
+
+        const messagesToSync = [...messages, systemFinalMsg];
+        
+        await chatAPI.syncHistory(sessionId, messagesToSync, token);
+        console.log("✅ Custom tour and history submitted successfully");
+      }
     } catch (err) {
       console.error("❌ Failed to submit tour:", err);
     }
@@ -565,9 +629,16 @@ const ChatAgentPage = () => {
               <p>Designing your bespoke journey to Sri Lanka</p>
             </div>
           </div>
-          <button className="reset-btn" style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }} onClick={() => { setMessages([]); setHistory([]); sessionStorage.clear(); window.location.reload(); }}>
-            <RefreshCw size={18} />
-          </button>
+          <div className="header-actions">
+            {messages.length > 1 && (
+              <button className="submit-consult-btn featured" onClick={() => handleSend("I want to submit this consultation to the team for review.")}>
+                <Award size={18} /> Send to Admin for Approval
+              </button>
+            )}
+            <button className="reset-btn" title="Restart Design Session" onClick={() => { setMessages([]); setHistory([]); sessionStorage.clear(); window.location.reload(); }}>
+              <RefreshCw size={18} />
+            </button>
+          </div>
         </header>
 
         <div className="chat-scroll-area">
@@ -576,29 +647,39 @@ const ChatAgentPage = () => {
               
                 {msg.sender === "assistant" && (
                     <div className="ai-mini-header" style={{ fontSize: '0.65rem', fontWeight: 900, color: '#c5a059', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Bot size={14} /> <span>ELITE CONCIERGE</span>
+                        <Bot size={14} /> <span>SIGNATURE AI AGENT</span>
                     </div>
                 )}
 
               <div className="message-content">
                 {msg.text && (
                   <div className={`text-bubble ${msg.sender}`}>
-                    <RenderText text={msg.text} />
+                    <RenderText text={msg.text} sender={msg.sender} />
                   </div>
                 )}
 
                 {msg.weather && <WeatherCard weather={msg.weather} />}
 
                 {msg.tourDraft && (
-                  <ProposalCard 
-                    draft={msg.tourDraft} 
-                    onSendToTeam={handleSendToTeam}
-                    onModify={() => setUserInput("I want to modify some parts of this tour.")}
-                    onChange={() => setUserInput("Can you make some changes to this itinerary?")}
-                  />
+                  <div className="proposal-render-container">
+                    <ProposalCard 
+                        draft={msg.tourDraft} 
+                        onSendToTeam={handleSendToTeam}
+                        onModify={() => setUserInput("I want to modify some parts of this tour.")}
+                        onChange={() => setUserInput("Can you make some changes to this itinerary?")}
+                    />
+                  </div>
                 )}
               </div>
               
+                {msg.sender === "assistant" && !msg.tourDraft && msg.text?.toLowerCase().includes("day") && (
+                  <div className="ai-repair-hint">
+                    <button className="btn-repair" onClick={() => handleSend("Please generate the full signature proposal card for this itinerary.")}>
+                      <Zap size={14} /> Sync Itinerary to Card
+                    </button>
+                  </div>
+                )}
+
               <span className="message-timestamp">
                 {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </span>
