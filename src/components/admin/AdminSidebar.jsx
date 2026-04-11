@@ -13,11 +13,13 @@ import {
   ShieldCheck,
   LogOut,
   Tag,
+  Ticket,
   DollarSign,
   MapPin,
   HelpCircle,
   UserCircle,
-  Home
+  Home,
+  History
 } from "lucide-react";
 
 import { adminAPI } from "../../services/api";
@@ -74,6 +76,7 @@ function AdminSidebar({ isOpen, onClose }) {
     { to: "/admin/packages", icon: Package, label: "Packages" },
     { to: "/admin/destinations", icon: MapPin, label: "Destinations" },
     { to: "/admin/pricing-rules", icon: Tag, label: "Pricing Rules" },
+    { to: "/admin/coupons", icon: Ticket, label: "Coupons" }, // Added Coupons
     { to: "/admin/bookings", icon: CalendarDays, label: "Bookings" },
     { 
       to: "/admin/guides", 
@@ -109,7 +112,8 @@ function AdminSidebar({ isOpen, onClose }) {
     },
     { to: "/admin/admins", icon: ShieldCheck, label: "Manage Admins" },
     { to: "/admin/faqs", icon: HelpCircle, label: "Manage FAQs" },
-    { to: "/admin/profile", icon: LayoutDashboard, label: "Profile" },
+    { to: "/admin/audit-logs", icon: History, label: "System Logs" },
+    { to: "/admin/profile", icon: UserCircle, label: "Profile" },
   ];
 
   return (

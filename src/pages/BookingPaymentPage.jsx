@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Lock, AlertCircle, Loader, CheckCircle, CreditCard, Calendar, User, Users } from "lucide-react";
-import { packageAPI, authAPI, bookingAPI } from "../services/api";
+import { packageAPI, authAPI, bookingAPI, couponAPI } from "../services/api";
+
 import paymentService from "../services/paymentService";
 import "./BookingPaymentPage.css";
 
@@ -112,6 +113,12 @@ const BookingPaymentPage = () => {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [promoCode, setPromoCode] = useState("");
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoError, setPromoError] = useState(null);
+
 
   useEffect(() => {
     // 1. Auth Check
@@ -161,20 +168,87 @@ const BookingPaymentPage = () => {
     setStep1Data(JSON.parse(s1));
     setTravellers(JSON.parse(s2));
 
-    // 4. Load Package
-    const fetchPackage = async () => {
+    // 4. Load Package/Booking for recovery
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+        // If s1 is missing, we might be coming from a direct link (notification)
+        if (!s1) {
+          console.log(`🔍 No session data found. Attempting to recover context for ID: ${id}...`);
+          
+          // If ID is numeric, it's a booking ID
+          if (/^\d+$/.test(id)) {
+            try {
+              const res = await bookingAPI.getById(id, authAPI.getToken());
+              if (res.success && res.booking) {
+                const b = res.booking;
+                setIsDirectBooking(true);
+                setExistingBooking(b);
+                setStep1Data({
+                  package_id: b.package_id,
+                  travel_date: b.travel_date,
+                  total_price: b.total_price,
+                  adults: b.travelers || 1,
+                  children: 0,
+                  room_type: "Standard",
+                  special_requests: b.admin_notes || ""
+                });
+                setLoading(false);
+                return;
+              }
+            } catch (err) {
+              console.warn("Failed to recover booking:", err);
+            }
+          }
+          
+          // If we can't recover a booking and have no session, we must go back
+          navigate(`/booking/${id}`);
+          return;
+        }
+
+        // Standard flow: Load package data
         const data = await packageAPI.getById(id);
         setPackageData(data);
       } catch (e) {
-        setError("Failed to load package data");
+        console.error("Fetch error:", e);
+        setError("Failed to load booking context. Please try starting the booking again.");
       } finally {
         setLoading(false);
       }
     };
-    fetchPackage();
+    fetchData();
 
   }, [id, navigate, location.state]);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    
+    setIsValidatingPromo(true);
+    setPromoError(null);
+    
+    try {
+      const amount = step1Data.total_price;
+      const res = await couponAPI.validate(promoCode, amount);
+      
+      if (res.success) {
+        setPromoDiscount(res.coupon.applied_discount);
+        setAppliedPromo(res.coupon);
+        setPromoError(null);
+      } else {
+        setPromoError(res.message || "Invalid coupon code");
+        setPromoDiscount(0);
+        setAppliedPromo(null);
+      }
+    } catch (err) {
+      setPromoError("Failed to validate coupon");
+    } finally {
+      setIsValidatingPromo(false);
+    }
+  };
 
   const handlePay = async () => {
     setProcessing(true);
@@ -200,6 +274,7 @@ const BookingPaymentPage = () => {
           room_type: step1Data.room_type,
           special_requests: step1Data.special_requests,
           travellers: travellers,
+          promo_code: appliedPromo ? appliedPromo.code : null,
         };
 
         const bookingRes = await bookingAPI.create(payload, token);
@@ -334,32 +409,77 @@ const BookingPaymentPage = () => {
                     <span>${totalPrice}</span>
                   </div>
 
+                  {appliedPromo && (
+                    <div className="summary-item discount" style={{ color: '#2f855a', fontSize: '1rem', marginTop: '0.5rem' }}>
+                      <span>Discount ({appliedPromo.code}):</span>
+                      <span>-${promoDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+
                   {isCloseIn ? (
                     <div className="summary-item full-payment" style={{ color: '#c53030', fontWeight: 'bold', fontSize: '1.2rem', marginTop: '1rem' }}>
                       <span>Full Payment Required:</span>
-                      <span>${totalPrice}</span>
+                      <span>${(totalPrice - promoDiscount).toFixed(2)}</span>
                     </div>
                   ) : (
                     <>
                       <div className="summary-item deposit" style={{ color: '#2e7d32', fontWeight: 'bold', fontSize: '1.2rem', marginTop: '1rem' }}>
                         <span>Deposit Due Today (30%):</span>
-                        <span>${depositAmount.toFixed(2)}</span>
+                        <span>${((totalPrice - promoDiscount) * 0.3).toFixed(2)}</span>
                       </div>
 
                       <div className="summary-item balance" style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
                         <span>Remaining Balance (70%):</span>
-                        <span>${balanceAmount.toFixed(2)}</span>
+                        <span>${((totalPrice - promoDiscount) * 0.7).toFixed(2)}</span>
                       </div>
                     </>
                   )}
+
                   
                   <p style={{ fontSize: '0.8rem', color: '#718096', marginTop: '0.5rem', fontStyle: 'italic' }}>
                     {isCloseIn 
                       ? "* Tours starting within 30 days require full payment at the time of booking."
                       : "* Balance must be paid at least 30 days before departure."}
                   </p>
+
+                  {!isDirectBooking && (
+                    <div className="promo-section" style={{ marginTop: '2rem', borderTop: '1px solid #edf2f7', paddingTop: '1.5rem' }}>
+                      <h3 style={{ fontSize: '1rem', color: '#2d3748', marginBottom: '1rem' }}>Promo Code</h3>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input
+                          type="text"
+                          placeholder="Enter code"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          disabled={isValidatingPromo || appliedPromo}
+                          style={{ flex: 1, padding: '0.6rem', border: '1px solid #cbd5e0', borderRadius: '4px' }}
+                        />
+                        <button
+                          onClick={handleApplyPromo}
+                          disabled={isValidatingPromo || !promoCode || appliedPromo}
+                          className="btn-apply"
+                          style={{ padding: '0 1rem', background: '#4a5568', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          {isValidatingPromo ? '...' : (appliedPromo ? 'Applied' : 'Apply')}
+                        </button>
+                      </div>
+                      {promoError && <p style={{ color: '#e53e3e', fontSize: '0.8rem', marginTop: '0.5rem' }}>{promoError}</p>}
+                      {appliedPromo && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', background: '#f0fff4', padding: '0.5rem', borderRadius: '4px' }}>
+                          <span style={{ color: '#2f855a', fontSize: '0.8rem' }}>Code <strong>{appliedPromo.code}</strong> applied!</span>
+                          <button 
+                            onClick={() => { setAppliedPromo(null); setPromoDiscount(0); setPromoCode(""); }}
+                            style={{ background: 'none', border: 'none', color: '#c53030', cursor: 'pointer', fontSize: '0.75rem' }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
+
 
               {/* Right Col: Payment */}
               <div>

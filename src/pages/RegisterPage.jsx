@@ -13,7 +13,8 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryRedirect = new URLSearchParams(location.search).get("redirect");
-  const from = queryRedirect || location.state?.from || "/";
+  const sessionRedirect = sessionStorage.getItem('returnUrl');
+  const from = queryRedirect || location.state?.from || sessionRedirect || "/";
 
   const [formData, setFormData] = useState({
     name: "",

@@ -2,9 +2,28 @@
 // Handles all backend communication
 
 // ============================================
-// API Configuration
+// API Configuration & Secure Fetch Helper
 // ============================================
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+/**
+ * Enhanced fetch wrapper that ensures credentials (cookies) are sent
+ * and handles base URL joining.
+ */
+const secureFetch = async (endpoint, options = {}) => {
+  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+  
+  const defaultOptions = {
+    ...options,
+    credentials: "include", // Essential for HttpOnly cookies
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  };
+
+  return fetch(url, defaultOptions);
+};
 
 // ============================================
 // API Service Functions
@@ -17,11 +36,10 @@ export const chatAPI = {
     try {
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}`, {
+      const response = await secureFetch(`/chat/${bookingId}`, {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Authorization": `Bearer ${token}`
         }
       });
 
@@ -37,11 +55,10 @@ export const chatAPI = {
     try {
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}`, {
+      const response = await secureFetch(`/chat/${bookingId}`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ message })
       });
@@ -58,11 +75,10 @@ export const chatAPI = {
     try {
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`${API_BASE_URL}/chat/${bookingId}/authorize`, {
+      const response = await secureFetch(`/chat/${bookingId}/authorize`, {
         method: "PATCH",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ is_authorized })
       });
@@ -422,9 +438,8 @@ export const authAPI = {
   // Tourist registration -> POST /api/auth/register
   register: async (userData) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      const res = await secureFetch("/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: userData.email,
           password: userData.password,
@@ -475,9 +490,8 @@ export const authAPI = {
   // Login -> POST /api/auth/login
   login: async (email, password) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      const res = await secureFetch("/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
 
@@ -517,6 +531,30 @@ export const authAPI = {
     }
   },
 
+  // Refresh token -> POST /api/auth/refresh
+  refreshToken: async () => {
+    try {
+      const res = await secureFetch("/auth/refresh", {
+        method: "POST"
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.message || "Session renewal failed" };
+      }
+
+      // If backend returns a new access token, update it
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      return { success: true, token: data.token };
+
+    } catch (error) {
+      console.error("Token Refresh Error:", error);
+      return { success: false, message: "Connection error during session renewal." };
+    }
+  },
+
   // Get current user from token
   getCurrentUser: () => {
     const userStr = localStorage.getItem("user");
@@ -545,21 +583,26 @@ export const authAPI = {
   },
 
   // Logout
-  logout: () => {
+  logout: async () => {
+    try {
+      await secureFetch("/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.warn("Backend logout failed, clearing local storage anyway");
+    }
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("loginTimestamp");
   },
 
   // Resend verification email
   resendVerification: async (email) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+      const res = await secureFetch("/auth/resend-verification", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
 
@@ -755,6 +798,24 @@ export const adminAPI = {
   },
 
   // Revenue Report
+
+
+  // GET AUDIT LOGS
+  getAuditLogs: async (filters = {}, token) => {
+    try {
+      const authToken = token || localStorage.getItem("token");
+      const params = new URLSearchParams(filters).toString();
+      const url = `${API_BASE_URL}/admin/audit-logs?${params}`;
+      
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching audit logs:", error);
+      return { success: false, logs: [], pagination: { total: 0 } };
+    }
+  },
   getRevenueReport: async (dateFrom, dateTo, token) => {
     try {
       const params = new URLSearchParams();
@@ -2546,6 +2607,85 @@ export const galleryAPI = {
 };
 
 // 👤 USER DASHBOARD API
+export const couponAPI = {
+  // Validate a coupon (Public)
+  validate: async (code, amount) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/coupons/validate?code=${code}&amount=${amount}`);
+      const data = await res.json();
+      return data; // { success, message, coupon: { code, discount_type, discount_value, applied_discount } }
+    } catch (error) {
+      console.error("Error validating coupon:", error);
+      return { success: false, message: "Network error during coupon validation" };
+    }
+  },
+
+  // --- Admin Methods ---
+
+  // Get all coupons
+  getAll: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      return { success: false, coupons: [] };
+    }
+  },
+
+  // Create a new coupon
+  create: async (couponData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(couponData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error creating coupon:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Update a coupon
+  update: async (id, couponData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(couponData)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating coupon:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Delete a coupon
+  delete: async (id, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      return { success: false, message: "Network error" };
+    }
+  }
+};
+
 export const userAPI = {
   // Get user profile
   getProfile: async (token) => {

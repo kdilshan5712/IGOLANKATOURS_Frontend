@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
+import { authAPI } from "./services/api";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -59,6 +60,7 @@ import AdminPricingRulesPage from "./pages/admin/AdminPricingRulesPage";
 import AdminPayoutsPage from "./pages/admin/AdminPayoutsPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminFAQPage from "./pages/admin/AdminFAQPage";
+import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 // User Dashboard imports
 import UserDashboard from "./pages/UserDashboard";
 import UserProfile from "./pages/UserProfile";
@@ -72,22 +74,26 @@ import "./App.css";
 function App() {
   // Validate session on app load
   useEffect(() => {
-    const validateSession = () => {
+    const validateSession = async () => {
       const token = localStorage.getItem('token');
       const loginTimestamp = localStorage.getItem('loginTimestamp');
 
-      // If no token or timestamp, nothing to validate
-      if (!token || !loginTimestamp) {
-        return;
-      }
+      if (!token) return;
 
-      // Check if session has expired
-      const elapsed = Date.now() - parseInt(loginTimestamp);
-      if (elapsed > SESSION_CONFIG.SESSION_TIMEOUT) {
-        // Session expired, clear everything
-        console.log('Session expired on app load, clearing storage');
-        localStorage.clear();
-        sessionStorage.clear();
+      // Check if session is roughly near expiry or on app load
+      // We attempt a silent refresh
+      try {
+        console.log('🔄 [App] Validating session via refresh token...');
+        const result = await authAPI.refreshToken();
+        if (!result.success) {
+          console.warn('⚠️ [App] Session refresh failed, logging out');
+          authAPI.logout();
+        } else {
+          console.log('✅ [App] Session renewed');
+          localStorage.setItem('loginTimestamp', Date.now().toString());
+        }
+      } catch (err) {
+        console.error('❌ [App] Session validation error:', err);
       }
     };
 
@@ -119,6 +125,7 @@ function App() {
             <Route path="pricing-rules" element={<AdminPricingRulesPage />} />
             <Route path="payouts" element={<AdminPayoutsPage />} />
             <Route path="faqs" element={<AdminFAQPage />} />
+            <Route path="audit-logs" element={<AdminAuditLogsPage />} />
           </Route>
 
           {/* Guide Routes - Using GuideLayout */}

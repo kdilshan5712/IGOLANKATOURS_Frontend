@@ -317,6 +317,22 @@ function AdminDashboardPage() {
     );
   }
 
+  const getRevenueDelta = () => {
+    if (!stats?.revenueTrends || stats.revenueTrends.length < 2) return null;
+    
+    // Last item is current month, second to last is previous month
+    const current = stats.revenueTrends[stats.revenueTrends.length - 1].revenue;
+    const previous = stats.revenueTrends[stats.revenueTrends.length - 2].revenue;
+    
+    if (previous === 0) return current > 0 ? "+100% Growth" : "New Month";
+    
+    const diff = ((current - previous) / previous) * 100;
+    const sign = diff >= 0 ? "+" : "";
+    return `${sign}${diff.toFixed(1)}% vs last month`;
+  };
+
+  const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+
   const statCards = [
     { label: "Tour Packages", value: stats?.total_packages || 0, icon: Package, color: "bg-blue-500", delta: "+2 this month" },
     { label: "Total Bookings", value: stats?.total_bookings || 0, icon: CalendarDays, color: "bg-green-500", delta: "+12% growth" },
@@ -351,7 +367,7 @@ function AdminDashboardPage() {
       action: true,
       delta: stats?.pending_payouts > 0 ? "+ Action Required" : "Up to date" 
     },
-    { label: "Revenue (MTD)", value: `$${stats?.total_revenue || 0} `, icon: DollarSign, color: "bg-emerald-600", delta: "+8% vs last month" },
+    { label: `${currentMonthName} Income`, value: `$${Number(stats?.total_revenue || 0).toLocaleString()} `, icon: DollarSign, color: "bg-emerald-600", delta: getRevenueDelta() || "MTD Performance" },
   ];
 
   return (
@@ -437,6 +453,51 @@ function AdminDashboardPage() {
               <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No data</div>
             )}
           </div>
+        </div>
+      </div>
+
+      <div className="section-container glass-panel chart-container" style={{ gridColumn: '1 / -1' }}>
+        <div className="section-header">
+          <h2 className="section-title"><Package size={20} className="stat-icon" style={{ color: '#ec4899' }} /> Top Performing Packages</h2>
+        </div>
+        <div style={{ height: 350, width: '100%', marginTop: '1rem' }}>
+          {stats?.topPackages?.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.topPackages} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ec4899" stopOpacity={1}/>
+                    <stop offset="100%" stopColor="#be185d" stopOpacity={0.8}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={80} 
+                  stroke="#6b7280" 
+                  fontSize={11} 
+                  tickLine={false} 
+                  axisLine={false} 
+                />
+                <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                <RechartsTooltip 
+                  cursor={{ fill: 'rgba(236, 72, 153, 0.05)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                />
+                <Bar 
+                  dataKey="bookings" 
+                  fill="url(#barGradient)" 
+                  radius={[6, 6, 0, 0]} 
+                  barSize={40}
+                  animationDuration={1500}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No data</div>
+          )}
         </div>
       </div>
 

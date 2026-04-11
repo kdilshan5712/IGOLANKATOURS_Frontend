@@ -26,7 +26,7 @@ const BookingStartPage = () => {
     // Check if user is logged in
     if (!authAPI.isAuthenticated()) {
       sessionStorage.setItem('returnUrl', `/booking/${id}`);
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
 
@@ -46,11 +46,28 @@ const BookingStartPage = () => {
     const fetchPackage = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        // Basic UUID format check (8-4-4-4-12 hex chars)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(id)) {
+          console.warn(`⚠️ Invalid package ID format: ${id}. This might be a booking or session ID.`);
+          
+          // If it's numeric, it's likely a booking ID
+          if (/^\d+$/.test(id)) {
+             setError("This link appears to be for an existing booking. Please visit your dashboard to manage your bookings.");
+          } else {
+             setError("Invalid package link. Please select a tour from our packages list.");
+          }
+          setLoading(false);
+          return;
+        }
+
         const data = await packageAPI.getById(id);
         setPackageData(data);
       } catch (err) {
         console.error("Error fetching package:", err);
-        setError("Failed to load package details");
+        setError("We couldn't find the tour package you're looking for. It may have been removed or the link might be broken.");
       } finally {
         setLoading(false);
       }

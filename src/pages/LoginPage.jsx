@@ -9,9 +9,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect handling: Priority Query Parameter -> State -> Home
+  // Redirect handling: Priority Query Parameter -> State -> SessionStorage -> Home
   const queryRedirect = new URLSearchParams(location.search).get("redirect");
-  const from = queryRedirect || location.state?.from || "/";
+  const sessionRedirect = sessionStorage.getItem('returnUrl');
+  const from = queryRedirect || location.state?.from || sessionRedirect || "/";
   const bookingFlow = location.state?.bookingFlow || false;
 
   const [formData, setFormData] = useState({
@@ -77,8 +78,10 @@ const LoginPage = () => {
           // Tourist → redirect back to booking flow or original page or home
           if (bookingFlow) {
             const packageId = from.split("/").pop();
+            sessionStorage.removeItem('returnUrl');
             navigate(`/booking/${packageId}`);
           } else {
+            sessionStorage.removeItem('returnUrl');
             navigate(from);
           }
         } else {

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { authAPI } from "../services/api";
 import { SESSION_CONFIG } from "../config/session";
 
@@ -12,6 +12,7 @@ import { SESSION_CONFIG } from "../config/session";
  * @param {string} props.redirectTo - Where to redirect if unauthorized
  */
 function ProtectedRoute({ children, requiredRole = null, redirectTo = "/login" }) {
+  const location = useLocation();
   const isAuthenticated = authAPI.isAuthenticated();
   const userRole = localStorage.getItem("userRole");
   const loginTimestamp = localStorage.getItem("loginTimestamp");
@@ -35,7 +36,7 @@ function ProtectedRoute({ children, requiredRole = null, redirectTo = "/login" }
 
   // Not logged in - redirect to login
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
 
   // Check if session is still valid
@@ -54,7 +55,7 @@ function ProtectedRoute({ children, requiredRole = null, redirectTo = "/login" }
       return <Navigate to="/login" state={{ error: "Access denied. Admin credentials required." }} replace />;
     }
     // Any other unauthorized access
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
 
   // Authorized - render the protected content
