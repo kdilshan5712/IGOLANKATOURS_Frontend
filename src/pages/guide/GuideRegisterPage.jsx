@@ -84,8 +84,8 @@ const GuideRegisterPage = () => {
         <div className="guide-register-container">
           <Card className="guide-register-card" padding="large">
             <div className="guide-register-header">
-              <h1 className="guide-register-title">Become a Tour Guide</h1>
-              <p className="guide-register-subtitle">Join our network of trusted local experts</p>
+              <h1 className="guide-register-title">Partner with Excellence</h1>
+              <p className="guide-register-subtitle">Join our elite network of trusted local experts</p>
             </div>
 
             {error && (

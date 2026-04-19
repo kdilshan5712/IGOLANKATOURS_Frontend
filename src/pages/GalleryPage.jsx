@@ -80,7 +80,7 @@ const GalleryPage = () => {
           <div className="text-center">
             <p className="text-red-500 mb-4">{error}</p>
             <button
-              onClick={fetchGalleryImages}
+              onClick={fetchGalleryData}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               Try Again

@@ -11,15 +11,14 @@
 
 .navbar.scrolled {
   background: linear-gradient(135deg,
-      rgba(37, 99, 235, 0.75) 0%,
-      rgba(59, 130, 246, 0.65) 50%,
-      rgba(96, 165, 250, 0.6) 100%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.1) inset;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      rgba(15, 23, 42, 0.85) 0%,
+      rgba(30, 41, 59, 0.75) 50%,
+      rgba(51, 65, 85, 0.7) 100%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .navbar.transparent {
@@ -92,8 +91,8 @@
 .navbar-logo-accent {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #fbbf24;
-  text-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  color: var(--color-accent);
+  text-shadow: 0 2px 8px rgba(197, 160, 89, 0.4);
 }
 
 /* Desktop Navigation */
@@ -143,8 +142,8 @@
   left: 0;
   bottom: -0.25rem;
   height: 2px;
-  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.5);
   width: 0;
   transition: width 0.3s;
 }
@@ -222,10 +221,10 @@
 }
 
 .cta-button.scrolled {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #1e293b;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+  color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4),
+  box-shadow: 0 4px 16px rgba(197, 160, 89, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.3) inset;
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
@@ -388,13 +387,13 @@
 .mobile-menu {
   display: block;
   background: linear-gradient(135deg,
-      rgba(37, 99, 235, 0.85) 0%,
-      rgba(59, 130, 246, 0.75) 100%);
+      rgba(15, 23, 42, 0.95) 0%,
+      rgba(30, 41, 59, 0.9) 100%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (min-width: 1024px) {

@@ -51,12 +51,12 @@
 }
 
 /* Category Badges */
-.category-booking-&-payments {
+.category-booking-payments {
   background: rgba(139, 92, 246, 0.1);
   color: #a78bfa;
 }
 
-.category-tours-&-travel {
+.category-tours-travel {
   background: rgba(16, 185, 129, 0.1);
   color: #34d399;
 }

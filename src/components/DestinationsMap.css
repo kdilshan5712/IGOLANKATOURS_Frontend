@@ -24,23 +24,28 @@
 }
 
 .destinations-map-footer {
-  margin-top: 1.5rem;
-  padding: 1.25rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 12px;
-  border-left: 4px solid #f59e0b;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-left: 4px solid var(--color-accent);
 }
 
 .destinations-map-note {
   margin: 0;
   font-size: 0.9375rem;
-  color: #78350f;
+  color: var(--color-primary);
   line-height: 1.6;
+  font-weight: 500;
 }
 
 .destinations-map-note strong {
-  color: #92400e;
-  font-weight: 600;
+  color: var(--color-accent);
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {

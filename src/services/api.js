@@ -443,7 +443,7 @@ export const authAPI = {
         body: JSON.stringify({
           email: userData.email,
           password: userData.password,
-          full_name: userData.name,
+          full_name: userData.full_name || userData.name,
           country: userData.country || null,
           phone: userData.phone || null
         })

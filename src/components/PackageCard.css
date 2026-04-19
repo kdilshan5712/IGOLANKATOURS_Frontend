@@ -2,15 +2,17 @@
 
 .package-card {
   background-color: #ffffff;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .package-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-premium);
 }
 
 /* Image Section */
@@ -53,16 +55,17 @@
 
 .package-category {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  padding: 0.25rem 0.75rem;
+  top: 1.25rem;
+  left: 1.25rem;
+  background: var(--color-primary);
+  color: #ffffff;
+  padding: 0.35rem 1rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #2563eb;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
 }
 
 .package-rating {
@@ -114,7 +117,7 @@
 }
 
 .package-rating svg {
-  color: #fbbf24;
+  color: var(--color-accent);
   fill: currentColor;
 }
 
@@ -196,33 +199,35 @@
 }
 
 .package-button {
-  padding: 0.625rem 1rem;
-  border-radius: 0.5rem;
-  background-color: #2563eb;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
   color: #ffffff;
   font-size: 0.875rem;
-  font-weight: 600;
-  border: 2px solid #2563eb;
+  font-weight: 700;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   text-decoration: none;
   display: inline-block;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
 }
 
 .package-button:hover {
-  background-color: #1d4ed8;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(197, 160, 89, 0.4);
+  filter: brightness(1.1);
 }
 
 .package-button-outline {
-  background-color: white;
-  color: #2563eb;
-  border: 2px solid #2563eb;
+  background: #ffffff;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .package-button-outline:hover {
-  background-color: #eff6ff;
-  transform: translateY(-2px);
+  background-color: var(--color-gray-100);
 }

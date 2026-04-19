@@ -1,8 +1,9 @@
 /* Footer Styles */
 
 .footer {
-  background-color: #0f172a;
-  color: #d1d5db;
+  background: var(--color-primary-dark);
+  color: var(--color-gray-400);
+  border-top: 1px solid var(--glass-border);
 }
 
 .footer-container {
@@ -39,7 +40,7 @@
 }
 
 .footer-brand-accent {
-  color: #fbbf24;
+  color: var(--color-accent);
 }
 
 .footer-brand-description {
@@ -66,7 +67,10 @@
 }
 
 .footer-social-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--color-accent);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
 }
 
 /* Links Section */

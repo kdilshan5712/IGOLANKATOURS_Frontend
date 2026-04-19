@@ -200,7 +200,7 @@ function AdminFAQPage() {
                   </div>
                 </td>
                 <td>
-                  <span className={`status-badge category-${faq.category?.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <span className={`status-badge category-${faq.category?.toLowerCase().replace(/[\s&]+/g, '-')}`}>
                     {faq.category}
                   </span>
                 </td>
