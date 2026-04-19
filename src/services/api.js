@@ -2156,40 +2156,23 @@ export const reviewAPI = {
   // Submit a review (tourist only - requires token)
   submit: async (token, reviewData) => {
     try {
-      // Check if images are included
       const hasImages = reviewData.images && reviewData.images.length > 0;
-
       let res;
+
       if (hasImages) {
-        // Use FormData for multipart upload
         const formData = new FormData();
-        formData.append('packageId', String(reviewData.packageId)); // Ensure it's a string for FormData
-        formData.append('rating', String(reviewData.rating)); // Ensure numeric values are explicitly stringified
+        formData.append('packageId', String(reviewData.packageId));
+        formData.append('rating', String(reviewData.rating));
         formData.append('title', reviewData.title || '');
         formData.append('comment', reviewData.comment);
-
-        // Append image files
-        reviewData.images.forEach(image => {
-          formData.append('images', image);
-        });
-
-        console.log("📤 Submitting review with FormData:", {
-          packageId: reviewData.packageId,
-          rating: reviewData.rating,
-          comment: reviewData.comment ? reviewData.comment.substring(0, 50) + '...' : '',
-          imageCount: reviewData.images.length
-        });
+        reviewData.images.forEach(image => formData.append('images', image));
 
         res = await fetch(`${API_BASE_URL}/reviews`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-            // Don't set Content-Type - browser will set it with boundary
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
           body: formData
         });
       } else {
-        // Standard JSON request
         res = await fetch(`${API_BASE_URL}/reviews`, {
           method: 'POST',
           headers: {
@@ -2205,21 +2188,10 @@ export const reviewAPI = {
         });
       }
 
-      const data = await res.json();
-
-      // Log response for debugging
-      if (!data.success) {
-        console.error("❌ Review submission failed:", {
-          status: res.status,
-          message: data.message,
-          error: data.error
-        });
-      }
-
-      return data; // { success, message, review }
+      return await res.json();
     } catch (error) {
       console.error("Error submitting review:", error);
-      return { success: false, message: "Failed to submit review" };
+      return { success: false, message: error.message };
     }
   },
 

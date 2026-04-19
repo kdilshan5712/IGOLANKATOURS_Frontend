@@ -273,12 +273,18 @@ const BookingPaymentPage = () => {
           children: step1Data.children,
           room_type: step1Data.room_type,
           special_requests: step1Data.special_requests,
-          travellers: travellers,
+          travellers: travellers.map(t => ({
+            full_name: t.fullName || t.full_name || '',
+            passport_number: t.passportNumber || t.passport_number || '',
+            nationality: t.nationality || '',
+            date_of_birth: t.dateOfBirth || t.date_of_birth || '',
+            type: t.type || 'adult',
+          })),
           promo_code: appliedPromo ? appliedPromo.code : null,
         };
 
         const bookingRes = await bookingAPI.create(payload, token);
-        if (!bookingRes.success) {
+        if (!bookingRes.booking) {
           if (bookingRes.errors) {
             setFieldErrors(bookingRes.errors);
             throw new Error("Please correct the traveler information errors below.");

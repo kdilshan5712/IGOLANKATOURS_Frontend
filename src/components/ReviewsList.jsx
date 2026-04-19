@@ -9,6 +9,7 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
   const [error, setError] = useState(null);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -72,6 +73,13 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
     ));
   };
 
+  const filteredReviews = reviews.filter(review => {
+    if (activeFilter === "all") return true;
+    if (activeFilter === "package") return !!review.package_id;
+    if (activeFilter === "website") return !review.package_id;
+    return true;
+  });
+
   return (
     <div className="reviews-list">
       <div className="reviews-list-header">
@@ -90,17 +98,41 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
             </div>
           </div>
         )}
+
+        {/* Filter Controls (only if not viewing a specific package) */}
+        {!packageId && reviews.length > 0 && (
+          <div className="reviews-filters">
+            <button 
+              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              All Reviews
+            </button>
+            <button 
+              className={`filter-btn ${activeFilter === 'package' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('package')}
+            >
+              Tour Packages
+            </button>
+            <button 
+              className={`filter-btn ${activeFilter === 'website' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('website')}
+            >
+              Website Experience
+            </button>
+          </div>
+        )}
       </div>
 
       {loading ? (
         <div className="reviews-loading">Loading reviews...</div>
       ) : error ? (
         <div className="reviews-error">{error}</div>
-      ) : reviews.length === 0 ? (
-        <div className="reviews-empty">No reviews yet. Be the first to share your experience!</div>
+      ) : filteredReviews.length === 0 ? (
+        <div className="reviews-empty">No reviews found for this category.</div>
       ) : (
         <div className="reviews-grid">
-          {reviews.map((review) => (
+          {filteredReviews.map((review) => (
             <div key={review.review_id} className="review-card">
               <div className="review-card-header">
                 <div className="review-author-info">
@@ -141,7 +173,14 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
                 </div>
               )}
               
-              <p className="review-meta">Rating: {review.rating}/5 ⭐</p>
+              <p className="review-meta">
+                {review.package_name ? (
+                  <span className="review-tag package-tag">{review.package_name}</span>
+                ) : (
+                  <span className="review-tag website-tag">Website Experience</span>
+                )}
+                <span className="review-rating-label">Rating: {review.rating}/5 ⭐</span>
+              </p>
             </div>
           ))}
         </div>

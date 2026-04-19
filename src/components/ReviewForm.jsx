@@ -5,10 +5,10 @@ import "./ReviewForm.css";
 
 const ReviewForm = ({ packageId = null }) => {
   const [formData, setFormData] = useState({
-    packageId: packageId || "",
     rating: 0,
     title: "",
     comment: "",
+    packageId: packageId || "",
   });
 
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -17,29 +17,22 @@ const ReviewForm = ({ packageId = null }) => {
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
   const [photos, setPhotos] = useState([]);
-  const [userBookings, setUserBookings] = useState([]);
   const [confirmedBookings, setConfirmedBookings] = useState([]);
   const token = localStorage.getItem("token");
 
-  // Fetch user bookings only - no need for all packages
+  // Fetch user bookings only
   useEffect(() => {
     if (token) {
       const fetchData = async () => {
         setLoading(true);
         try {
-          // 1. Fetch user's bookings
           const bookingResult = await bookingAPI.getMy(token);
-
           if (bookingResult.success && bookingResult.bookings) {
-            // Filter for confirmed or completed bookings
             const confirmed = bookingResult.bookings.filter(b =>
               b.status === 'confirmed' || b.status === 'completed'
             );
-
             setConfirmedBookings(confirmed);
 
-            // Extract unique packages from bookings for the dropdown
-            // We use a Map to ensure unique package_ids
             const uniquePackagesMap = new Map();
             confirmed.forEach(booking => {
               if (booking.package_id && !uniquePackagesMap.has(booking.package_id)) {
@@ -49,7 +42,6 @@ const ReviewForm = ({ packageId = null }) => {
                 });
               }
             });
-
             setPackages(Array.from(uniquePackagesMap.values()));
           }
         } catch (err) {
@@ -60,7 +52,6 @@ const ReviewForm = ({ packageId = null }) => {
           setLoading(false);
         }
       };
-
       fetchData();
     }
   }, [token]);
@@ -99,7 +90,6 @@ const ReviewForm = ({ packageId = null }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!token) {
       setMessage("Please log in to submit a review");
       setMessageType("error");
@@ -124,10 +114,9 @@ const ReviewForm = ({ packageId = null }) => {
       return;
     }
 
-    // Verify user has a confirmed booking for this package (Double check)
+    // Verify user has a confirmed booking for this package
     const hasBooking = confirmedBookings.some(b =>
-      b.package_id === parseInt(formData.packageId) ||
-      b.package_id === formData.packageId
+      String(b.package_id) === String(formData.packageId)
     );
 
     if (!hasBooking) {
@@ -138,13 +127,12 @@ const ReviewForm = ({ packageId = null }) => {
 
     setLoading(true);
     try {
-      // Prepare review data with actual image files
       const reviewPayload = {
         packageId: formData.packageId,
         rating: formData.rating,
         title: formData.title || "",
         comment: formData.comment,
-        images: photos.map(p => p.file) // Send actual file objects
+        images: photos.map(p => p.file)
       };
 
       const result = await reviewAPI.submit(token, reviewPayload);
@@ -158,10 +146,8 @@ const ReviewForm = ({ packageId = null }) => {
           title: "",
           comment: "",
         });
-        // Clear photos
         photos.forEach(photo => URL.revokeObjectURL(photo.preview));
         setPhotos([]);
-        // Clear message after 5 seconds
         setTimeout(() => setMessage(null), 5000);
       } else {
         setMessage(result.message || "Failed to submit review");
@@ -184,16 +170,8 @@ const ReviewForm = ({ packageId = null }) => {
           key={index}
           size={32}
           className="review-form-star"
-          fill={
-            starValue <= (hoveredRating || formData.rating)
-              ? "#d97706"
-              : "none"
-          }
-          color={
-            starValue <= (hoveredRating || formData.rating)
-              ? "#d97706"
-              : "#d1d5db"
-          }
+          fill={starValue <= (hoveredRating || formData.rating) ? "#d97706" : "none"}
+          color={starValue <= (hoveredRating || formData.rating) ? "#d97706" : "#d1d5db"}
           onMouseEnter={() => setHoveredRating(starValue)}
           onMouseLeave={() => setHoveredRating(0)}
           onClick={() => setFormData({ ...formData, rating: starValue })}
@@ -218,9 +196,9 @@ const ReviewForm = ({ packageId = null }) => {
   return (
     <div className="review-form-section">
       <div className="review-form-header">
-        <h2 className="review-form-title">Share Your Experience</h2>
+        <h2 className="review-form-title">Review Your Tour</h2>
         <p className="review-form-subtitle">
-          We'd love to hear about your journey with us
+          Share your experience with other travelers
         </p>
       </div>
 
@@ -228,13 +206,6 @@ const ReviewForm = ({ packageId = null }) => {
         <div className="review-form-warning">
           <AlertCircle size={20} />
           <p>You can only review packages you have booked and completed. We couldn't find any confirmed bookings in your history.</p>
-        </div>
-      )}
-
-      {formData.packageId && confirmedBookings.length > 0 && !confirmedBookings.some(b => b.package_id == formData.packageId) && (
-        <div className="review-form-warning">
-          <AlertCircle size={20} />
-          <p>You can only review packages you have booked. This review will be validated against your confirmed bookings.</p>
         </div>
       )}
 

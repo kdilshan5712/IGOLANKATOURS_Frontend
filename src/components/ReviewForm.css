@@ -57,6 +57,41 @@
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
+/* Review Type Selector */
+.review-type-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-type-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #4b5563;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.review-type-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.review-type-btn.active {
+  background-color: #fef3c7;
+  border-color: #d97706;
+  color: #92400e;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.1);
+}
+
 .review-form-stars {
   display: flex;
   gap: 0.5rem;
