@@ -1,8 +1,29 @@
+/**
+ * 🎯 I GO LANKA TOURS - Unified Authentication Modal
+ * 
+ * Dual-mode modal providing integrated Login and Registration workflows. 
+ * Orchestrates user sessions, persistent storage of auth tokens, and 
+ * strict password complexity validation for new accounts.
+ * 
+ * @module LoginModal
+ */
+
 import { useState } from "react";
 import { X, Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import { authAPI } from "../services/api";
 import { validatePassword } from "../utils/passwordValidation";
 
+/**
+ * LoginModal Component
+ * 
+ * Facilitates contextual authentication without page redirection.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Visibility control state.
+ * @param {Function} props.onClose - UI callback to hide the modal.
+ * @param {Function} props.onLoginSuccess - callback triggered on successful auth.
+ * @returns {JSX.Element|null}
+ */
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);

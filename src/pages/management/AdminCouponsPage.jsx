@@ -1,8 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Coupons Management
+ * 
+ * Provides a specialized interface for administrators to manage promotional 
+ * codes. Supports percentage and fixed discounts, expiration logic, usage 
+ * limitations, and active/inactive toggling.
+ * 
+ * @module AdminCouponsPage
+ */
+
 import React, { useState, useEffect } from "react";
 import { Ticket, Plus, Edit, Trash2, X, Save, AlertCircle, Calendar, Hash, DollarSign } from "lucide-react";
 import { adminAPI, authAPI } from "../../services/api";
 import "./AdminCouponsPage.css";
 
+/**
+ * AdminCouponsPage Component
+ * 
+ * Orchestrates the CRUD operations for promotional coupons, synchronizing 
+ * with the administrative API and managing modal-driven forms.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminCouponsPage = () => {
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -32,13 +50,16 @@ const AdminCouponsPage = () => {
     const fetchCoupons = async (authToken) => {
         try {
             setLoading(true);
+            // @API_CALL: Fetch all configured promotional coupons
             const res = await adminAPI.getAllCoupons(authToken || token);
             if (res.success) {
                 setCoupons(res.coupons);
             } else {
+                // @ERROR_HANDLING: API returned failure state for coupon retrieval
                 setError("Failed to fetch coupons");
             }
         } catch (err) {
+            // @ERROR_HANDLING: Network or endpoint connectivity issue
             setError("Error loading coupons");
             console.error(err);
         } finally {
@@ -86,8 +107,10 @@ const AdminCouponsPage = () => {
         try {
             let res;
             if (editingCoupon) {
+                // @API_CALL: Update existing coupon configuration
                 res = await adminAPI.updateCoupon(editingCoupon.coupon_id, formData, token);
             } else {
+                // @API_CALL: Create a new promotional coupon
                 res = await adminAPI.createCoupon(formData, token);
             }
 
@@ -95,9 +118,11 @@ const AdminCouponsPage = () => {
                 fetchCoupons(token);
                 handleCloseModal();
             } else {
+                // @ERROR_HANDLING: Form submission failed at the service level
                 alert(res.message || "Failed to save coupon");
             }
         } catch (err) {
+            // @ERROR_HANDLING: Unexpected network or server failure
             console.error(err);
             alert("Error saving coupon");
         }

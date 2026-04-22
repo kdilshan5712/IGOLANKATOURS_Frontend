@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Authentication Portal
+ * 
+ * Provides a secure entry point for administrative personnel. Implements 
+ * role-based access control (RBAC) validation at the authentication layer 
+ * to ensure only authorized admins can access the backend management suite.
+ * 
+ * @module AdminLoginPage
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, AlertCircle, Eye, EyeOff, Shield } from "lucide-react";
@@ -5,6 +15,14 @@ import { authAPI } from "../../services/api";
 import { Button, Card } from "../../components/shared";
 import "./AdminLogin.css";
 
+/**
+ * AdminLoginPage Component
+ * 
+ * Orchestrates the administrative login flow, handling credential 
+ * validation and secure session token storage.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminLoginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -29,8 +47,10 @@ function AdminLoginPage() {
     setError("");
 
     try {
+      // @API_CALL: Authenticate credentials against the centralized auth service
       const result = await authAPI.login(formData.email, formData.password);
 
+      // @VALIDATION: Ensure the authenticated user has administrative privileges
       if (result.success && result.user.role === "admin") {
         localStorage.setItem("token", result.token);
         localStorage.setItem("userRole", result.user.role);
@@ -38,11 +58,14 @@ function AdminLoginPage() {
         localStorage.setItem("userName", result.user.name || "Admin");
         navigate("/admin/dashboard", { replace: true });
       } else if (result.success && result.user.role !== "admin") {
+        // @ERROR_HANDLING: Access denied for non-admin accounts
         setError("Access denied. Admin credentials required.");
       } else {
+        // @ERROR_HANDLING: Invalid credentials provided
         setError(result.message || "Invalid email or password");
       }
     } catch {
+      // @ERROR_HANDLING: Unexpected network or environment failure during login
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);

@@ -1,9 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Booking Success Page
+ * 
+ * Celebration and confirmation page shown after a successful transaction.
+ * Handles booking summary display, session cleanup, and invoice generation.
+ * 
+ * @module BookingSuccessPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Check, Loader, AlertCircle } from "lucide-react";
 import { bookingAPI } from "../services/api";
 import "./BookingSuccessPage.css";
 
+/**
+ * BookingSuccessPage Component
+ * 
+ * Provides visual confirmation and post-booking actions like invoice downloads.
+ * 
+ * @returns {JSX.Element}
+ */
 const BookingSuccessPage = () => {
   const navigate = useNavigate();
   const location = useLocation();

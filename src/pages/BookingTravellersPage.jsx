@@ -1,9 +1,23 @@
 /**
- * 🧑‍🤝‍🧑 BookingTravellersPage Component
+ * 🎯 I GO LANKA TOURS - Booking Travellers Page
  * 
- * Second step of the booking flow.
- * Collects detailed information for all travelers (Adults & Children).
+ * Second step of the booking flow. Collects detailed information for all 
+ * travelers (Adults & Children) including passport details and nationalities.
  * Performs complex age-based validation against the selected travel date.
+ * 
+ * @module BookingTravellersPage
+ */
+
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
+
+/**
+ * BookingTravellersPage Component
+ * 
+ * Manages individual traveler profile collection and age-rule validation.
+ * 
+ * @returns {JSX.Element}
  */
 const BookingTravellersPage = () => {
     const { id } = useParams();

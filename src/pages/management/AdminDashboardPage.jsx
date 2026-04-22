@@ -1,3 +1,12 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Dashboard Page
+ * 
+ * Central control panel for system administrators. Aggregates business-critical 
+ * KPIs, revenue trends, and booking distributions. Provides operational 
+ * tools for report generation, guide assignments, and booking confirmations.
+ * 
+ * @module AdminDashboardPage
+ */
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +38,14 @@ import {
 import "./AdminDashboard.css";
 import "../../styles/AdminTheme.css";
 
+/**
+ * AdminDashboardPage Component
+ * 
+ * Orchestrates the high-level management of the platform by synchronizing 
+ * statistical data and providing transactional interfaces for admin tasks.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminDashboardPage() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
@@ -77,6 +94,7 @@ function AdminDashboardPage() {
       const token = localStorage.getItem("token");
       console.log("🔍 Dashboard: Fetching data with token:", token ? "Present" : "Missing");
 
+      // @API_CALL: Concurrent retrieval of dashboard metrics and recent rental/booking activity
       const [statsResult, bookingsResult] = await Promise.all([
         adminAPI.getDashboardStats(token),
         adminAPI.getRecentBookings(token)
@@ -89,10 +107,10 @@ function AdminDashboardPage() {
         console.log("✅ Setting stats:", statsResult.stats);
         setStats(statsResult.stats);
       } else {
+        // @ERROR_HANDLING: Service layer reporting failure for statistics retrieval
         console.error("❌ Stats fetch failed:", statsResult.message || "No stats in response");
         console.error("Full statsResult:", JSON.stringify(statsResult, null, 2));
 
-        // Show error notification
         setNotificationMessage("Failed to load dashboard statistics. Please refresh the page.");
         setNotificationType("error");
         setShowNotification(true);
@@ -102,9 +120,11 @@ function AdminDashboardPage() {
         setRecentBookings(bookingsResult.bookings || []);
         console.log(`✅ Loaded ${(bookingsResult.bookings || []).length} bookings`);
       } else {
+        // @ERROR_HANDLING: Service layer reporting failure for recent bookings retrieval
         console.error("❌ Bookings fetch failed:", bookingsResult.message);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       console.error("❌ Error fetching dashboard data:", error);
       setNotificationMessage("Error connecting to server. Please check if the backend is running.");
       setNotificationType("error");
@@ -142,7 +162,7 @@ function AdminDashboardPage() {
       const reportName = `${reportType}_report_${dateFrom}_to_${dateTo}.${ext}`;
       setReportFilename(reportName);
 
-      // 1. Fetch the actual report file (Blob) for ALL types - this makes the process "same"
+      // @API_CALL: Dynamic report generation for bookings, revenue, or user data
       console.log(`📥 Preparing ${reportType} report (${ext})...`);
       const blobResult = await adminAPI.generateReport(reportType, ext, dateFrom, dateTo, token);
 
@@ -152,7 +172,7 @@ function AdminDashboardPage() {
 
       setReportBlob(blobResult.blob);
 
-      // 2. For revenue, also fetch summary data for the preview
+      // @API_CALL: Fetch supplementary revenue summaries for in-dashboard visualization
       if (reportType === "revenue") {
         console.log("📊 Fetching revenue summary data...");
         const dataResult = await adminAPI.getRevenueReport(dateFrom, dateTo, token);
@@ -167,6 +187,7 @@ function AdminDashboardPage() {
       setReportMessageType("success");
 
     } catch (error) {
+      // @ERROR_HANDLING: Multi-stage report generation failure (file or data)
       console.error("Error generating report:", error);
       setReportMessage(error.message || "Failed to generate report. Please try again.");
       setReportMessageType("error");

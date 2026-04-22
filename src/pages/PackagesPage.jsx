@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Packages Discovery Page
+ * 
+ * Provides a comprehensive interface for browsing, filtering, and searching 
+ * available tour packages. Features multi-criteria filtering (budget, 
+ * duration, category) and integration with the AI Chat Agent.
+ * 
+ * @module PackagesPage
+ */
+
 import { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +17,14 @@ import { packageAPI, transformPackages } from "../services/api";
 import SEO from "../components/SEO";
 import "./PackagesPage.css";
 
+/**
+ * PackagesPage Component
+ * 
+ * Orchestrates the tour discovery process through asynchronous data fetching 
+ * and client-side filtering logic.
+ * 
+ * @returns {JSX.Element}
+ */
 const PackagesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedBudget, setSelectedBudget] = useState("all");
@@ -26,11 +44,13 @@ const PackagesPage = () => {
     const fetchPackages = async () => {
       setLoading(true);
       try {
+        // @API_CALL: Fetch all active tour packages
         const data = await packageAPI.getAll();
         if (data.success && data.packages) {
           setAllPackages(transformPackages(data.packages));
         }
       } catch (err) {
+        // @ERROR_HANDLING: Network or server connectivity issue
         console.error("Error loading packages:", err);
         setError("Failed to load packages. Please try again later.");
       } finally {

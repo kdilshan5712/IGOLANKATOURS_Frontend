@@ -1,8 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Wishlist State Management Hook
+ * 
+ * Orchestrates the persistent state of user favorites. Implements cross-tab 
+ * synchronization via localStorage, optimistic UI updates for responsiveness, 
+ * and background synchronization with the backend database upon authentication.
+ * 
+ * @module useWishlist
+ */
+
 import { useState, useEffect } from 'react';
 import { packageAPI, transformPackage, wishlistAPI, authAPI } from '../services/api';
 
 const WISHLIST_KEY = 'igolanka_wishlist';
 
+/**
+ * useWishlist Hook
+ * 
+ * Centralizes favors logic and provides synchronized favorite state across the app.
+ * 
+ * @returns {Object} Wishlist state and control functions.
+ */
 export const useWishlist = () => {
   const [wishlistIds, setWishlistIds] = useState(() => {
     try {

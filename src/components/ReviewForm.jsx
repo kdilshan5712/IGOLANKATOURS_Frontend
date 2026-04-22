@@ -1,8 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Tour Review Submission Form
+ * 
+ * Secure interface for travelers to provide feedback on completed tours. 
+ * Implements strict booking verification (only allows reviews for confirmed/
+ * completed trips), multi-file photo uploads, and star-rating interactions.
+ * 
+ * @module ReviewForm
+ */
+
 import { useState, useEffect } from "react";
 import { Star, Send, AlertCircle, CheckCircle, Camera, X } from "lucide-react";
 import { reviewAPI, packageAPI, bookingAPI } from "../services/api";
 import "./ReviewForm.css";
 
+/**
+ * ReviewForm Component
+ * 
+ * Orchestrates the submission of user reviews and professional verification of journey history.
+ * 
+ * @param {Object} props
+ * @param {string|number} [props.packageId=null] - Pre-selected package ID context.
+ * @returns {JSX.Element}
+ */
 const ReviewForm = ({ packageId = null }) => {
   const [formData, setFormData] = useState({
     rating: 0,

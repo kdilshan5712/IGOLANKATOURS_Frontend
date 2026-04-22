@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Seasonal Pricing Management
+ * 
+ * Provides an administrative interface for configuring seasonal price 
+ * adjustments. Supports date-range rules, geographical coast-based 
+ * applicability, and percentage-based price shifts.
+ * 
+ * @module AdminPricingRulesPage
+ */
+
 import React, { useState, useEffect } from "react";
 import { Package, Calendar, Edit, Trash2, Plus, X, Save, AlertCircle } from "lucide-react";
-import { adminAPI } from "../../services/api";
-import { authAPI } from "../../services/api";
+import { adminAPI, authAPI } from "../../services/api";
 import "./AdminPricingRulesPage.css";
 
+/**
+ * AdminPricingRulesPage Component
+ * 
+ * Orchestrates the management of seasonal price multipliers, synchronizing 
+ * period-based rules with the administrative pricing service.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminPricingRulesPage = () => {
     const [rules, setRules] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,13 +65,16 @@ const AdminPricingRulesPage = () => {
     const fetchRules = async (authToken) => {
         try {
             setLoading(true);
+            // @API_CALL: Fetch all seasonal pricing adjustment rules
             const res = await adminAPI.getPricingRules(authToken || token);
             if (res.success) {
                 setRules(res.rules);
             } else {
+                // @ERROR_HANDLING: API failure response
                 setError("Failed to fetch pricing rules");
             }
         } catch (err) {
+            // @ERROR_HANDLING: Connection or major failure
             setError("Error loading rules");
             console.error(err);
         } finally {
@@ -102,8 +122,10 @@ const AdminPricingRulesPage = () => {
         try {
             let res;
             if (editingRule) {
+                // @API_CALL: Update configuration for an existing pricing rule
                 res = await adminAPI.updatePricingRule(editingRule.rule_id, formData, token);
             } else {
+                // @API_CALL: Create a new seasonal pricing modification rule
                 res = await adminAPI.createPricingRule(formData, token);
             }
 
@@ -111,9 +133,11 @@ const AdminPricingRulesPage = () => {
                 fetchRules(token);
                 handleCloseModal();
             } else {
+                // @ERROR_HANDLING: Service layer validation failure
                 alert(res.message || "Failed to save rule");
             }
         } catch (err) {
+            // @ERROR_HANDLING: Unexpected network or environment failure
             console.error(err);
             alert("Error saving rule");
         }

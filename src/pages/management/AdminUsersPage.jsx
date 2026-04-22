@@ -1,9 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin User Management
+ * 
+ * Provides a comprehensive overview of all registered system users. 
+ * Allows for multi-role filtering (tourists, guides, admins) and displays 
+ * critical account metadata such as verification status and booking history.
+ * 
+ * @module AdminUsersPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, User, MapPin } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import "./AdminUsers.css";
 
+/**
+ * AdminUsersPage Component
+ * 
+ * Orchestrates the retrieval and display of the user registry, 
+ * synchronizing with the administrative user service for role auditing.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminUsersPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -25,12 +43,14 @@ function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
+      // @API_CALL: Fetch all registered users and their account metrics
       const result = await adminAPI.getAllUsers(token);
 
       if (result.success) {
         setUsers(result.users || []);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       console.error("Error fetching users:", error);
     } finally {
       setLoading(false);

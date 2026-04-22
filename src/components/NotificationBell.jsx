@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Notification Bell Component
+ * 
+ * Persistent UI element that monitors and displays the unread notification 
+ * count for the authenticated user. Implements periodic polling and 
+ * orchestrates the notification dropdown visibility.
+ * 
+ * @module NotificationBell
+ */
+
 import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { notificationAPI } from '../services/api';
 import NotificationDropdown from './NotificationDropdown';
 import './NotificationBell.css';
 
+/**
+ * NotificationBell Component
+ * 
+ * Orchestrates real-time awareness of system alerts and user messages.
+ * 
+ * @returns {JSX.Element}
+ */
 function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);

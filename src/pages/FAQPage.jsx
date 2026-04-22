@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Support & FAQ
+ * 
+ * Displays categorized frequently asked questions fetched from the backend.
+ * Provides quick answers to common travel, booking, and policy inquiries
+ * to maximize user self-service and trust.
+ * 
+ * @module FAQPage
+ */
+
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, HelpCircle, Mail, Phone, MessageSquare, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,22 +16,33 @@ import SEO from "../components/SEO";
 import "../styles/LegalPages.css";
 import "./FAQPage.css";
 
+/**
+ * FAQPage Component
+ * 
+ * Handles FAQ data fetching, category organization, and accordion interactions.
+ * 
+ * @returns {JSX.Element}
+ */
 const FAQPage = () => {
     const [openSection, setOpenSection] = useState(0); // Which category is open (mobile view)
     const [openItems, setOpenItems] = useState({}); // Which specific questions are open
     const [faqData, setFaqData] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // @SIDE_EFFECTS: Fetch all FAQs on component mount
     useEffect(() => {
         const fetchFaqs = async () => {
             try {
+                // @API_CALL: Fetch FAQ data from public endpoint
                 const response = await faqAPI.getAll();
                 if (response.success && response.faqData) {
                     setFaqData(response.faqData);
                 } else {
+                    // @ERROR_HANDLING: Log retrieval failures
                     console.error("Failed to load FAQs", response.message);
                 }
             } catch (err) {
+                // @ERROR_HANDLING: Catch network or server-side errors
                 console.error("Failed to fetch FAQs:", err);
             } finally {
                 setLoading(false);

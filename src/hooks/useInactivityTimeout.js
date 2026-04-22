@@ -1,12 +1,23 @@
+/**
+ * 🎯 I GO LANKA TOURS - Inactivity Timeout Service Hook
+ * 
+ * Security-focused hook that monitors user interaction events and automatically 
+ * terminates sessions after a predefined period of inactivity. Ensures local 
+ * storage and session state are purged before redirecting to authentication.
+ * 
+ * @module useInactivityTimeout
+ */
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SESSION_CONFIG } from '../config/session';
 
 /**
- * Hook to handle user inactivity timeout
- * Automatically logs out user after specified period of inactivity
+ * useInactivityTimeout Hook
  * 
- * @param {number} timeoutMs - Timeout duration in milliseconds (default: 30 minutes)
+ * Enforces session security by monitoring user engagement across global window events.
+ * 
+ * @param {number} timeoutMs - Timeout duration in milliseconds.
  */
 export const useInactivityTimeout = (timeoutMs = SESSION_CONFIG.INACTIVITY_TIMEOUT) => {
     const navigate = useNavigate();

@@ -1,8 +1,24 @@
+/**
+ * 🎯 I GO LANKA TOURS - User Profile Page
+ * 
+ * Manages traveler personal information, account verification status, 
+ * and profile photo customization. Includes secure file upload/delete capabilities.
+ * 
+ * @module UserProfile
+ */
+
 import { useEffect, useState, useRef } from "react";
 import { userAPI, authAPI } from "../services/api";
 import { Mail, AlertCircle, Camera, Trash2, Loader } from "lucide-react";
 import "./UserProfile.css";
 
+/**
+ * UserProfile Component
+ * 
+ * Orchestrates personal data retrieval and biological/session attribute management.
+ * 
+ * @returns {JSX.Element}
+ */
 const UserProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);

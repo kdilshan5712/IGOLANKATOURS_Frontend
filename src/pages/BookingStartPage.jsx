@@ -1,8 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Booking Configuration (Step 1)
+ * 
+ * Orchestrates the initial step of the tour booking funnel. Handles travel 
+ * date selection, traveler count input, and dynamic price simulation 
+ * based on administrative pricing rules.
+ * 
+ * @module BookingStartPage
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { packageAPI, authAPI } from "../services/api";
 import "./BookingStartPage.css";
 
+/**
+ * BookingStartPage Component
+ * 
+ * Manages the entry state for a booking transaction, ensuring user 
+ * authentication and email verification requirements are met.
+ * 
+ * @returns {JSX.Element}
+ */
 const BookingStartPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,7 +66,7 @@ const BookingStartPage = () => {
         setLoading(true);
         setError(null);
 
-        // Basic UUID format check (8-4-4-4-12 hex chars)
+        // @VALIDATION: Enforce strict UUID format check for package identifiers
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!uuidRegex.test(id)) {
           console.warn(`⚠️ Invalid package ID format: ${id}. This might be a booking or session ID.`);
@@ -63,9 +81,11 @@ const BookingStartPage = () => {
           return;
         }
 
+        // @API_CALL: Fetch tour package metadata for booking context
         const data = await packageAPI.getById(id);
         setPackageData(data);
       } catch (err) {
+        // @ERROR_HANDLING: Persistent failure or invalid package reference
         console.error("Error fetching package:", err);
         setError("We couldn't find the tour package you're looking for. It may have been removed or the link might be broken.");
       } finally {

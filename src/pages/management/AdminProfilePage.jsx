@@ -1,9 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Profile Management
+ * 
+ * Provides an administrative interface for viewing and managing account 
+ * information. Supports profile photo management, account status 
+ * verification, and credential display.
+ * 
+ * @module AdminProfilePage
+ */
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Shield, Calendar, CheckCircle, Camera, Trash2, Loader } from "lucide-react";
+import { User, Mail, Shield, Calendar, CheckCircle, Camera, Trash2, Loader } from "lucide-center";
 import { adminAPI } from "../../services/api";
 import "./AdminProfile.css";
 
+/**
+ * AdminProfilePage Component
+ * 
+ * Orchestrates the retrieval and display of administrative account data, 
+ * housing profile-specific interaction logic.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminProfilePage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -27,14 +45,17 @@ const AdminProfilePage = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
+      // @API_CALL: Fetch the current administrator's profile data
       const data = await adminAPI.getProfile(token);
 
       if (data.profile) {
         setProfile(data.profile);
       } else {
+        // @ERROR_HANDLING: API failure response
         setError(data.message || "Failed to load profile");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Network or server connectivity issues
       console.error("Profile fetch error:", err);
       setError("Failed to connect to server");
     } finally {
@@ -58,16 +79,19 @@ const AdminProfilePage = () => {
 
     setUploadingInfo({ uploading: true, message: "Uploading..." });
     try {
+      // @API_CALL: Upload a physical photo file to the profile service
       const response = await adminAPI.uploadProfilePhoto(file, localStorage.getItem('token'));
       if (response.success) {
         setProfile({ ...profile, profile_photo: response.profile_photo });
         setUploadingInfo({ uploading: false, message: "Photo updated!" });
         setTimeout(() => setUploadingInfo({ uploading: false, message: "" }), 3000);
       } else {
+        // @ERROR_HANDLING: Upload failed at the service level (size, type, etc)
         alert(response.message || "Failed to upload photo");
         setUploadingInfo({ uploading: false, message: "" });
       }
     } catch (err) {
+      // @ERROR_HANDLING: Unexpected network or environment failure
       console.error(err);
       alert("Failed to connect");
       setUploadingInfo({ uploading: false, message: "" });

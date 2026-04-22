@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Guide Profile Page
+ * 
+ * Comprehensive profile management for tour guides. Handles biological information,
+ * professional documentation verification, bank detail management for payouts,
+ * and high-resolution profile photo customization.
+ * 
+ * @module GuideProfilePage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Phone, CheckCircle, AlertCircle, Camera, Upload, X, Edit } from "lucide-react";
 import { guideAPI } from "../../services/api";
 import "./GuideProfile.css";
 
+/**
+ * GuideProfilePage Component
+ * 
+ * Orchestrates professional identity management and financial onboarding for guides.
+ * 
+ * @returns {JSX.Element}
+ */
 const GuideProfilePage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);

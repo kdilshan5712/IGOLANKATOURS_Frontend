@@ -1,8 +1,26 @@
 /**
- * 🔑 LoginPage Component
+ * 🎯 I GO LANKA TOURS - Login Page
  * 
  * Manages user authentication for Tourists, Admins, and Guides.
  * Includes role-based redirection, session management, and persistent storage of auth tokens.
+ * 
+ * @module LoginPage
+ */
+
+import { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { authAPI } from "../services/api";
+import Card from "../components/shared/Card";
+import Button from "../components/shared/Button";
+import "./LoginPage.css";
+
+/**
+ * LoginPage Component
+ * 
+ * Orchestrates the authentication workflow and post-login redirection logic.
+ * 
+ * @returns {JSX.Element}
  */
 const LoginPage = () => {
   const navigate = useNavigate();

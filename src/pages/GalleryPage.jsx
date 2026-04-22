@@ -1,8 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Visual Experience Gallery
+ * 
+ * Displays a curated collection of Sri Lankan travel photography,
+ * categorized by destination and experience. Includes lightbox functionality
+ * and dynamic filtering from the centralized gallery service.
+ * 
+ * @module GalleryPage
+ */
+
 import { useState, useEffect } from "react";
 import { X, Camera, Star, Heart, MapPin, Loader } from "lucide-react";
 import { galleryAPI } from "../services/api";
 import "./GalleryPage.css";
 
+/**
+ * GalleryPage Component
+ * 
+ * Coordinates image fetching, filtering, and full-screen visualization.
+ * 
+ * @returns {JSX.Element}
+ */
 const GalleryPage = () => {
   const [images, setImages] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
@@ -12,6 +29,7 @@ const GalleryPage = () => {
 
   const [categories, setCategories] = useState(["all"]);
 
+  // @SIDE_EFFECTS: Load gallery images and category filters on mount
   useEffect(() => {
     fetchGalleryData();
   }, []);
@@ -20,7 +38,7 @@ const GalleryPage = () => {
     setLoading(true);
     setError(null);
     try {
-      // Fetch images and categories in parallel
+      // @API_CALL: Fetch images and categories in parallel for efficiency
       const [imagesRes, categoriesRes] = await Promise.all([
         galleryAPI.getAll({ status: 'active' }),
         galleryAPI.getCategories()
@@ -36,6 +54,7 @@ const GalleryPage = () => {
         setCategories(["all", ...categoriesRes.categories]);
       }
     } catch (err) {
+      // @ERROR_HANDLING: Handle concurrent fetch failures
       console.error("Error loading gallery data:", err);
       setError("An unexpected error occurred while loading the gallery");
     } finally {

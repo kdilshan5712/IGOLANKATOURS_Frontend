@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Payouts Management
+ * 
+ * Provides an administrative interface for processing guide payout requests.
+ * Supports status transitions (pending -> approved -> paid), internal note 
+ * management, and comprehensive bank detail verification for secure transfers.
+ * 
+ * @module AdminPayoutsPage
+ */
+
 import { useState, useEffect } from "react";
 import { 
   DollarSign, 
@@ -18,6 +28,14 @@ import {
 import { adminAPI } from "../../services/api";
 import "./AdminPayouts.css";
 
+/**
+ * AdminPayoutsPage Component
+ * 
+ * Orchestrates the guide remuneration workflow, interfacing with the 
+ * administrative payout service to manage financial disbursements.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminPayoutsPage = () => {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +65,7 @@ const AdminPayoutsPage = () => {
     try {
       const token = localStorage.getItem("token");
       const filters = filterStatus !== "all" ? { status: filterStatus } : {};
+      // @API_CALL: Fetch payout requests with optional status filtering
       const response = await adminAPI.getPayoutRequests(token, filters);
       
       if (response.success) {
@@ -55,9 +74,11 @@ const AdminPayoutsPage = () => {
           setStatusCounts(response.statusCounts);
         }
       } else {
+        // @ERROR_HANDLING: API failure response
         setError(response.message || "Failed to load payout requests");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Connection or major failure
       console.error("Fetch payouts error:", err);
       setError("An error occurred while fetching payout requests");
     } finally {
@@ -73,6 +94,7 @@ const AdminPayoutsPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      // @API_CALL: Update the lifecycle status of a payout request
       const result = await adminAPI.updatePayoutStatus(
         selectedPayout.payout_id, 
         { status, admin_notes: adminNotes }, 
@@ -90,9 +112,11 @@ const AdminPayoutsPage = () => {
           setUpdateMessage("");
         }, 1500);
       } else {
+        // @ERROR_HANDLING: Validation or service layer failure during status transition
         setUpdateMessage(result.message || "Failed to update status");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Unexpected network or system failure
       console.error("Update status error:", err);
       setUpdateMessage("An error occurred. Please try again.");
     } finally {

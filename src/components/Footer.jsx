@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Global Footer Component
+ * 
+ * Persistent application footer containing site mapping, contact information, 
+ * social media integration, and legal policy links. Ensures brand consistency 
+ * and operational reachability across all pages.
+ * 
+ * @module Footer
+ */
+
 import {
   Phone,
   Mail,
@@ -9,6 +19,13 @@ import {
 import { Link } from "react-router-dom";
 import "./Footer.css";
 
+/**
+ * Footer Component
+ * 
+ * Renders the primary organizational and legal information for the platform.
+ * 
+ * @returns {JSX.Element}
+ */
 const Footer = () => {
   return (
     <footer className="footer">

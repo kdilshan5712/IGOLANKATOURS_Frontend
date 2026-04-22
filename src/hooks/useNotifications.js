@@ -1,12 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Notification Management Hook
+ * 
+ * Generic hook for managing system alerts and messages for any user role. 
+ * Implements automated periodic synchronization, unread status tracking, 
+ * and local state updates for instantaneous UI feedback.
+ * 
+ * @module useNotifications
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 /**
- * Custom hook to manage notifications for any user role
- * @param {string} token - JWT authentication token
- * @param {number} refreshInterval - Auto-refresh interval in ms (default: 30000)
- * @returns {object} - { notifications, unreadCount, loading, refresh, markAsRead }
+ * useNotifications Hook
+ * 
+ * Centralizes notification arrival and status transitions.
+ * 
+ * @param {string} token - JWT authentication token.
+ * @param {number} refreshInterval - Auto-refresh interval in milliseconds (default: 30000).
+ * @returns {Object} Notifications state and refresh/read control functions.
  */
 export const useNotifications = (token, refreshInterval = 30000) => {
   const [notifications, setNotifications] = useState([]);

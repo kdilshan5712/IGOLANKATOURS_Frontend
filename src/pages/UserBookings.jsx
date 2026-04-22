@@ -1,8 +1,24 @@
+/**
+ * 🎯 I GO LANKA TOURS - User Bookings Page
+ * 
+ * Lists all tour bookings for the authenticated traveler. Provides status 
+ * visualization, detail drill-down, and cancellation logic for upcoming tours.
+ * 
+ * @module UserBookings
+ */
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { userAPI } from "../services/api";
 import "./UserBookings.css";
 
+/**
+ * UserBookings Component
+ * 
+ * Displays a grid of traveler bookings with integrated lifecycle actions.
+ * 
+ * @returns {JSX.Element}
+ */
 const UserBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,28 @@
+/**
+ * 🎯 I GO LANKA TOURS - Guide Assignment Modal
+ * 
+ * Administrative modal used to link an approved tour guide with a specific 
+ * booking. Handles availability checks based on travel dates and allows 
+ * administrators to attach professional notes for the assigned guide.
+ * 
+ * @module AssignGuideModal
+ */
+
 import { useState, useEffect } from "react";
 import { X, User, Mail, Phone, Languages, Award, Search } from "lucide-react";
 import { adminAPI } from "../services/api";
 
+/**
+ * AssignGuideModal Component
+ * 
+ * Facilitates the transactional assignment of guides to reservations.
+ * 
+ * @param {Object} props
+ * @param {Object} props.booking - The booking object to assign a guide to.
+ * @param {Function} props.onClose - UI callback to close the modal.
+ * @param {Function} props.onAssign - API callback to commit the assignment.
+ * @returns {JSX.Element}
+ */
 const AssignGuideModal = ({ booking, onClose, onAssign }) => {
   const [guides, setGuides] = useState([]);
   const [selectedGuideId, setSelectedGuideId] = useState("");

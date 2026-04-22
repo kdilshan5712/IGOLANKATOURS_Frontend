@@ -1,3 +1,11 @@
+/* 
+ * 🎯 I GO LANKA TOURS - Administrative Dashboard Styles
+ * 
+ * Defines the layout and visual language for the main admin control panel.
+ * Includes glassmorphism panels, statistical grid animations, and 
+ * responsive form layouts.
+ */
+
 /* Dashboard Container */
 .admin-page {
     display: flex;

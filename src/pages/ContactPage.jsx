@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Contact & Inquiry Gateway
+ * 
+ * Provides a communication interface for travelers to send inquiries,
+ * request quotes for AI-generated itineraries, or ask questions. Supports 
+ * contextual data injection from the AI travel assistant.
+ * 
+ * @module ContactPage
+ */
+
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, MessageCircle, AlertCircle, CheckCircle, HelpCircle } from "lucide-react";
@@ -5,6 +15,13 @@ import { contactAPI } from "../services/api";
 import SEO from "../components/SEO";
 import "./ContactPage.css";
 
+/**
+ * ContactPage Component
+ * 
+ * Manages contact form state, validation, and API submission.
+ * 
+ * @returns {JSX.Element}
+ */
 const ContactPage = () => {
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -21,7 +38,7 @@ const ContactPage = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [aiSessionId, setAiSessionId] = useState(null);
 
-  // Handle pre-filled contextual data from routing
+  // @SIDE_EFFECTS: Handle pre-filled contextual data from routing (e.g., from AI Chatbot)
   useEffect(() => {
     if (location.state) {
       if (location.state.aiItinerary) {
@@ -43,14 +60,16 @@ const ContactPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFieldErrors({});
-    setMessage(null);
-
-    // ... (existing validation logic)
+    // @VALIDATION: Basic presence checks before submission
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setMessage("Please fill in all required fields.");
+      setMessageType("error");
+      return;
+    }
 
     setLoading(true);
     try {
+      // @API_CALL: Submit contact inquiry to backend
       const result = await contactAPI.submit({
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -73,6 +92,7 @@ const ContactPage = () => {
         // Clear message after 5 seconds
         setTimeout(() => setMessage(null), 5000);
       } else {
+        // @ERROR_HANDLING: Parse validation errors or generic failures from API
         if (result.errors) {
           setFieldErrors(result.errors);
           setMessage("Please correct the highlighted errors.");
@@ -82,6 +102,7 @@ const ContactPage = () => {
         setMessageType("error");
       }
     } catch (error) {
+      // @ERROR_HANDLING: Catch network or unexpected runtime errors
       console.error("Error submitting contact form:", error);
       setMessage("Failed to send message. Please try again.");
       setMessageType("error");

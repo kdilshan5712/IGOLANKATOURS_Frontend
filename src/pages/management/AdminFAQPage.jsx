@@ -1,9 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin FAQ Management
+ * 
+ * Provides an administrative interface for managing the support knowledge base.
+ * Allows administrators to categorize, create, update, and hide frequently 
+ * asked questions for the public support portal.
+ * 
+ * @module AdminFAQPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit, Trash2, Plus, X, Check, AlertCircle, HelpCircle, MessageSquare } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import "./AdminFAQ.css";
 
+/**
+ * AdminFAQPage Component
+ * 
+ * Orchestrates the CRUD lifecycle for support content, synchronizing 
+ * question-answer pairs with the centralized administrative API.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminFAQPage() {
   const navigate = useNavigate();
   const [faqs, setFaqs] = useState([]);
@@ -39,12 +57,14 @@ function AdminFAQPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+      // @API_CALL: Fetch all FAQ entries regardless of active status
       const result = await adminAPI.getFaqs(token);
 
       if (result.success) {
         setFaqs(result.faqs || []);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       console.error("Error fetching FAQs:", error);
     } finally {
       setLoading(false);
@@ -92,8 +112,10 @@ function AdminFAQPage() {
     try {
       let result;
       if (editingFaq) {
+        // @API_CALL: Update metadata for an existing FAQ entry
         result = await adminAPI.updateFaq(editingFaq.id, formData, token);
       } else {
+        // @API_CALL: Create a new FAQ entry in the system
         result = await adminAPI.createFaq(formData, token);
       }
 
@@ -107,12 +129,14 @@ function AdminFAQPage() {
           handleCloseModal();
         }, 1500);
       } else {
+        // @ERROR_HANDLING: Validation or service failure during FAQ save
         setNotificationMessage(result.message || "Operation failed");
         setNotificationType("error");
         setShowNotification(true);
         setTimeout(() => setShowNotification(false), 3000);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Unexpected network or system failure
       console.error("Error saving FAQ:", error);
       setNotificationMessage("Failed to save FAQ");
       setNotificationType("error");

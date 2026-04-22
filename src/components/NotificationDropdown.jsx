@@ -1,9 +1,29 @@
+/**
+ * 🎯 I GO LANKA TOURS - Notification Dropdown Component
+ * 
+ * Interactive list displaying recent system notifications. Supports read 
+ * status updates, bulk mark-as-read, and contextual navigation based on 
+ * notification payload (e.g., jumping to a booking details page).
+ * 
+ * @module NotificationDropdown
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Check, Trash2, Bell, Calendar, CheckCircle, AlertCircle, Info, Package } from 'lucide-react';
 import { notificationAPI } from '../services/api';
 import './NotificationDropdown.css';
 
+/**
+ * NotificationDropdown Component
+ * 
+ * Renders an actionable list of system alerts with contextual categorization.
+ * 
+ * @param {Object} props
+ * @param {Function} props.onClose - UI callback to hide the dropdown.
+ * @param {Function} props.onUpdate - Callback to refresh parent state (e.g., bell count).
+ * @returns {JSX.Element}
+ */
 function NotificationDropdown({ onClose, onUpdate }) {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);

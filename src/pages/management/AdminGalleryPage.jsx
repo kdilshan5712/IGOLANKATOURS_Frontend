@@ -1,8 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Gallery Management
+ * 
+ * Provides an administrative interface for managing the visual assets of 
+ * the platform. Supports bulk image uploads, category organization, 
+ * featured image selection, and visibility controls for the public gallery.
+ * 
+ * @module AdminGalleryPage
+ */
+
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Edit2, Star, Check, X } from 'lucide-react';
 import { galleryAPI } from '../../services/api';
 import './AdminGalleryPage.css';
 
+/**
+ * AdminGalleryPage Component
+ * 
+ * Orchestrates the management of the centralized photo gallery, synchronizing 
+ * image records and physical assets with the administrative API.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminGalleryPage = () => {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,11 +65,13 @@ const AdminGalleryPage = () => {
       if (filters.category !== 'all') filtersParams.category = filters.category;
       if (filters.status !== 'all') filtersParams.status = filters.status;
 
+      // @API_CALL: Fetch filtered gallery images for administrative management
       const result = await galleryAPI.getAdminAll(token, filtersParams);
 
       if (!result.success) throw new Error(result.message || 'Failed to fetch gallery');
       setGallery(result.gallery || []);
     } catch (err) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       setError(err.message);
     } finally {
       setLoading(false);
@@ -120,6 +140,7 @@ const AdminGalleryPage = () => {
       formData.append('description', uploadForm.description);
       formData.append('category', uploadForm.category);
 
+      // @API_CALL: Upload a physical image file and associated metadata
       const result = await galleryAPI.uploadImage(token, formData);
 
       if (!result.success) throw new Error(result.message || 'Upload failed');
@@ -131,6 +152,7 @@ const AdminGalleryPage = () => {
       fetchGallery();
       fetchStats();
     } catch (err) {
+      // @ERROR_HANDLING: Multi-part form submission failure (size, type, or network)
       setError(err.message);
     } finally {
       setLoading(false);

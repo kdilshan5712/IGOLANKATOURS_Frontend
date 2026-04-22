@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Package Exploration
+ * 
+ * Detailed view for a single tour package. Includes highlights, inclusions, 
+ * day-by-day itinerary, interactive map, reviews, and dynamic price 
+ * calculation based on seasonal rules and traveler count.
+ * 
+ * @module PackageDetailsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star, Clock, MapPin, Calendar, Users, Mail, Download, Image as ImageIcon, Sparkles, Heart } from "lucide-react";
@@ -60,6 +70,14 @@ const DUMMY_PACKAGE_DATA = {
   ]
 };
 
+/**
+ * PackageDetailsPage Component
+ * 
+ * Orchestrates package data retrieval, dynamic pricing logic, and interactive 
+ * elements for travelers exploring a specific tour.
+ * 
+ * @returns {JSX.Element}
+ */
 const PackageDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -84,18 +102,15 @@ const PackageDetailsPage = () => {
     }
   }, [id]);
 
+  // @SIDE_EFFECTS: Fetch full package details from API on mount or ID change
   useEffect(() => {
-    // Skip fetch if id is invalid
-    if (!id || id === 'undefined' || id === 'null') {
-      return;
-    }
-
     const fetchPackage = async () => {
       try {
         setLoading(true);
+        // @API_CALL: Fetch single package by ID
         const data = await packageAPI.getById(id);
 
-        // Parse array fields if they're strings
+        // @DATA_TRANSFORMATION: Parse serialized string fields (highlights, included, etc.) into arrays/objects
         if (data.highlights && typeof data.highlights === 'string') {
           try {
             data.highlights = JSON.parse(data.highlights);
@@ -133,8 +148,8 @@ const PackageDetailsPage = () => {
         setPackageData(data);
         setError(null);
       } catch (err) {
+        // @ERROR_HANDLING: Fallback to dummy data if API fails to prevent white-screen
         console.error('Error fetching package:', err);
-        // Use dummy data when API fails
         setPackageData(DUMMY_PACKAGE_DATA);
         setError(null);
       } finally {
@@ -146,24 +161,27 @@ const PackageDetailsPage = () => {
   }, [id]);
 
   // key: price-calculation-effect
+  // @SIDE_EFFECTS: Trigger dynamic price calculation when travelers or dates change (debounced)
   useEffect(() => {
     if (!packageData || !travelDate) return;
 
     const getPrice = async () => {
       setCalculating(true);
       try {
+        // @API_CALL: Fetch season-adjusted and traveler-count adjusted price
         const res = await packageAPI.calculatePrice(id, travelDate, travelers);
         if (res.success) {
           setCalculatedPrice(res.pricing);
         }
       } catch (e) {
+        // @ERROR_HANDLING: Log calculation failures
         console.error("Price calc error", e);
       } finally {
         setCalculating(false);
       }
     };
 
-    const timer = setTimeout(getPrice, 500); // Debounce
+    const timer = setTimeout(getPrice, 500); // Debounce to avoid excessive API load
     return () => clearTimeout(timer);
   }, [id, packageData, travelDate, travelers]);
 

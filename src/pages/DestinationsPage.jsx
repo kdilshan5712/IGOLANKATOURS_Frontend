@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Destinations Discovery Page
+ * 
+ * Provides a visual grid of Sri Lanka's top travel destinations. Integrates 
+ * with the centralized DestinationsMap component to provide spatial context 
+ * and category-based visual cues.
+ * 
+ * @module DestinationsPage
+ */
+
 import { useState, useEffect } from "react";
 import { MapPin, ArrowRight, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,6 +16,14 @@ import { destinationAPI } from "../services/api";
 import SEO from "../components/SEO";
 import "./DestinationsPage.css";
 
+/**
+ * DestinationsPage Component
+ * 
+ * Renders an curated list of hotspots and geographical zones, facilitating 
+ * discovery before specific package selection.
+ * 
+ * @returns {JSX.Element}
+ */
 const DestinationsPage = () => {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +32,7 @@ const DestinationsPage = () => {
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
+        // @API_CALL: Fetch all geographic hotspots and details
         const response = await destinationAPI.getAll();
         if (response.success && Array.isArray(response.data)) {
           setDestinations(response.data);
@@ -22,6 +41,7 @@ const DestinationsPage = () => {
           setError("Failed to load destinations data.");
         }
       } catch (err) {
+        // @ERROR_HANDLING: Persistent connection or API failure
         console.error("Failed to load destinations:", err);
         setError("Failed to load destinations. Please try again later.");
       } finally {

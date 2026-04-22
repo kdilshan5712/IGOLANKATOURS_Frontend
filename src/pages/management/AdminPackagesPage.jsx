@@ -1,8 +1,24 @@
 /**
- * 🛠️ AdminPackagesPage Component
+ * 🎯 I GO LANKA TOURS - Admin Packages Management
  * 
- * Provides an administrative interface for Managing (CRUD) tour packages.
- * Includes form validation, asynchronous API integration, and interactive feedback modals.
+ * Administrative suite for managing the tour inventory. Supports full CRUD 
+ * operations, status toggling, and interactive feedback for inventory updates.
+ * 
+ * @module AdminPackagesPage
+ */
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Edit, Trash2, X, Image as ImageIcon, Check, AlertCircle } from "lucide-react";
+import { adminAPI } from "../../services/api";
+import "./AdminPackages.css";
+
+/**
+ * AdminPackagesPage Component
+ * 
+ * Orchestrates the tour package inventory lifecycle and administrative visibility.
+ * 
+ * @returns {JSX.Element}
  */
 function AdminPackagesPage() {
   const navigate = useNavigate();

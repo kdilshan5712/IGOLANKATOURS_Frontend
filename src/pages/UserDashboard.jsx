@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - User Dashboard
+ * 
+ * Central hub for registered travelers. Displays personalized statistics, 
+ * recent bookings, and AI-generated custom tours. Orchestrates cross-domain 
+ * data fetching (profile, classics, custom).
+ * 
+ * @module UserDashboard
+ */
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { userAPI } from "../services/api";
 import { Activity, Map, CheckCircle2, Navigation, ArrowRight, Heart } from "lucide-react";
 import "./UserDashboard.css";
 
+/**
+ * UserDashboard Component
+ * 
+ * Aggregates user activity metrics and provides quick access to past and upcoming tours.
+ * 
+ * @returns {JSX.Element}
+ */
 const UserDashboard = () => {
   const [stats, setStats] = useState({
     totalBookings: 0,
@@ -30,16 +47,19 @@ const UserDashboard = () => {
 
       // Fetch Profile for Hero Banner Welcome
       try {
+        // @API_CALL: Retrieve basic profile info for dashboard localization
         const profileData = await userAPI.getProfile(token);
         if (profileData.profile) {
           const { first_name, full_name } = profileData.profile;
           setUserName(first_name || full_name?.split(' ')[0] || "Traveler");
         }
       } catch (e) {
+        // @ERROR_HANDLING: Silently handle profile fetch failure (dashboard remains functional)
         console.error("Profile load error", e);
       }
 
       // Fetch Bookings Data
+      // @API_CALL: Retrieve travel history for metric aggregation
       const data = await userAPI.getBookings(token);
       if (data.bookings) {
         const bookings = data.bookings;
@@ -60,11 +80,11 @@ const UserDashboard = () => {
           completedBookings: completed
         });
 
-        // Get 3 most recent bookings for the mini-feed
         setRecentBookings(bookings.slice(0, 3));
       }
 
       // Fetch Custom Tours Data
+      // @API_CALL: Retrieve AI-generated custom tours for visual feed
       const customData = await userAPI.getCustomTours(token);
       if (customData.customTours) {
         const customTours = customData.customTours;
@@ -75,6 +95,7 @@ const UserDashboard = () => {
         setRecentCustomTours(customTours.slice(0, 2));
       }
     } catch (err) {
+      // @ERROR_HANDLING: Aggregate handling for data retrieval failures
       console.error("Failed to fetch dashboard data:", err);
     } finally {
       setLoading(false);

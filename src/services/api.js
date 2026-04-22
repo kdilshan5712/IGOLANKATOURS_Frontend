@@ -112,8 +112,11 @@ export const chatAPI = {
   // Get messages for a custom tour session
   getSessionMessages: async (sessionId, token) => {
     try {
+      // @VALIDATION: Require sessionId and token
+      if (!sessionId) throw new Error("Session ID is required");
       if (!token) throw new Error("Authentication required");
-
+ 
+      // @API_CALL: Fetch AI chatbot session messages
       const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
         method: "GET",
         headers: {
@@ -121,9 +124,10 @@ export const chatAPI = {
           "Content-Type": "application/json"
         }
       });
-
+ 
       return await response.json();
     } catch (error) {
+      // @ERROR_HANDLING: Log and normalize session retrieval errors
       console.error("Chat getSessionMessages Error:", error);
       return { success: false, message: error.message || "Failed to fetch session messages." };
     }
@@ -132,8 +136,12 @@ export const chatAPI = {
   // Send a message for a custom tour session
   sendSessionMessage: async (sessionId, message, token) => {
     try {
+      // @VALIDATION: Ensure session and non-empty message
+      if (!sessionId) throw new Error("Session ID is required");
+      if (!message || message.trim() === "") throw new Error("Message cannot be empty");
       if (!token) throw new Error("Authentication required");
-
+ 
+      // @API_CALL: Post message to AI chatbot session
       const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
         method: "POST",
         headers: {
@@ -142,9 +150,10 @@ export const chatAPI = {
         },
         body: JSON.stringify({ message })
       });
-
+ 
       return await response.json();
     } catch (error) {
+      // @ERROR_HANDLING: Capture and report messaging failures
       console.error("Chat sendSessionMessage Error:", error);
       return { success: false, message: error.message || "Failed to send session message." };
     }
@@ -153,6 +162,10 @@ export const chatAPI = {
   // Sync entire chat history for a session (AI generation journey)
   syncHistory: async (sessionId, messages, token) => {
     try {
+      // @VALIDATION: Pre-flight check for sync data
+      if (!sessionId || !messages) throw new Error("Invalid sync payload");
+ 
+      // @API_CALL: Synchronize local chat history with server persistence
       const response = await fetch(`${API_BASE_URL}/ai/sync-history`, {
         method: "POST",
         headers: {
@@ -163,6 +176,7 @@ export const chatAPI = {
       });
       return await response.json();
     } catch (error) {
+      // @ERROR_HANDLING: Handle history synchronization failures
       console.error("Chat syncHistory Error:", error);
       return { success: false, message: error.message || "Failed to sync history." };
     }

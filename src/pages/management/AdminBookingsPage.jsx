@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Bookings Management
+ * 
+ * Comprehensive management interface for all system reservations. Allows admins 
+ * to filter by status, confirm/cancel bookings, assign guides, and monitor 
+ * real-time chats between guides and travelers.
+ * 
+ * @module AdminBookingsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Check, UserPlus, X, Calendar, User, DollarSign, MapPin, Mail, Phone, Ban, MessageCircle } from "lucide-react";
@@ -6,6 +16,13 @@ import AssignGuideModal from "../../components/AssignGuideModal";
 import TourChatWindow from "../../components/TourChatWindow";
 import "./AdminBookings.css";
 
+/**
+ * AdminBookingsPage Component
+ * 
+ * Orchestrates the administrative lifecycle of tour reservations and guide assignments.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminBookingsPage() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);

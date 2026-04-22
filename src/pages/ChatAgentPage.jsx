@@ -513,19 +513,22 @@ const ChatAgentPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+ 
+      // @API_CALL: Primary endpoint for AI travel design and weather queries
       const res = await axios.post(`${API_BASE}/ai/chat`, { 
         message: text, 
         history: updatedHistory.slice(-5) 
       }, {
         headers: { ...(token && { Authorization: `Bearer ${token}` }) }
       });
-
+ 
       const data = res.data;
       setHistory([...updatedHistory, { role: "assistant", content: data.reply }]);
-
+ 
+      // @VALIDATION: Parse and extract the structural itinerary JSON from LLM or structured data
       const tourDraft = data.custom_tour_draft || extractTourDraft(data.reply);
       const cleanedText = tourDraft ? stripJsonFromText(data.reply, true) : data.reply;
-
+ 
       const aiMsg = {
         id: Date.now() + 1,
         sender: "assistant",
@@ -534,9 +537,10 @@ const ChatAgentPage = () => {
         tourDraft: tourDraft,
         timestamp: new Date(),
       };
-
+ 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
+      // @ERROR_HANDLING: Display user-friendly error bubble for failed AI requests
       const errMsg = err.response?.data?.message || err.message;
       console.error("❌ Chat API Error:", errMsg);
       setMessages((prev) => [...prev, {
@@ -554,15 +558,17 @@ const ChatAgentPage = () => {
   const handleSendToTeam = async (draft, tier) => {
     try {
       const token = localStorage.getItem("token");
+ 
+      // @VALIDATION: Ensure user is logged in before allowing tour submission
       if (!token) return;
-
+ 
       const pricing = draft.pricing_estimate || {};
       const selectedPrice = pricing[tier] || 0;
-
+ 
       // Extract user info from Signature account
       const userName = localStorage.getItem("userName") || "Signature Member";
       const userEmail = localStorage.getItem("userEmail");
-
+ 
       const payload = {
         title: draft.title,
         duration_days: draft.duration_days,
@@ -576,29 +582,31 @@ const ChatAgentPage = () => {
         tourist_email: userEmail,
         tourist_phone: localStorage.getItem("userPhone") || "N/A"
       };
-
+ 
+      // @API_CALL: Submit the structured custom tour request to the administrative review system
       const res = await axios.post(`${API_BASE}/ai/submit-custom-tour`, payload, {
         headers: { ...(token && { Authorization: `Bearer ${token}` }) }
       });
       
       const sessionId = res.data?.session?.session_id || res.data?.session_id;
-
+ 
       if (sessionId) {
         // Prepare history for admin sync
-        // Add a system notification as the final entry to clearly show the choice to the admin
         const systemFinalMsg = {
           id: Date.now(),
           sender: "assistant", 
           text: `[SYSTEM NOTIFICATION]: User has submitted this "${draft.title}" for approval. Selected Tier: ${tier.toUpperCase()} ($${selectedPrice}).`,
           timestamp: new Date()
         };
-
+ 
         const messagesToSync = [...messages, systemFinalMsg];
         
+        // @API_CALL: Synchronize the chat history associated with the new custom tour session
         await chatAPI.syncHistory(sessionId, messagesToSync, token);
         console.log("✅ Custom tour and history submitted successfully");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Log submission failures for debugging
       console.error("❌ Failed to submit tour:", err);
     }
   };

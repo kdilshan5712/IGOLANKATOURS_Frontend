@@ -1,9 +1,11 @@
 /**
- * 📱 Main App Component
+ * 📱 I GO LANKA TOURS - Main App Component
  * 
- * Entry point for the I GO LANKA TOURS frontend.
- * Manages global routing, layout composition, and initial session validation.
- * Uses a hybrid routing model with ProtectedRoutes for role-based access control.
+ * Entry point for the frontend application. Orchestrates global routing, 
+ * layout composition, and initial session validation. Uses a hybrid routing 
+ * model with ProtectedRoutes for role-based access control.
+ * 
+ * @module App
  */
 function App() {
   // Validate session on app load

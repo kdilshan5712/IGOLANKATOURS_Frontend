@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Home Experience
+ * 
+ * The main landing page of the application, aggregating key sections
+ * like Hero, Trust Badges, Features, Destinations, and Package Previews.
+ * Serves as the primary entry point for brand discovery and SEO.
+ * 
+ * @module HomePage
+ */
+
 import HeroSection from "../components/HeroSection";
 import TrustBadges from "../components/TrustBadges";
 import FeaturesSection from "../components/FeaturesSection";
@@ -6,6 +16,13 @@ import PackagesPreview from "../components/PackagesPreview";
 import TestimonialsSection from "../components/TestimonialsSection";
 import SEO from "../components/SEO";
 
+/**
+ * HomePage Component
+ * 
+ * Renders the primary entry point of the website with SEO schema support.
+ * 
+ * @returns {JSX.Element}
+ */
 const HomePage = () => {
   const structuredData = {
     "@context": "https://schema.org",

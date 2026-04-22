@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Guide Bookings Page
+ * 
+ * Operational view for guides to manage their active and upcoming assignments.
+ * Includes interactive tourist chat, assignment lifecycle management (Mark Completed),
+ * and detailed traveler information display.
+ * 
+ * @module GuideBookingsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar, User, MessageCircle, Phone, CheckCircle } from "lucide-react";
@@ -5,6 +15,13 @@ import { getGuideBookings, markTourCompleted } from "../../services/api";
 import TourChatWindow from "../../components/TourChatWindow";
 import "./GuideBookings.css";
 
+/**
+ * GuideBookingsPage Component
+ * 
+ * Orchestrates the management of assigned tours and real-time tourist communication.
+ * 
+ * @returns {JSX.Element}
+ */
 const GuideBookingsPage = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);

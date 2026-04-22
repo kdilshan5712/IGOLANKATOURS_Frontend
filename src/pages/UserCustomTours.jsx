@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - User Custom Tours Page
+ * 
+ * Displays AI-generated custom tour requests. Allows travelers to track 
+ * approval status, review admin-provided pricing, and convert approved 
+ * itineraries into active bookings.
+ * 
+ * @module UserCustomTours
+ */
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Calendar, Users, DollarSign, Clock, CheckCircle2, XCircle, AlertCircle, ArrowRight, Loader } from "lucide-react";
 import { userAPI, bookingAPI } from "../services/api";
 import "./UserCustomTours.css";
 
+/**
+ * UserCustomTours Component
+ * 
+ * Orchestrates the lifecycle of personalized tour requests from draft to payment.
+ * 
+ * @returns {JSX.Element}
+ */
 const UserCustomTours = () => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,20 +35,23 @@ const UserCustomTours = () => {
   const fetchCustomTours = async () => {
     try {
       const token = localStorage.getItem("token");
+      // @VALIDATION: Ensure user is authenticated to fetch personal requests
       if (!token) {
         setError("Not logged in. Please log in to view custom tours.");
         setLoading(false);
         return;
       }
       
+      // @API_CALL: Fetch all custom tour requests for the current user
       const data = await userAPI.getCustomTours(token);
-
+ 
       if (data.customTours) {
         setTours(data.customTours);
       } else {
         setError(data.message || "Failed to load custom tours");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Catch network failures in fetching tour list
       console.error("Error fetching custom tours:", err);
       setError("Failed to connect to server");
     } finally {
@@ -43,6 +63,8 @@ const UserCustomTours = () => {
     setProcessingId(sessionId);
     try {
       const token = localStorage.getItem("token");
+ 
+      // @API_CALL: Transform an approved custom tour request into a formal booking record
       const res = await bookingAPI.acceptCustomTour(sessionId, token);
       
       if (res.success && res.booking) {
@@ -54,9 +76,11 @@ const UserCustomTours = () => {
           } 
         });
       } else {
+        // @ERROR_HANDLING: Log logical failure from the booking conversion step
         alert(res.message || "Failed to initiate booking. Please try again.");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Capture and alert common network/server errors during acceptance
       console.error("Error in handleAcceptTour:", err);
       alert("A network error occurred. Please try again.");
     } finally {

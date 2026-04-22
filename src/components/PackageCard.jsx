@@ -1,8 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Tour Package Card Component
+ * 
+ * Visual representation of a tour package in grid/list views. Displays 
+ * high-level metadata (price, duration, rating) and provides integrated 
+ * wishlist management and direct navigation to booking/details.
+ * 
+ * @module PackageCard
+ */
+
 import { Star, Clock, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../hooks/useWishlist";
 import "./PackageCard.css";
 
+/**
+ * PackageCard Component
+ * 
+ * Renders a standardized tour package summary card.
+ * 
+ * @param {Object} props
+ * @param {Object} props.pkg - The tour package data object.
+ * @returns {JSX.Element}
+ */
 const PackageCard = ({ pkg }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const isSaved = isInWishlist(pkg.id);

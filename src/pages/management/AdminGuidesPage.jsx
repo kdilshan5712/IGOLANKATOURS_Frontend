@@ -1,12 +1,23 @@
 /**
- * 🧑‍🏫 AdminGuidesPage Component
+ * 🎯 I GO LANKA TOURS - Admin Guide Management
  * 
- * Administrative dashboard for managing Tour Guide applications and active guides.
- * Features:
- * - Application review (Approve/Reject with reasons).
- * - Document verification (Identity, Licenses).
- * - Financial setup (Custom commission rates).
- * - Multi-stage confirmation modals for sensitive actions.
+ * Comprehensive portal for vetting tour guide applications. Orchestrates 
+ * document verification, commission negotiation, and approval workflows.
+ * Ensures quality assurance through multi-stage confirmation for guide onboarding.
+ * 
+ * @module AdminGuidesPage
+ */
+
+import { useState, useEffect } from "react";
+import { adminAPI } from "../../services/api";
+import "./AdminGuides.css";
+
+/**
+ * AdminGuidesPage Component
+ * 
+ * Orchestrates professional vetting and onboarding for tour guide applicants.
+ * 
+ * @returns {JSX.Element}
  */
 function AdminGuidesPage() {
   const [guides, setGuides] = useState([]);

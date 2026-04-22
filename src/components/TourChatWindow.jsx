@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Real-time Tour Chat Interface
+ * 
+ * Component facilitating multi-party communication between travelers, guides, 
+ * and administrators. Implements adaptive polling, document visibility-aware 
+ * updates, and administrative access controls (Lock/Unlock chat).
+ * 
+ * @module TourChatWindow
+ */
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Send, Loader, MessageCircle, Lock, Unlock } from 'lucide-react';
 import { chatAPI } from '../services/api';
@@ -6,6 +16,18 @@ import './TourChatWindow.css';
 const POLL_INTERVAL_ACTIVE = 2000;   // 2s when tab is visible
 const POLL_INTERVAL_HIDDEN = 8000;   // 8s when tab is hidden
 
+/**
+ * TourChatWindow Component
+ * 
+ * Orchestrates live messaging and administrative monitoring for tour bookings.
+ * 
+ * @param {Object} props
+ * @param {string} props.bookingId - Unique identifier for the shared chat session.
+ * @param {boolean} [props.initialAuthStatus=false] - Starting lock state of the chat.
+ * @param {Function} props.onClose - UI callback to terminate visibility.
+ * @param {Function} [props.onAuthChange] - Callback triggered on lock state toggle.
+ * @returns {JSX.Element}
+ */
 const TourChatWindow = ({ bookingId, initialAuthStatus = false, onClose, onAuthChange }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');

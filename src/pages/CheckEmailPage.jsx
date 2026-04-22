@@ -1,9 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Check Email Page
+ * 
+ * An interstitial page shown after registration or password reset requests.
+ * Provides instructions for email verification and a countdown-limited resend mechanism.
+ * 
+ * @module CheckEmailPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, Clock, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import { authAPI } from "../services/api";
 import "./CheckEmailPage.css";
 
+/**
+ * CheckEmailPage Component
+ * 
+ * Manages the "Verification Email Sent" state and handles resend throttling.
+ * 
+ * @returns {JSX.Element}
+ */
 export default function CheckEmailPage() {
   const navigate = useNavigate();
   const location = useLocation();

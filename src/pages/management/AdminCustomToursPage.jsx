@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Custom Tour Management
+ * 
+ * Administrative workflow for processing AI-generated custom tour requests. 
+ * Supports interactive chat with travelers, itinerary modification, and 
+ * formal pricing approval to convert requests into bookable tours.
+ * 
+ * @module AdminCustomToursPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar, Users, DollarSign, Mail, Phone, FileText, X, Eye, Send, Loader, MessageCircle, CheckCircle2 } from "lucide-react";
 import { adminAPI, chatAPI } from "../../services/api";
 import "./AdminCustomTours.css";
 
+/**
+ * AdminCustomToursPage Component
+ * 
+ * Orchestrates the conversion of AI design sessions into verified travel products.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminCustomToursPage() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);

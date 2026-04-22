@@ -1,7 +1,23 @@
+/**
+ * 🎯 I GO LANKA TOURS - Booking Failure Page
+ * 
+ * Error state page shown when a booking transaction fails or is cancelled.
+ * Provides specific error details and retry mechanisms.
+ * 
+ * @module BookingFailurePage
+ */
+
 import { useNavigate, useLocation } from "react-router-dom";
 import { X, AlertCircle } from "lucide-react";
 import "./BookingFailurePage.css";
 
+/**
+ * BookingFailurePage Component
+ * 
+ * Displays transaction error messages and provides recovery paths for travelers.
+ * 
+ * @returns {JSX.Element}
+ */
 const BookingFailurePage = () => {
     const navigate = useNavigate();
     const location = useLocation();

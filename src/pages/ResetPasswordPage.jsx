@@ -1,8 +1,25 @@
 /**
- * 🔐 ResetPasswordPage Component
+ * 🎯 I GO LANKA TOURS - Reset Password Page
  * 
- * Allows users to set a new password using a token received via email.
- * Includes complex validation logic for password strength and matching.
+ * Finalizes the password recovery flow, allowing users to establish
+ * new credentials using a temporary verification token.
+ * 
+ * @module ResetPasswordPage
+ */
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Lock, ArrowLeft, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Button, Card } from "../components/shared";
+import { validatePassword } from "../utils/validators";
+import "./ResetPasswordPage.css";
+
+/**
+ * ResetPasswordPage Component
+ * 
+ * Handles token validation from URL, password parity checks, and API submission.
+ * 
+ * @returns {JSX.Element}
  */
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();

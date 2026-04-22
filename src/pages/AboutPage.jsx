@@ -1,7 +1,23 @@
+/**
+ * 🎯 I GO LANKA TOURS - About Page
+ * 
+ * Displays company information, mission statement, founder details,
+ * and value propositions for travelers.
+ * 
+ * @module AboutPage
+ */
+
 import { CheckCircle, Award, Users, HeartHandshake } from "lucide-react";
 import SEO from "../components/SEO";
 import "./AboutPage.css";
 
+/**
+ * AboutPage Component
+ * 
+ * Renders the brand story and unique selling points.
+ * 
+ * @returns {JSX.Element}
+ */
 const AboutPage = () => {
   const whyChooseUs = [
     {

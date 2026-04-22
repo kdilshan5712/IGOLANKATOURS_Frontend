@@ -1,7 +1,23 @@
+/**
+ * 🎯 I GO LANKA TOURS - Terms & Conditions Page
+ * 
+ * Outlines the legal agreement between the tour operator and travelers,
+ * covering bookings, payments, cancellations, and code of conduct.
+ * 
+ * @module TermsPage
+ */
+
 import "../styles/LegalPages.css";
 import { FileText, CreditCard, Luggage, Edit, AlertTriangle, Users, MessageSquare, Mail, Phone, Shield, Lock, Eye } from "lucide-react";
 import SEO from "../components/SEO";
 
+/**
+ * TermsPage Component
+ * 
+ * Renders static legal terms with SEO support.
+ * 
+ * @returns {JSX.Element}
+ */
 const TermsPage = () => {
   return (
     <main className="legal-page-layout">

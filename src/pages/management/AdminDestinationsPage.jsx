@@ -1,9 +1,26 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Destinations Management
+ * 
+ * Provides an administrative interface for managing Sri Lankan travel hotspots.
+ * Supports CRUD operations, category assignments, and rich description management.
+ * 
+ * @module AdminDestinationsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit, Trash2, Plus, X, Check, AlertCircle, Image as ImageIcon, MapPin } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import "./AdminDestinations.css";
 
+/**
+ * AdminDestinationsPage Component
+ * 
+ * Orchestrates destination inventory management through synchronized API 
+ * interactions and interactive modal interfaces.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminDestinationsPage() {
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState([]);
@@ -38,12 +55,14 @@ function AdminDestinationsPage() {
   const fetchDestinations = async () => {
     try {
       const token = localStorage.getItem("token");
+      // @API_CALL: Fetch all geographic destinations for administrative management
       const result = await adminAPI.getAllDestinations(token);
 
       if (result.success) {
         setDestinations(result.data || []);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       console.error("Error fetching destinations:", error);
     } finally {
       setLoading(false);
@@ -90,8 +109,10 @@ function AdminDestinationsPage() {
     try {
       let result;
       if (editingDestination) {
+        // @API_CALL: Update metadata for an existing destination
         result = await adminAPI.updateDestination(editingDestination.destination_id, formData, token);
       } else {
+        // @API_CALL: Create a new destination entry in the system
         result = await adminAPI.createDestination(formData, token);
       }
 
@@ -105,12 +126,14 @@ function AdminDestinationsPage() {
           handleCloseModal();
         }, 1500);
       } else {
+        // @ERROR_HANDLING: Validation or service failure during destination save
         setNotificationMessage(result.message || "Operation failed");
         setNotificationType("error");
         setShowNotification(true);
         setTimeout(() => setShowNotification(false), 3000);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Unexpected network or system failure
       console.error("Error saving destination:", error);
       setNotificationMessage("Failed to save destination");
       setNotificationType("error");

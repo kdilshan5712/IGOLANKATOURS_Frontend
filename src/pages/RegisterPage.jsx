@@ -1,9 +1,30 @@
 /**
- * 📝 RegisterPage Component
+ * 🎯 I GO LANKA TOURS - Register Page
  * 
  * Handles new user registration for the I GO LANKA TOURS platform.
  * Includes complex form state management, real-time validation,
  * and integration with the Auth API.
+ * 
+ * @module RegisterPage
+ */
+
+import { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { User, Mail, Lock, Eye, EyeOff, AlertCircle, MapPin, Phone } from "lucide-react";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import { authAPI } from "../services/api";
+import { validatePassword } from "../utils/validators";
+import Card from "../components/shared/Card";
+import Button from "../components/shared/Button";
+import "./RegisterPage.css";
+
+/**
+ * RegisterPage Component
+ * 
+ * Manages the user registration lifecycle from form input to email verification redirect.
+ * 
+ * @returns {JSX.Element}
  */
 const RegisterPage = () => {
   const navigate = useNavigate();

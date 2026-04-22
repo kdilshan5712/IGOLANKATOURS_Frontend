@@ -1,9 +1,25 @@
+/**
+ * 🎯 I GO LANKA TOURS - Forgot Password Page
+ * 
+ * Initiates the password recovery flow by allowing users to request
+ * a secure reset link via email.
+ * 
+ * @module ForgotPasswordPage
+ */
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import { Button, Card } from "../components/shared";
 import "./ForgotPasswordPage.css";
 
+/**
+ * ForgotPasswordPage Component
+ * 
+ * Manages the "Forgot Password" form submission and success state visualization.
+ * 
+ * @returns {JSX.Element}
+ */
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

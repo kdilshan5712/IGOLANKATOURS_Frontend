@@ -1,3 +1,10 @@
+/* ?? I GO LANKA TOURS - Audit Documentation Styles
+
+Defines the styling for system activity logs and compliance tracking.
+Includes specialized table layouts for chronological data, action-based
+badge highlights, and JSON modification views.
+*/
+
 .audit-logs-page {
   padding: 2rem;
   animation: fadeIn 0.4s ease-out;
@@ -277,3 +284,4 @@
     padding: 0.5rem 0;
   }
 }
+

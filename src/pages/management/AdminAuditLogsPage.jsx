@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Audit Logs Page
+ * 
+ * Provides high-level visibility into administrative actions and system 
+ * modifications. Includes sophisticated filtering by action type, target 
+ * entity, and date range, with CSV/PDF export capabilities.
+ * 
+ * @module AdminAuditLogsPage
+ */
+
 import { useState, useEffect } from "react";
 import { adminAPI } from "../../services/api";
 import { 
@@ -21,6 +31,13 @@ import {
 import "./AdminAuditLogs.css";
 import "../../styles/AdminTheme.css";
 
+/**
+ * AdminAuditLogsPage Component
+ * 
+ * Orchestrates the retrieval and display of system audit trails for administrative review.
+ * 
+ * @returns {JSX.Element}
+ */
 const AdminAuditLogsPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +62,10 @@ const AdminAuditLogsPage = () => {
     fetchLogs();
   }, [currentPage]);
 
-  const fetchLogs = async () => {
+    const fetchLogs = async () => {
     setLoading(true);
     try {
+      // @API_CALL: Fetch paginated audit logs with active filters
       const response = await adminAPI.getAuditLogs({
         ...filters,
         page: currentPage,
@@ -58,9 +76,11 @@ const AdminAuditLogsPage = () => {
         setLogs(response.logs);
         setTotalPages(Math.ceil(response.pagination.total / response.pagination.limit));
       } else {
+        // @ERROR_HANDLING: API returned failure state
         setError(response.message || "Failed to load audit logs");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Network or server connectivity issue
       console.error("Fetch logs error:", err);
       setError("An error occurred while fetching audit logs");
     } finally {
@@ -121,6 +141,7 @@ const AdminAuditLogsPage = () => {
       const token = localStorage.getItem("token");
       const filename = `audit_logs_${new Date().toISOString().split('T')[0]}.${exportFormat}`;
       
+      // @API_CALL: Generate a physical report of filtered audit trails
       const response = await adminAPI.generateReport(
         "audit", 
         exportFormat, 
@@ -141,6 +162,7 @@ const AdminAuditLogsPage = () => {
         
         setExportMessage({ text: `Successfully exported to ${exportFormat.toUpperCase()}`, type: "success" });
       } else {
+        // @ERROR_HANDLING: Report generation failure at the service layer
         throw new Error(response.message || "Failed to generate report");
       }
     } catch (err) {

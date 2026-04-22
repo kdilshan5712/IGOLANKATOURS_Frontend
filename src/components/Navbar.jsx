@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Core Navigation Component
+ * 
+ * Primary application header providing responsive navigation, authentication 
+ * context awareness, and access to role-bound dashboards. Handles scroll 
+ * transitions and mobile drawer state.
+ * 
+ * @module Navbar
+ */
+
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Menu, X, LogOut, User, Heart } from "lucide-react";
@@ -7,6 +17,13 @@ import NotificationBell from "./NotificationBell";
 
 import "./Navbar.css";
 
+/**
+ * Navbar Component
+ * 
+ * Orchestrates global navigation flows and user session visibility.
+ * 
+ * @returns {JSX.Element}
+ */
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

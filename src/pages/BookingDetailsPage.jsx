@@ -1,9 +1,25 @@
 /**
- * 🛂 BookingDetailsPage Component
+ * 🎯 I GO LANKA TOURS - Booking Details Page
  * 
- * First step of the booking flow.
- * Handles package validation, travel date selection, and group size (number of travelers).
- * Synchronizes state with the useBooking context for subsequent steps.
+ * First step of the booking flow. Handles package validation, travel date 
+ * selection, and group size (number of travelers). Synchronizes state with 
+ * the BookingContext for subsequent steps.
+ * 
+ * @module BookingDetailsPage
+ */
+
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Calendar, Users, ArrowRight } from "lucide-react";
+import { packageAPI } from "../services/api";
+import { useBooking } from "../contexts/BookingContext";
+
+/**
+ * BookingDetailsPage Component
+ * 
+ * Captures core booking parameters and hydrates the global booking session.
+ * 
+ * @returns {JSX.Element}
  */
 const BookingDetailsPage = () => {
   const { packageId } = useParams();

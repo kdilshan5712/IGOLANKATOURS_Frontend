@@ -1,7 +1,23 @@
+/**
+ * 🎯 I GO LANKA TOURS - Privacy Policy Page
+ * 
+ * Displays the privacy policy terms, data collection methods, 
+ * and user rights regarding personal information.
+ * 
+ * @module PrivacyPolicyPage
+ */
+
 import "../styles/LegalPages.css";
 import { Shield, Lock, Eye, Users, FileText, Mail, Phone, MessageSquare } from "lucide-react";
 import SEO from "../components/SEO";
 
+/**
+ * PrivacyPolicyPage Component
+ * 
+ * Renders static privacy information with SEO support.
+ * 
+ * @returns {JSX.Element}
+ */
 const PrivacyPolicyPage = () => {
   return (
     <main className="legal-page-layout">

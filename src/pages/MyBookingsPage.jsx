@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Traveler Booking History
+ * 
+ * Provides a comprehensive overview of a traveler's past and upcoming 
+ * bookings. Supports status filtering, invoice downloads, and 
+ * cancellation workflows (subject to policy rules).
+ * 
+ * @module MyBookingsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Users, DollarSign, Clock, Package, AlertCircle, FileDown } from "lucide-react";
@@ -6,6 +16,14 @@ import NotificationBell from "../components/NotificationBell";
 import CancelBookingModal from "../components/CancelBookingModal";
 import "./MyBookingsPage.css";
 
+/**
+ * MyBookingsPage Component
+ * 
+ * Orchestrates the retrieval of user-specific booking records, 
+ * integrating notification and cancellation logic.
+ * 
+ * @returns {JSX.Element}
+ */
 const MyBookingsPage = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
@@ -41,13 +59,14 @@ const MyBookingsPage = () => {
         return;
       }
 
+      // @API_CALL: Retrieve full booking history for the authenticated traveler
       const data = await userAPI.getBookings(token);
       console.log("📦 [MyBookingsPage] API Response:", data);
 
       if (data.bookings) {
         console.log("✅ [MyBookingsPage] Bookings found:", data.bookings.length);
 
-        // Transform backend data to frontend format
+        // @DATA_TRANSFORMATION: Map core database fields to normalized frontend display formats
         const transformedBookings = data.bookings.map((booking) => ({
           id: booking.booking_id,
           packageId: booking.package_id,
@@ -77,6 +96,7 @@ const MyBookingsPage = () => {
         setBookings([]);
       }
     } catch (err) {
+      // @ERROR_HANDLING: Persistent failure or unauthorized access during fetch
       console.error("💥 [MyBookingsPage] Error fetching bookings:", err);
       setError("Failed to load bookings. Please try again.");
     } finally {

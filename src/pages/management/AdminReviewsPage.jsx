@@ -1,9 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Reviews Moderation
+ * 
+ * Provides an administrative interface for moderating traveler feedback. 
+ * Allows for review approval, rejection with reason, and permanent 
+ * deletion to maintain platform quality and authenticity.
+ * 
+ * @module AdminReviewsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle, Trash2, ThumbsUp, ThumbsDown, Star, MessageSquare, X, User } from "lucide-react";
 import { reviewAPI } from "../../services/api";
 import "./AdminReviews.css";
 
+/**
+ * AdminReviewsPage Component
+ * 
+ * Orchestrates the moderation workflow for user-submitted reviews, 
+ * interfaces with the centralized review service for status updates.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminReviewsPage() {
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
@@ -32,6 +50,7 @@ function AdminReviewsPage() {
   const fetchReviews = async () => {
     try {
       setLoading(true);
+      // @API_CALL: Fetch reviews based on moderation status (pending, approved, rejected)
       const result = await reviewAPI.getAllAdmin(token, {
         status: statusFilter,
         limit: 50,
@@ -43,10 +62,12 @@ function AdminReviewsPage() {
         setStatusCounts(result.statusCounts || {});
         setMessage(null);
       } else {
+        // @ERROR_HANDLING: API failure response
         setMessage(result.message || "Failed to fetch reviews");
         setMessageType("error");
       }
     } catch (error) {
+      // @ERROR_HANDLING: Connection or major failure
       console.error("Error fetching reviews:", error);
       setMessage("Failed to fetch reviews");
       setMessageType("error");
@@ -59,6 +80,7 @@ function AdminReviewsPage() {
     setConfirmMessage("Approve this review? The review will be visible to all users.");
     setConfirmAction(() => async () => {
       try {
+        // @API_CALL: Approve a review to make it public
         const result = await reviewAPI.approve(token, reviewId);
         if (result.success) {
           setMessage("Review approved successfully");
@@ -67,11 +89,13 @@ function AdminReviewsPage() {
           setTimeout(() => setMessage(null), 3000);
           await fetchReviews();
         } else {
+          // @ERROR_HANDLING: API returned failure during approval
           setMessage(result.message || "Failed to approve review");
           setMessageType("error");
           setShowConfirmModal(false);
         }
       } catch (error) {
+        // @ERROR_HANDLING: Unexpected network failure
         console.error("Error approving review:", error);
         setMessage("Error approving review");
         setMessageType("error");

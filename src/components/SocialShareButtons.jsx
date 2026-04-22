@@ -1,7 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Social Sharing Interface
+ * 
+ * Shared utility component providing standardized deep-links for sharing 
+ * content across Facebook, Twitter, and WhatsApp. Includes a one-click 
+ * clipboard copy feature with UI feedback.
+ * 
+ * @module SocialShareButtons
+ */
+
 import { useState } from "react";
 import { Facebook, Twitter, Link as LinkIcon, MessageCircle } from "lucide-react";
 import "./SocialShareButtons.css";
 
+/**
+ * SocialShareButtons Component
+ * 
+ * Facilitates content distribution through external social networking platforms.
+ * 
+ * @param {Object} props
+ * @param {string} props.url - The canonical URL to be shared.
+ * @param {string} props.title - Descriptive text to accompany the shared link.
+ * @returns {JSX.Element}
+ */
 const SocialShareButtons = ({ url, title }) => {
     const [copied, setCopied] = useState(false);
 

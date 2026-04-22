@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Booking Payment Page
+ * 
+ * Final stage of the booking flow. Handles session recovery, coupon validation,
+ * booking creation, and secure payment processing (deposit or full payment).
+ * Support for both standard wizard flow and direct booking links.
+ * 
+ * @module BookingPaymentPage
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Lock, AlertCircle, Loader, CheckCircle, CreditCard, Calendar, User, Users } from "lucide-react";
@@ -6,6 +16,17 @@ import { packageAPI, authAPI, bookingAPI, couponAPI } from "../services/api";
 import paymentService from "../services/paymentService";
 import "./BookingPaymentPage.css";
 
+/**
+ * DummyCheckoutForm Component
+ * 
+ * Mock credit card input form for demonstration purposes.
+ * 
+ * @param {Object} props
+ * @param {number} props.amount - Total amount to pay
+ * @param {Function} props.onPay - Success callback
+ * @param {boolean} props.processing - Loading state
+ * @returns {JSX.Element}
+ */
 const DummyCheckoutForm = ({ amount, onPay, processing }) => {
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",

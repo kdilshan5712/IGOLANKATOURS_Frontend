@@ -1,3 +1,13 @@
+/**
+ * 🎯 I GO LANKA TOURS - Guide Dashboard Page
+ * 
+ * Central operational hub for tour guides. Displays assignment KPIs, 
+ * earnings trends, tour distribution analytics, and payout management.
+ * Integrates interactive charts and real-time notification alerts.
+ * 
+ * @module GuideDashboardPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -35,6 +45,13 @@ const StatCard = ({ icon: Icon, label, value, description, change, color }) => (
   </div>
 );
 
+/**
+ * GuideDashboardPage Component
+ * 
+ * Orchestrates guide-specific data visualization and financial operations.
+ * 
+ * @returns {JSX.Element}
+ */
 const GuideDashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);

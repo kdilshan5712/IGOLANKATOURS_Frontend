@@ -1,9 +1,27 @@
 /**
- * 🔒 VerifyEmailPage Component
+ * 🎯 I GO LANKA TOURS - Email Verification Page
  * 
  * Auto-executing verification page that handles the account activation flow.
  * Consumes a token from the URL, calls the backend verification endpoint,
  * and handles success/error UI states with automatic redirection.
+ * 
+ * @module VerifyEmailPage
+ */
+
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { CheckCircle, XCircle, Loader } from 'lucide-react';
+import './VerifyEmailPage.css';
+
+// Local API URL for direct fetch in this component
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+/**
+ * VerifyEmailPage Component
+ * 
+ * Automatically triggers verification on mount and manages activation lifecycle UI.
+ * 
+ * @returns {JSX.Element}
  */
 const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();

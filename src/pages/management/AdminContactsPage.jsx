@@ -1,9 +1,27 @@
+/**
+ * 🎯 I GO LANKA TOURS - Admin Contacts Management
+ * 
+ * Provides an interface for administrators to manage user inquiries. 
+ * Allows for reading, responding via email, adding internal notes, 
+ * and tracking message statuses (new, read, responded, archived).
+ * 
+ * @module AdminContactsPage
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle, Mail, Phone, Trash2, Save, MessageSquare, X, User, Send, Loader } from "lucide-react";
 import { contactAPI, adminAPI } from "../../services/api";
 import "./AdminContacts.css";
 
+/**
+ * AdminContactsPage Component
+ * 
+ * Orchestrates the lifecycle of contact messages, including state management 
+ * for replies, notes, and status updates.
+ * 
+ * @returns {JSX.Element}
+ */
 function AdminContactsPage() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
@@ -40,6 +58,7 @@ function AdminContactsPage() {
   const fetchMessages = async () => {
     try {
       setLoading(true);
+      // @API_CALL: Fetch contact messages based on current status filter
       const result = await contactAPI.getAllAdmin(token, {
         status: statusFilter,
         limit: 50,
@@ -51,10 +70,12 @@ function AdminContactsPage() {
         setStatusCounts(result.statusCounts || {});
         setMessage(null);
       } else {
+        // @ERROR_HANDLING: API failure response
         setMessage(result.message || "Failed to fetch messages");
         setMessageType("error");
       }
     } catch (error) {
+      // @ERROR_HANDLING: Connection or major failure
       console.error("Error fetching messages:", error);
       setMessage("Failed to fetch messages");
       setMessageType("error");
@@ -124,21 +145,24 @@ function AdminContactsPage() {
       setReplyError(null);
       setReplySuccess(false);
 
+      // @API_CALL: Send direct email reply to the traveler
       const result = await adminAPI.replyContactMessage(selectedMessage.message_id, replyText, token);
 
       if (result.success) {
         setReplySuccess(true);
         setReplyText("");
-        // Optionally update the selected message status locally so the UI updates
+        // @VALIDATION: Update local state to reflect the responded status immediately
         setSelectedMessage({
           ...selectedMessage,
           status: "responded"
         });
         fetchMessages();
       } else {
+        // @ERROR_HANDLING: Email sending failed
         setReplyError(result.message || "Failed to send reply");
       }
     } catch (error) {
+      // @ERROR_HANDLING: Unexpected system failure during email dispatch
       console.error("Error sending reply:", error);
       setReplyError("An unexpected error occurred");
     } finally {
