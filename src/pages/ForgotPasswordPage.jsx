@@ -15,6 +15,7 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setError("");
 
+    // @VALIDATION: Basic presence check for email
     if (!email.trim()) {
       setError("Please enter your email address");
       return;
@@ -23,7 +24,8 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
+      // @API_CALL: Request password reset link from backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
@@ -32,11 +34,14 @@ const ForgotPasswordPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // UI STATE: Switch to "Check your email" view
         setSubmitted(true);
       } else {
+        // @ERROR_HANDLING: Display server-side verification failure
         setError(data.message || "Failed to send reset email. Please try again.");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Catch network/timeout errors
       console.error("Forgot password error:", err);
       setError("An error occurred. Please try again.");
     } finally {

@@ -7,7 +7,6 @@ import paymentService from "../services/paymentService";
 import "./BookingPaymentPage.css";
 
 const DummyCheckoutForm = ({ amount, onPay, processing }) => {
-  // ... (keeping original DummyCheckoutForm)
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -98,6 +97,15 @@ const DummyCheckoutForm = ({ amount, onPay, processing }) => {
   );
 };
 
+/**
+ * 💳 BookingPaymentPage Component
+ * 
+ * Final stage of the booking flow. Handles:
+ * 1. Session recovery and direct booking context (for custom tours).
+ * 2. Coupon/Promo code validation.
+ * 3. Booking creation (if not already created).
+ * 4. Payment processing (Deposit of 30% or Full payment based on travel date).
+ */
 const BookingPaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -121,7 +129,7 @@ const BookingPaymentPage = () => {
 
 
   useEffect(() => {
-    // 1. Auth Check
+    // @VALIDATION: 1. Auth Check - Redirect if session expired
     if (!authAPI.isAuthenticated()) {
       sessionStorage.setItem('returnUrl', `/booking/${id}`);
       navigate('/login');
@@ -231,6 +239,7 @@ const BookingPaymentPage = () => {
     setPromoError(null);
     
     try {
+      // @API_CALL: Validate promo code against current booking amount
       const amount = step1Data.total_price;
       const res = await couponAPI.validate(promoCode, amount);
       
@@ -239,11 +248,13 @@ const BookingPaymentPage = () => {
         setAppliedPromo(res.coupon);
         setPromoError(null);
       } else {
+        // @ERROR_HANDLING: Display coupon rejection reason
         setPromoError(res.message || "Invalid coupon code");
         setPromoDiscount(0);
         setAppliedPromo(null);
       }
     } catch (err) {
+      // @ERROR_HANDLING: Network error during validation
       setPromoError("Failed to validate coupon");
     } finally {
       setIsValidatingPromo(false);
@@ -260,6 +271,7 @@ const BookingPaymentPage = () => {
       let bookingId;
       let finalPrice;
 
+      // WORKFLOW BRANCHING: Direct vs Wizard Flow
       if (isDirectBooking && existingBooking) {
         // --- CASE 1: Direct Payment for Existing Booking ---
         bookingId = existingBooking.booking_id;
@@ -268,6 +280,7 @@ const BookingPaymentPage = () => {
         // --- CASE 2: Create New Booking (Wizard Flow) ---
         const payload = {
           package_id: step1Data.package_id,
+          // ... (payload assembly)
           travel_date: step1Data.travel_date,
           adults: step1Data.adults,
           children: step1Data.children,
@@ -283,8 +296,10 @@ const BookingPaymentPage = () => {
           promo_code: appliedPromo ? appliedPromo.code : null,
         };
 
+        // @API_CALL: Create the booking before payment
         const bookingRes = await bookingAPI.create(payload, token);
         if (!bookingRes.booking) {
+          // @ERROR_HANDLING: Parse server-side validation errors (e.g., passport missing)
           if (bookingRes.errors) {
             setFieldErrors(bookingRes.errors);
             throw new Error("Please correct the traveler information errors below.");
@@ -296,7 +311,7 @@ const BookingPaymentPage = () => {
         finalPrice = bookingRes.booking.total_price;
       }
 
-      // Process Payment (Deposit or Full)
+      // @VALIDATION: Payment logic - Deposit vs Full Payment
       const travelDateStr = isDirectBooking ? existingBooking.travel_date : step1Data.travel_date;
       const travelDate = new Date(travelDateStr);
       const today = new Date();
@@ -306,10 +321,11 @@ const BookingPaymentPage = () => {
       // For custom bookings (Direct), we usually require full payment as finalized by admin
       const paymentAmount = isDirectBooking ? finalPrice : (daysUntilTravel <= 30 ? finalPrice : (finalPrice * 0.3).toFixed(2));
       
+      // @API_CALL: Execute payment transaction
       const paymentRes = await paymentService.processDummyPayment(bookingId, paymentAmount, token);
 
       if (paymentRes.success) {
-        // Success!
+        // Success! Cleanup session storage
         sessionStorage.removeItem('booking_step1');
         sessionStorage.removeItem('booking_travellers');
 
@@ -324,6 +340,7 @@ const BookingPaymentPage = () => {
           }
         });
       } else {
+        // @ERROR_HANDLING: Payment gateway error
         throw new Error("Payment failed: " + paymentRes.message);
       }
 

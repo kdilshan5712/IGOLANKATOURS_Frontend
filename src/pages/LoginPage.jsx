@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Mail, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
-import { authAPI } from "../services/api";
-import { Button, Card } from "../components/shared";
-import "./LoginPage.css";
-
+/**
+ * 🔑 LoginPage Component
+ * 
+ * Manages user authentication for Tourists, Admins, and Guides.
+ * Includes role-based redirection, session management, and persistent storage of auth tokens.
+ */
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,6 +30,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
 
+    // @VALIDATION: Basic presence check for email and password
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields");
       return;
@@ -39,11 +39,11 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Call backend API for authentication
+      // @API_CALL: Authenticate credentials against backend
       const data = await authAPI.login(formData.email, formData.password);
 
       if (data.success && data.token) {
-        // Store token and user data
+        // PERSISTENCE: Store session details in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("isLoggedIn", "true");
@@ -54,12 +54,12 @@ const LoginPage = () => {
         // Store login timestamp for session validation
         localStorage.setItem("loginTimestamp", Date.now().toString());
 
-        // Role-based redirect
+        // ROLE-BASED REDIRECTION LOGIC
         if (data.user.role === "admin") {
           // Admin → redirect to admin dashboard
           navigate("/admin/dashboard", { replace: true });
         } else if (data.user.role === "guide") {
-          // Check if guide is rejected
+          // @VALIDATION: Check guide application current status
           if (data.user.isRejected || data.user.status === 'rejected') {
             // Rejected guide → redirect to rejection page for resubmission
             navigate("/guide/rejected", { replace: true });
@@ -89,9 +89,11 @@ const LoginPage = () => {
           navigate("/");
         }
       } else {
+        // @ERROR_HANDLING: Show specific failure message from server
         setError(data.message || "Login failed. Please check your credentials.");
       }
     } catch (err) {
+      // @ERROR_HANDLING: Connection or unexpected runtime errors
       console.error("Login error:", err);
       setError("An error occurred. Please try again.");
     } finally {

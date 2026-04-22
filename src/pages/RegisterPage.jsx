@@ -1,14 +1,10 @@
-import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { User, Mail, Lock, AlertCircle, Phone, MapPin, Eye, EyeOff } from "lucide-react";
-import PhoneInputModule from 'react-phone-input-2';
-const PhoneInput = PhoneInputModule.default || PhoneInputModule;
-import 'react-phone-input-2/lib/style.css';
-import { authAPI } from "../services/api";
-import { validatePassword } from "../utils/passwordValidation";
-import { Button, Card } from "../components/shared";
-import "./RegisterPage.css";
-
+/**
+ * 📝 RegisterPage Component
+ * 
+ * Handles new user registration for the I GO LANKA TOURS platform.
+ * Includes complex form state management, real-time validation,
+ * and integration with the Auth API.
+ */
 const RegisterPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,17 +39,19 @@ const RegisterPage = () => {
     setError("");
     setFieldErrors({});
 
+    // @VALIDATION: Check for presence of mandatory fields
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all required fields");
       return;
     }
 
+    // @VALIDATION: Compare password confirmation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // Validate password strength
+    // @VALIDATION: Enforce strong password policy via utility
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
       setError(passwordValidation.message);
@@ -63,7 +61,7 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      // Call backend API for registration
+      // @API_CALL: Submit registration data to backend
       const data = await authAPI.register({
         full_name: formData.name,
         email: formData.email,
@@ -84,6 +82,7 @@ const RegisterPage = () => {
           }
         });
       } else {
+        // @ERROR_HANDLING: Display server-side field validation errors
         if (data.errors) {
           setFieldErrors(data.errors);
           setError("Please correct the highlighted errors.");
@@ -92,6 +91,7 @@ const RegisterPage = () => {
         }
       }
     } catch (err) {
+      // @ERROR_HANDLING: Generic catch for network/timeout issues
       console.error("Registration error:", err);
       setError("An error occurred. Please try again.");
     } finally {
@@ -108,6 +108,7 @@ const RegisterPage = () => {
             <p className="register-subtitle">Join us and start your Sri Lankan adventure</p>
           </div>
 
+          {/* @ERROR_HANDLING: Global error alert display */}
           {error && (
             <div className="register-error">
               <AlertCircle size={18} />

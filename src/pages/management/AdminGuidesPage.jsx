@@ -1,7 +1,13 @@
-import { useState, useEffect } from "react";
-import { adminAPI } from "../../services/api";
-import "./AdminGuides.css";
-
+/**
+ * 🧑‍🏫 AdminGuidesPage Component
+ * 
+ * Administrative dashboard for managing Tour Guide applications and active guides.
+ * Features:
+ * - Application review (Approve/Reject with reasons).
+ * - Document verification (Identity, Licenses).
+ * - Financial setup (Custom commission rates).
+ * - Multi-stage confirmation modals for sensitive actions.
+ */
 function AdminGuidesPage() {
   const [guides, setGuides] = useState([]);
   const [filteredGuides, setFilteredGuides] = useState([]);
@@ -34,20 +40,18 @@ function AdminGuidesPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      console.log('🔍 Fetching guides with token:', token ? 'Present' : 'Missing');
-
-      // Use new endpoint that includes documents array
+      
+      // @API_CALL: Fetch all guides including their digital documents
       const result = await adminAPI.getGuidesWithDocuments(token);
 
-      console.log('📦 API Response:', result);
-
       if (result.success) {
-        console.log(`✅ Setting ${result.guides?.length || 0} guides to state`);
         setGuides(result.guides || []);
       } else {
+        // @ERROR_HANDLING: Log and display fetch failures
         console.error("❌ Failed to fetch guides:", result.message);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Persistent connection issues
       console.error("❌ Error fetching guides:", error);
     } finally {
       setLoading(false);
@@ -131,15 +135,18 @@ function AdminGuidesPage() {
   const viewDocument = async (guideId, documentId) => {
     try {
       const token = localStorage.getItem("token");
+      // @API_CALL: Fetch temporary secure URL for document viewing (Supabase/S3)
       const result = await adminAPI.getDocumentUrl(guideId, documentId, token);
 
       if (result.success && result.url) {
         window.open(result.url, "_blank");
       } else {
+        // @ERROR_HANDLING: Failed to retrieve secure link
         setErrorMessage("Failed to load document. Please try again.");
         setShowErrorModal(true);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Network/Auth error
       console.error("Error viewing document:", error);
       setErrorMessage("Error loading document. Please try again.");
       setShowErrorModal(true);
@@ -147,6 +154,7 @@ function AdminGuidesPage() {
   };
 
   const handleReject = async () => {
+    // @VALIDATION: Ensure rejection reason is provided for the user
     if (!rejectReason.trim()) {
       setErrorMessage("Please provide a reason for rejection before proceeding.");
       setShowErrorModal(true);
@@ -156,13 +164,15 @@ function AdminGuidesPage() {
     try {
       setActionLoading(true);
       const token = localStorage.getItem("token");
+      // @API_CALL: Submit rejection with reason to backend
       const result = await adminAPI.rejectGuideAction(selectedGuide.guide_id, rejectReason, token);
 
       if (result.success) {
+        // UI FEEDBACK: Show success notification and cleanup
         setShowRejectModal(false);
         setShowModal(false);
         setApprovalMessage(
-          `${selectedGuide?.full_name || "Guide"} application has been rejected. A notification email with the reason has been sent.`
+          `${selectedGuide?.full_name || "Guide"} application has been rejected. A notification email has been sent.`
         );
         setShowApprovalSuccess(true);
         setTimeout(() => {
@@ -170,10 +180,12 @@ function AdminGuidesPage() {
           fetchGuides();
         }, 3000);
       } else {
+        // @ERROR_HANDLING: Server-side rejection failure
         setErrorMessage(result.message || "Failed to reject guide. Please try again.");
         setShowErrorModal(true);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Network/Timeout error
       console.error("Error rejecting guide:", error);
       setErrorMessage("An error occurred while rejecting the application. Please try again.");
       setShowErrorModal(true);

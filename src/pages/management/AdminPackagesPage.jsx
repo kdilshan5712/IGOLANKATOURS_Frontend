@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Edit, Trash2, Plus, X, Check, AlertCircle, Image as ImageIcon } from "lucide-react";
-import { adminAPI } from "../../services/api";
-import "./AdminPackages.css";
-
+/**
+ * 🛠️ AdminPackagesPage Component
+ * 
+ * Provides an administrative interface for Managing (CRUD) tour packages.
+ * Includes form validation, asynchronous API integration, and interactive feedback modals.
+ */
 function AdminPackagesPage() {
   const navigate = useNavigate();
   const [packages, setPackages] = useState([]);
@@ -42,6 +42,7 @@ function AdminPackagesPage() {
 
   const fetchPackages = async () => {
     try {
+      // @API_CALL: Fetch all packages for the admin table
       const token = localStorage.getItem("token");
       const result = await adminAPI.getAllPackages(token);
 
@@ -49,6 +50,7 @@ function AdminPackagesPage() {
         setPackages(result.packages || []);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Log fetch failures
       console.error("Error fetching packages:", error);
     } finally {
       setLoading(false);
@@ -102,8 +104,17 @@ function AdminPackagesPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
+    // @VALIDATION: Basic presence check for mandatory fields
+    if (!formData.name || !formData.description || !formData.price) {
+      setNotificationMessage("Please fill in all required fields.");
+      setNotificationType("error");
+      setShowNotification(true);
+      return;
+    }
+
     try {
       let result;
+      // @API_CALL: Determine whether to Create (POST) or Update (PUT)
       if (editingPackage) {
         result = await adminAPI.updatePackage(editingPackage.package_id, formData, token);
       } else {
@@ -111,6 +122,7 @@ function AdminPackagesPage() {
       }
 
       if (result.success) {
+        // @ERROR_HANDLING: Success feedback and state refresh
         setNotificationMessage(editingPackage ? "Package updated successfully!" : "Package created successfully!");
         setNotificationType("success");
         setShowNotification(true);
@@ -120,12 +132,14 @@ function AdminPackagesPage() {
           handleCloseModal();
         }, 1500);
       } else {
+        // @ERROR_HANDLING: API-level error messaging
         setNotificationMessage(result.message || "Operation failed");
         setNotificationType("error");
         setShowNotification(true);
         setTimeout(() => setShowNotification(false), 3000);
       }
     } catch (error) {
+      // @ERROR_HANDLING: Caught network or runtime errors
       console.error("Error saving package:", error);
       setNotificationMessage("Failed to save package");
       setNotificationType("error");
@@ -136,11 +150,14 @@ function AdminPackagesPage() {
 
   const handleDelete = async (packageId) => {
     const token = localStorage.getItem("token");
+    // @VALIDATION: Confirmation pattern for destructive actions
     setConfirmMessage("Are you sure you want to delete this package? This action cannot be undone.");
     setConfirmAction(() => async () => {
       try {
+        // @API_CALL: Send delete request to backend
         const result = await adminAPI.deletePackage(packageId, token);
         if (result.success) {
+          // @ERROR_HANDLING: Success feedback and cleanup
           setNotificationMessage("Package deleted successfully!");
           setNotificationType("success");
           setShowNotification(true);
@@ -150,6 +167,7 @@ function AdminPackagesPage() {
             fetchPackages();
           }, 1500);
         } else {
+          // @ERROR_HANDLING: Failed deletion feedback
           setNotificationMessage(result.message || "Failed to delete package");
           setNotificationType("error");
           setShowNotification(true);
@@ -157,6 +175,7 @@ function AdminPackagesPage() {
           setTimeout(() => setShowNotification(false), 3000);
         }
       } catch (error) {
+        // @ERROR_HANDLING: Unexpected deletion error
         console.error("Error deleting package:", error);
         setNotificationMessage("Failed to delete package");
         setNotificationType("error");

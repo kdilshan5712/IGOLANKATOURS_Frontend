@@ -1,5 +1,11 @@
-// 🎯 I GO LANKA TOURS - API Service Layer
-// Handles all backend communication
+/**
+ * 🎯 I GO LANKA TOURS - API Service Layer
+ * 
+ * Handles all backend communication using fetch API.
+ * Centralizes error handling, authentication state, and data transformation.
+ * 
+ * @module api
+ */
 
 // ============================================
 // API Configuration & Secure Fetch Helper
@@ -9,6 +15,13 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 /**
  * Enhanced fetch wrapper that ensures credentials (cookies) are sent
  * and handles base URL joining.
+ * 
+ * @ERROR_HANDLING: This wrapper handles the initial URL formation and default headers.
+ * Errors in transport are caught in individual API methods for granular response.
+ * 
+ * @param {string} endpoint - The API endpoint path
+ * @param {Object} options - Standard fetch options
+ * @returns {Promise<Response>} - The fetch promise
  */
 const secureFetch = async (endpoint, options = {}) => {
   const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
@@ -34,8 +47,10 @@ export const chatAPI = {
   // Get messages for a booking
   getMessages: async (bookingId, token) => {
     try {
+      // @VALIDATION: Ensure token exists before attempting call
       if (!token) throw new Error("Authentication required");
 
+      // @API_CALL: Fetch booking chat messages
       const response = await secureFetch(`/chat/${bookingId}`, {
         method: "GET",
         headers: {
@@ -45,6 +60,7 @@ export const chatAPI = {
 
       return await response.json();
     } catch (error) {
+      // @ERROR_HANDLING: Log and normalize error response
       console.error("Chat getMessages Error:", error);
       return { success: false, message: error.message || "Failed to fetch chat messages." };
     }
@@ -53,8 +69,10 @@ export const chatAPI = {
   // Send a message for a booking
   sendMessage: async (bookingId, message, token) => {
     try {
+      // @VALIDATION: Auth token check
       if (!token) throw new Error("Authentication required");
 
+      // @API_CALL: Post new chat message
       const response = await secureFetch(`/chat/${bookingId}`, {
         method: "POST",
         headers: {
@@ -65,6 +83,7 @@ export const chatAPI = {
 
       return await response.json();
     } catch (error) {
+      // @ERROR_HANDLING: Error normalization for UI
       console.error("Chat sendMessage Error:", error);
       return { success: false, message: error.message || "Failed to send chat message." };
     }
@@ -169,17 +188,19 @@ export const packageAPI = {
   // Get single package by UUID
   getById: async (id) => {
     try {
-      // Validate ID
+      // @VALIDATION: Check for malformed or missing ID
       if (!id || id === 'undefined' || id === 'null') {
         console.error('[API] Invalid package ID:', id);
         throw new Error('Invalid package ID');
       }
 
       console.log('[API] Fetching package with ID:', id);
+      // @API_CALL: Fetch full package details
       const res = await fetch(`${API_BASE_URL}/packages/${id}`);
 
       console.log('[API] Response status:', res.status);
 
+      // @ERROR_HANDLING: Detailed status code handling
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error('Package not found');
@@ -188,9 +209,8 @@ export const packageAPI = {
       }
 
       const data = await res.json();
-      console.log('[API] Response data:', data);
-
-      // Handle different response formats
+      
+      // @ERROR_HANDLING: Handle logical failure payload
       if (data.success === false) {
         throw new Error(data.message || 'Failed to load package');
       }
@@ -198,7 +218,7 @@ export const packageAPI = {
       // Get the raw package data
       const rawPackage = data.package || data;
 
-      // Transform to consistent format
+      // DATA TRANSFORMATION: Normalize backend response to frontend model
       const transformedPackage = {
         id: rawPackage.package_id || rawPackage.id,
         package_id: rawPackage.package_id || rawPackage.id,
@@ -223,9 +243,9 @@ export const packageAPI = {
         latestReviews: rawPackage.latestReviews || []
       };
 
-      console.log('[API] Transformed package:', transformedPackage);
       return transformedPackage;
     } catch (error) {
+      // @ERROR_HANDLING: Propagate error to UI components
       console.error('[API] Error fetching package:', error);
       throw error;
     }
@@ -285,6 +305,7 @@ export const bookingAPI = {
   // Create booking
   create: async (bookingData, token) => {
     try {
+      // @API_CALL: Create a new booking record
       const res = await fetch(`${API_BASE_URL}/bookings`, {
         method: 'POST',
         headers: {
@@ -296,6 +317,7 @@ export const bookingAPI = {
       const data = await res.json();
       return data; // { message, booking }
     } catch (error) {
+      // @ERROR_HANDLING: Catch network or server-side validation errors
       console.error("Error creating booking:", error);
       return { success: false, message: "Failed to create booking", errors: error.errors || null };
     }
@@ -304,12 +326,14 @@ export const bookingAPI = {
   // Get my bookings
   getMy: async (token) => {
     try {
+      // @API_CALL: Retrieve user's personal booking history
       const res = await fetch(`${API_BASE_URL}/bookings/my`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
       return { success: res.ok, ...data }; // { message, count, bookings, success }
     } catch (error) {
+      // @ERROR_HANDLING: Fetch failure fallback
       console.error("Error fetching bookings:", error);
       return { success: false, bookings: [] };
     }
@@ -438,6 +462,7 @@ export const authAPI = {
   // Tourist registration -> POST /api/auth/register
   register: async (userData) => {
     try {
+      // @API_CALL: Register a new user account
       const res = await secureFetch("/auth/register", {
         method: "POST",
         body: JSON.stringify({
@@ -450,6 +475,8 @@ export const authAPI = {
       });
 
       const data = await res.json();
+
+      // @ERROR_HANDLING: Handle registration failures (e.g. duplicate email)
       if (!res.ok) {
         return {
           success: false,
@@ -458,6 +485,7 @@ export const authAPI = {
         };
       }
 
+      // @VALIDATION: Fallback logic for user display name
       const user = data.user || {};
       const nameFallback =
         userData.name?.trim() ||
@@ -482,6 +510,7 @@ export const authAPI = {
           "Registration successful. Please check your email to verify."
       };
     } catch (error) {
+      // @ERROR_HANDLING: Catch connection/network errors
       console.error("Error registering:", error);
       return { success: false, message: "Network error. Please try again." };
     }
@@ -490,12 +519,15 @@ export const authAPI = {
   // Login -> POST /api/auth/login
   login: async (email, password) => {
     try {
+      // @API_CALL: Authenticate user credentials
       const res = await secureFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
+
+      // @ERROR_HANDLING: Invalid credentials or status issues
       if (!res.ok) {
         return {
           success: false,
@@ -526,6 +558,7 @@ export const authAPI = {
         message: data.message || "Login successful"
       };
     } catch (error) {
+      // @ERROR_HANDLING: Connectivity issues
       console.error("Error logging in:", error);
       return { success: false, message: "Network error. Please try again." };
     }

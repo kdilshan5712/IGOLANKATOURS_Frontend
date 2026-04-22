@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Lock, ArrowLeft, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
-import { validatePassword } from "../utils/passwordValidation";
-import { Button, Card } from "../components/shared";
-import "./ResetPasswordPage.css";
-
+/**
+ * 🔐 ResetPasswordPage Component
+ * 
+ * Allows users to set a new password using a token received via email.
+ * Includes complex validation logic for password strength and matching.
+ */
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -36,12 +35,13 @@ const ResetPasswordPage = () => {
     setError("");
     setFieldErrors({});
 
+    // @VALIDATION: Basic presence check
     if (!formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields");
       return;
     }
 
-    // Validate password strength
+    // @VALIDATION: Enforce strong password policy
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
       setError(passwordValidation.message);
@@ -61,7 +61,8 @@ const ResetPasswordPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/reset-password", {
+      // @API_CALL: Submit new password to backend with reset token
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,9 +74,11 @@ const ResetPasswordPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // UI STATE: Success message and delayed redirect
         setSuccess(true);
         setTimeout(() => navigate("/login"), 3000);
       } else {
+        // @ERROR_HANDLING: Display server-side verification/token failure
         if (data.errors) {
           setFieldErrors(data.errors);
           setError("Please correct the highlighted errors.");
@@ -84,6 +87,7 @@ const ResetPasswordPage = () => {
         }
       }
     } catch (err) {
+      // @ERROR_HANDLING: Catch network/timeout errors
       console.error("Reset password error:", err);
       setError("An error occurred. Please try again.");
     } finally {

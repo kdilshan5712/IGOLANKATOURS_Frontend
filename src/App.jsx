@@ -1,91 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { authAPI } from "./services/api";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminLayout from "./layouts/AdminLayout";
-import GuideLayout from "./layouts/GuideLayout";
-import UserLayout from "./layouts/UserLayout";
-import HomePage from "./pages/HomePage";
-import PackagesPage from "./pages/PackagesPage";
-import PackageDetailsPage from "./pages/PackageDetailsPage";
-import DestinationsPage from "./pages/DestinationsPage";
-import DestinationDetailsPage from "./pages/DestinationDetailsPage";
-import FAQPage from "./pages/FAQPage";
-import AboutPage from "./pages/AboutPage";
-import ReviewsPage from "./pages/ReviewsPage";
-import ContactPage from "./pages/ContactPage";
-import ChatAgentPage from "./pages/ChatAgentPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import BookingStartPage from "./pages/BookingStartPage";
-import BookingTravellersPage from "./pages/BookingTravellersPage";
-import BookingPaymentPage from "./pages/BookingPaymentPage";
-import BookingSuccessPage from "./pages/BookingSuccessPage";
-import BookingFailurePage from "./pages/BookingFailurePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import CheckEmailPage from "./pages/CheckEmailPage";
-import MyBookingsPage from "./pages/MyBookingsPage";
-import GalleryPage from "./pages/GalleryPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import TermsPage from "./pages/TermsPage";
-import CancellationPolicyPage from "./pages/CancellationPolicyPage";
-import GuideRegisterPage from "./pages/guide/GuideRegisterPage";
-import GuideDocumentsPage from "./pages/guide/GuideDocumentsPage";
-import GuidePendingPage from "./pages/guide/GuidePendingPage";
-import GuideRejectedPage from "./pages/guide/GuideRejectedPage";
-import GuideDashboardPage from "./pages/guide/GuideDashboardPage";
-import GuideBookingsPage from "./pages/guide/GuideBookingsPage";
-import GuideAvailabilityPage from "./pages/guide/GuideAvailabilityPage";
-import GuideProfilePage from "./pages/guide/GuideProfilePage";
-import GuideReviewsPage from "./pages/guide/GuideReviewsPage";
-import WishlistPage from "./pages/WishlistPage";
-// Admin imports
-import AdminDashboardPage from "./pages/management/AdminDashboardPage";
-import AdminPackagesPage from "./pages/management/AdminPackagesPage";
-import AdminDestinationsPage from "./pages/management/AdminDestinationsPage";
-import AdminBookingsPage from "./pages/management/AdminBookingsPage";
-import AdminReviewsPage from "./pages/management/AdminReviewsPage";
-import AdminUsersPage from "./pages/management/AdminUsersPage";
-import AdminContactsPage from "./pages/management/AdminContactsPage";
-import AdminCustomToursPage from "./pages/management/AdminCustomToursPage";
-import AdminGuidesPage from "./pages/management/AdminGuidesPage";
-import AdminProfilePage from "./pages/management/AdminProfilePage";
-import AdminGalleryPage from "./pages/management/AdminGalleryPage";
-import AdminManagementPage from "./pages/management/AdminManagementPage";
-import AdminPricingRulesPage from "./pages/management/AdminPricingRulesPage";
-import AdminPayoutsPage from "./pages/management/AdminPayoutsPage";
-import AdminLoginPage from "./pages/management/AdminLoginPage";
-import AdminFAQPage from "./pages/management/AdminFAQPage";
-import AdminAuditLogsPage from "./pages/management/AdminAuditLogsPage";
-// User Dashboard imports
-import UserDashboard from "./pages/UserDashboard";
-import UserProfile from "./pages/UserProfile";
-import UserBookings from "./pages/UserBookings";
-import UserBookingDetails from "./pages/UserBookingDetails";
-import UserCustomTours from "./pages/UserCustomTours";
-// Session management
-import { SESSION_CONFIG } from "./config/session";
-import "./App.css";
-
+/**
+ * 📱 Main App Component
+ * 
+ * Entry point for the I GO LANKA TOURS frontend.
+ * Manages global routing, layout composition, and initial session validation.
+ * Uses a hybrid routing model with ProtectedRoutes for role-based access control.
+ */
 function App() {
   // Validate session on app load
   useEffect(() => {
     const validateSession = async () => {
       const token = localStorage.getItem('token');
-      const loginTimestamp = localStorage.getItem('loginTimestamp');
-
       if (!token) return;
 
-      // Check if session is roughly near expiry or on app load
-      // We attempt a silent refresh
       try {
+        // @API_CALL: Attempt silent token refresh to extend session
         console.log('🔄 [App] Validating session via refresh token...');
         const result = await authAPI.refreshToken();
+        
         if (!result.success) {
+          // @ERROR_HANDLING: Token expired or invalid, force logout
           console.warn('⚠️ [App] Session refresh failed, logging out');
           authAPI.logout();
         } else {
@@ -93,6 +26,7 @@ function App() {
           localStorage.setItem('loginTimestamp', Date.now().toString());
         }
       } catch (err) {
+        // @ERROR_HANDLING: Persistent network/server error
         console.error('❌ [App] Session validation error:', err);
       }
     };

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Users, ArrowRight } from "lucide-react";
-import { packageAPI } from "../services/api";
-import { useBooking } from "../contexts/BookingContext";
-import "./BookingDetailsPage.css";
-
+/**
+ * 🛂 BookingDetailsPage Component
+ * 
+ * First step of the booking flow.
+ * Handles package validation, travel date selection, and group size (number of travelers).
+ * Synchronizes state with the useBooking context for subsequent steps.
+ */
 const BookingDetailsPage = () => {
   const { packageId } = useParams();
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const BookingDetailsPage = () => {
 
   useEffect(() => {
     const fetchPackage = async () => {
-      // Validate packageId first
+      // @VALIDATION: Ensure a valid package ID is present in URL
       if (!packageId || packageId === 'undefined' || packageId === 'null') {
         setError('No package selected');
         setLoading(false);
@@ -29,6 +29,7 @@ const BookingDetailsPage = () => {
       
       try {
         setLoading(true);
+        // @API_CALL: Fetch package details to hydrate booking flow
         const data = await packageAPI.getById(packageId);
         
         // Ensure we have valid package data
@@ -39,6 +40,7 @@ const BookingDetailsPage = () => {
         setPackageData(data);
         setError(null);
       } catch (err) {
+        // @ERROR_HANDLING: Parse error message for specific user feedback
         console.error('[BookingDetails] Error fetching package:', err);
         
         if (err.message.includes('not found')) {
@@ -62,17 +64,19 @@ const BookingDetailsPage = () => {
   const totalPrice = packageData ? packageData.price * numberOfTravelers : 0;
 
   const handleContinue = () => {
+    // @VALIDATION: Ensure travel date is selected
     if (!travelDate) {
       alert("Please select a travel date");
       return;
     }
 
+    // @VALIDATION: Fallback check for package hydration
     if (!packageData || !packageData.id) {
       alert("Package data is not available. Please try again.");
       return;
     }
 
-    // Update booking context with consistent IDs
+    // STATE SYNC: Update global booking context for subsequent steps
     updateBookingData({
       packageId: packageData.id,
       packageData: {

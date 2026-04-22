@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { authAPI } from "../services/api";
-import "./BookingTravellersPage.css";
-
+/**
+ * 🧑‍🤝‍🧑 BookingTravellersPage Component
+ * 
+ * Second step of the booking flow.
+ * Collects detailed information for all travelers (Adults & Children).
+ * Performs complex age-based validation against the selected travel date.
+ */
 const BookingTravellersPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -12,7 +14,7 @@ const BookingTravellersPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 1. Load Step 1 Data
+        // STATE RECOVERY: Load Step 1 Data from sessionStorage
         const step1Data = sessionStorage.getItem('booking_step1');
         if (!step1Data) {
             navigate(`/booking/${id}`); // Redirect to start if no data
@@ -22,16 +24,16 @@ const BookingTravellersPage = () => {
         const parsedData = JSON.parse(step1Data);
         setBookingData(parsedData);
 
-        // 2. Initialize Travellers Array
+        // DATA INITIALIZATION: Build Travellers Array based on counts
         const totalTravelers = (parsedData.adults || 0) + (parsedData.children || 0);
 
-        // Check if we already have data (if user came back from payment page)
+        // PERSISTENCE: Check for existing data (e.g., if user returns from payment)
         const existingTravellers = sessionStorage.getItem('booking_travellers');
 
         if (existingTravellers) {
             setTravellers(JSON.parse(existingTravellers));
         } else {
-            // Initialize new
+            // AUTH INTEGRATION: Pre-fill first traveler with logged-in user info
             const currentUser = authAPI.getCurrentUser();
             const initialTravellers = Array(totalTravelers).fill(null).map((_, index) => ({
                 id: index,
@@ -39,7 +41,7 @@ const BookingTravellersPage = () => {
                 passportNumber: "",
                 nationality: "",
                 dateOfBirth: "",
-                isPrimary: index === 0, // First one is primary by default
+                isPrimary: index === 0, // First one is primary contact
                 type: index < (parsedData.adults || 0) ? 'Adult' : 'Child'
             }));
             setTravellers(initialTravellers);
@@ -71,30 +73,30 @@ const BookingTravellersPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate
+        // @VALIDATION: Iterate through all travelers to ensure complete profiles
         for (let i = 0; i < travellers.length; i++) {
             const t = travellers[i];
             
-            // Basic required check
+            // @VALIDATION: Basic required check for individual fields
             if (!t.fullName.trim() || !t.passportNumber.trim() || !t.nationality.trim() || !t.dateOfBirth) {
                 alert(`Please fill in all details for Traveller ${i + 1}`);
                 return;
             }
 
-            // Age validation for Children
+            // @VALIDATION: Business Rule - Age validation for Children (must be <= 16)
             if (t.type === 'Child' && bookingData.travel_date) {
                 const age = calculateAge(t.dateOfBirth, bookingData.travel_date);
                 if (age > 16) {
-                    alert(`Traveller ${i + 1} is listed as a Child but is ${age} years old. Children must be 16 years or younger at the time of travel. Please go back and correct the traveler counts.`);
+                    alert(`Traveller ${i + 1} is listed as a Child but is ${age} years old. Children must be 16 years or younger at the time of travel.`);
                     return;
                 }
             }
         }
 
-        // Save
+        // PERSISTENCE: Save validated traveler data to session
         sessionStorage.setItem('booking_travellers', JSON.stringify(travellers));
 
-        // Proceed
+        // NAVIGATION: Move to payment step
         navigate(`/booking/${id}/payment`);
     };
 

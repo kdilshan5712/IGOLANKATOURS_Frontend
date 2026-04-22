@@ -1,7 +1,16 @@
-import { createContext, useState, useContext } from 'react';
-
+/**
+ * 📦 BookingContext
+ * 
+ * Centralized state management for the tour booking wizard.
+ * Persists package selection, traveler details, and payment status across steps.
+ */
 export const BookingContext = createContext(null);
 
+/**
+ * 🛠️ BookingProvider Component
+ * 
+ * Wraps the booking-related routes to provide access to shared state.
+ */
 export const BookingProvider = ({ children }) => {
   const [bookingData, setBookingData] = useState({
     packageId: null,
@@ -27,6 +36,9 @@ export const BookingProvider = ({ children }) => {
     paymentStatus: null
   });
 
+  /**
+   * 🔄 Merge new data into the current booking state
+   */
   const updateBookingData = (data) => {
     setBookingData(prev => ({
       ...prev,
@@ -34,6 +46,9 @@ export const BookingProvider = ({ children }) => {
     }));
   };
 
+  /**
+   * 🧹 Clear all booking data (e.g., after success or cancellation)
+   */
   const resetBooking = () => {
     setBookingData({
       packageId: null,
@@ -60,7 +75,14 @@ export const BookingProvider = ({ children }) => {
     });
   };
 
-  // Simulate payment processing
+  /**
+   * 💳 processPayment (Mock Implementation)
+   * 
+   * Simulates a network call to a payment gateway.
+   * Includes random failure simulation for testing @ERROR_HANDLING in UI components.
+   * 
+   * @API_CALL: Simulated backend interaction
+   */
   const processPayment = async (paymentInfo) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -83,6 +105,7 @@ export const BookingProvider = ({ children }) => {
             message: 'Payment processed successfully'
           });
         } else {
+          // @ERROR_HANDLING: Persistent failure state in context
           updateBookingData({
             status: 'pending',
             paymentStatus: 'failed',

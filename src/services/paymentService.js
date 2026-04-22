@@ -12,6 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
  */
 export const createPaymentIntent = async (bookingId, amount, token, useMock = false) => {
     try {
+        // @API_CALL: Initialize Stripe payment intent or mock transaction
         const response = await axios.post(
             `${API_URL}/payments/create-intent`,
             {
@@ -29,6 +30,7 @@ export const createPaymentIntent = async (bookingId, amount, token, useMock = fa
         );
         return response.data;
     } catch (error) {
+        // @ERROR_HANDLING: Capture intent creation failures
         console.error('Error creating payment intent:', error);
         return {
             success: false,
@@ -42,6 +44,7 @@ export const createPaymentIntent = async (bookingId, amount, token, useMock = fa
  */
 export const processDummyPayment = async (bookingId, amount, token) => {
     try {
+        // @API_CALL: Process non-Stripe (mock) payment bypass
         const response = await axios.post(
             `${API_URL}/payments/process-dummy`,
             {
@@ -57,6 +60,7 @@ export const processDummyPayment = async (bookingId, amount, token) => {
         );
         return response.data;
     } catch (error) {
+        // @ERROR_HANDLING: Capture mock processing errors
         console.error('Error processing dummy payment:', error);
         return {
             success: false,
@@ -70,6 +74,7 @@ export const processDummyPayment = async (bookingId, amount, token) => {
  */
 export const confirmPayment = async (paymentIntentId, bookingId, token) => {
     try {
+        // @API_CALL: Finalize payment status after Stripe webhook/return
         const response = await axios.post(
             `${API_URL}/payments/confirm`,
             {
@@ -85,6 +90,7 @@ export const confirmPayment = async (paymentIntentId, bookingId, token) => {
         );
         return response.data;
     } catch (error) {
+        // @ERROR_HANDLING: Error during payment finalization phase
         console.error('Error confirming payment:', error);
         return {
             success: false,
