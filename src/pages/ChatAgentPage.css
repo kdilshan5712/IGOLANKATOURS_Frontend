@@ -938,3 +938,71 @@
     right: 0;
     pointer-events: none;
 }
+
+/* ─── Sticky Active Draft Badge ──────────────────────────────────── */
+.sticky-draft-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--teal-primary), var(--teal-dark));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin: 0 auto 16px;
+    width: fit-content;
+    max-width: 90%;
+    box-shadow: 0 4px 16px rgba(15, 76, 74, 0.25);
+    animation: badge-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.sticky-draft-badge strong {
+    color: var(--gold-primary);
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.sticky-draft-badge span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    opacity: 0.9;
+}
+
+.draft-badge-action {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+.draft-badge-action:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.draft-badge-action.submit {
+    background: var(--gold-primary);
+    border-color: var(--gold-primary);
+}
+
+.draft-badge-action.submit:hover {
+    background: var(--gold-deep);
+}
+
+@keyframes badge-slide-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

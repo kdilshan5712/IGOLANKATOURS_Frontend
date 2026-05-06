@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Send, Sparkles, Bot, User as UserIcon, MapPin,
@@ -8,7 +8,7 @@ import {
   Users, Plane, Star, Hotel, Info,
   Zap, Award, ShieldCheck, Image as ImageIcon, Heart, Camera,
   ThumbsUp, MessageSquare, Save, Edit3, ChevronRight, Activity,
-  ChevronDown, ChevronUp, Mail, Phone, User, X
+  ChevronDown, ChevronUp, Mail, Phone, User, X, AlertTriangle
 } from "lucide-react";
 import axios from "axios";
 import { chatAPI } from "../services/api";
@@ -227,6 +227,41 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
   const dailyPlan = draft.daily_plan || [];
   const days = draft.duration_days || dailyPlan.length || 7;
 
+  // ─── PDF Download ────────────────────────────────────────────────────────────
+  const downloadProposalAsPDF = async () => {
+    try {
+      const { default: html2canvas } = await import('html2canvas');
+      const { default: jsPDF } = await import('jspdf');
+      const card = document.querySelector('.proposal-card.glass-premium');
+      if (!card) { alert('Proposal card not found.'); return; }
+      const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#0a0a0a' });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`IGO-LANKA-${(draft.title || 'Custom-Tour').replace(/\s+/g, '-')}.pdf`);
+    } catch (e) {
+      console.error('PDF generation failed:', e);
+      alert('PDF download requires html2canvas and jspdf. Run: npm install html2canvas jspdf');
+    }
+  };
+
+  // ─── WhatsApp Share ──────────────────────────────────────────────────────────
+  const handleWhatsAppShare = () => {
+    const route = draft.route?.join(' → ') || 'Sri Lanka';
+    const price = pricing[selectedTier] ? `$${pricing[selectedTier]} (${selectedTier})` : 'Custom pricing';
+    const text = [
+      `✈️ *${draft.title || `${days}-Day Sri Lanka Journey`}*`,
+      `📍 Route: ${route}`,
+      `📅 Duration: ${days} days`,
+      `💰 Estimated: ${price} per person`,
+      ``,
+      `Designed by IGO LANKA AI — www.igolankatours.com`
+    ].join('\n');
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   const handleInitiateSend = () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -384,9 +419,9 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
                  <Settings2 size={14} />
                  Customize This Tour
               </button>
-              <div className="share-actions-v3">
-                 <button className="icon-btn-v3" title="Save Itinerary"><Download size={16} /></button>
-                 <button className="icon-btn-v3" title="Share Journey"><Share2 size={16} /></button>
+           <div className="share-actions-v3">
+                 <button className="icon-btn-v3" title="Download as PDF" onClick={downloadProposalAsPDF}><Download size={16} /></button>
+                 <button className="icon-btn-v3" title="Share via WhatsApp" onClick={handleWhatsAppShare}><Share2 size={16} /></button>
               </div>
            </div>
         </div>
@@ -435,16 +470,31 @@ const ChatAgentPage = () => {
     {
       id: 1,
       sender: "assistant",
-      text: "Ayubowan! 🇱🇰 I am your Signature AI Travel Designer for I GO LANKA TOURS.\n\ndescribe your dream journey — the duration, your preferred travel style, and the experiences you crave. I will craft an elite, custom-tailored tour proposal just for you.",
+      text: "Ayubowan! 🇱🇰 I am your Signature AI Travel Designer for I GO LANKA TOURS.\n\nDescribe your dream journey — the duration, your preferred travel style, and the experiences you crave. I will craft an elite, custom-tailored tour proposal just for you.",
       timestamp: new Date(),
+      displayText: null, // null = animate on mount
     },
   ]);
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [history, setHistory] = useState([]);
   const [resumeData, setResumeData] = useState(null);
+  const [activeDraft, setActiveDraft] = useState(null); // tracks the latest tour draft
   const messagesEndRef = useRef(null);
   const location = useLocation();
+
+  // ─── Animated Text Reveal ────────────────────────────────────────────────────
+  const animateMessage = useCallback((msgId, fullText) => {
+    const words = fullText.split(' ');
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setMessages(prev => prev.map(m =>
+        m.id === msgId ? { ...m, displayText: words.slice(0, i).join(' ') } : m
+      ));
+      if (i >= words.length) clearInterval(interval);
+    }, 30);
+  }, []);
 
   // Check for auto-resume on mount
   useEffect(() => {
@@ -533,12 +583,23 @@ const ChatAgentPage = () => {
         id: Date.now() + 1,
         sender: "assistant",
         text: cleanedText,
+        displayText: '',  // starts empty, will animate
         weather: data.weather || null,
         tourDraft: tourDraft,
         timestamp: new Date(),
       };
  
       setMessages((prev) => [...prev, aiMsg]);
+
+      // Track active draft globally for the sticky badge
+      if (tourDraft) setActiveDraft(tourDraft);
+
+      // Animate the text reveal (skip if very short or weather-only)
+      if (cleanedText && cleanedText.length > 20) {
+        animateMessage(aiMsg.id, cleanedText);
+      } else {
+        setMessages(prev => prev.map(m => m.id === aiMsg.id ? { ...m, displayText: cleanedText } : m));
+      }
     } catch (err) {
       // @ERROR_HANDLING: Display user-friendly error bubble for failed AI requests
       const errMsg = err.response?.data?.message || err.message;
@@ -625,6 +686,21 @@ const ChatAgentPage = () => {
     </button>
   );
 
+  // Context-aware quick prompts — switch to modification suggestions once a draft exists
+  const INITIAL_PROMPTS = [
+    { text: "10-day luxury honeymoon", icon: Heart },
+    { text: "Family wildlife safari for 7 days", icon: Users },
+    { text: "Budget backpacking tour 14 days", icon: MapPin },
+    { text: "Weather in Ella right now", icon: CloudRain },
+  ];
+  const DRAFT_PROMPTS = [
+    { text: "Add whale watching to my itinerary", icon: Zap },
+    { text: "Make it more luxurious", icon: Sparkles },
+    { text: "Change the accommodation style to boutique", icon: Hotel },
+    { text: "What's the weather in my first destination?", icon: CloudRain },
+  ];
+  const promptsToShow = activeDraft ? DRAFT_PROMPTS : INITIAL_PROMPTS;
+
   return (
     <div className="chat-page-wrapper">
       <div className="chat-main-container">
@@ -643,13 +719,34 @@ const ChatAgentPage = () => {
                 <Award size={18} /> Send to Admin for Approval
               </button>
             )}
-            <button className="reset-btn" title="Restart Design Session" onClick={() => { setMessages([]); setHistory([]); sessionStorage.clear(); window.location.reload(); }}>
+            <button className="reset-btn" title="Restart Design Session" onClick={() => {
+              setMessages([{ id: 1, sender: "assistant", text: "Ayubowan! 🇱🇰 Ready to design a new journey. Tell me your dream trip!", timestamp: new Date(), displayText: null }]);
+              setHistory([]);
+              setActiveDraft(null);
+              sessionStorage.removeItem('chat_messages');
+              sessionStorage.removeItem('chat_history');
+            }}>
               <RefreshCw size={18} />
             </button>
           </div>
         </header>
 
         <div className="chat-scroll-area">
+
+          {/* Sticky Active Draft Badge */}
+          {activeDraft && (
+            <div className="sticky-draft-badge">
+              <MapPin size={13} />
+              <strong>Active Draft:</strong>
+              <span>{activeDraft.title || `${activeDraft.duration_days}-Day Journey`}</span>
+              <button className="draft-badge-action" onClick={() => handleSend("I want to modify some parts of this tour.")}>
+                <Edit3 size={11} /> Edit
+              </button>
+              <button className="draft-badge-action submit" onClick={() => handleSend("I want to submit this consultation to the team for review.")}>
+                <Send size={11} /> Submit
+              </button>
+            </div>
+          )}
           {messages.map((msg) => (
             <div key={msg.id} className={`message-frame ${msg.sender}`}>
               
@@ -662,7 +759,10 @@ const ChatAgentPage = () => {
               <div className="message-content">
                 {msg.text && (
                   <div className={`text-bubble ${msg.sender}`}>
-                    <RenderText text={msg.text} sender={msg.sender} />
+                    <RenderText
+                      text={msg.displayText !== null && msg.displayText !== undefined ? msg.displayText : msg.text}
+                      sender={msg.sender}
+                    />
                   </div>
                 )}
 
@@ -709,10 +809,12 @@ const ChatAgentPage = () => {
         <div className="chat-footer">
           {messages.length <= 1 && (
             <div className="quick-prompts-row">
-              <QuickPrompt text="10-day luxury honeymoon" icon={Heart} />
-              <QuickPrompt text="Family wildlife safari for 7 days" icon={Users} />
-              <QuickPrompt text="Budget backpacking tour" icon={MapPin} />
-              <QuickPrompt text="Weather in Ella right now" icon={CloudRain} />
+              {promptsToShow.map((p, i) => <QuickPrompt key={i} text={p.text} icon={p.icon} />)}
+            </div>
+          )}
+          {messages.length > 1 && activeDraft && (
+            <div className="quick-prompts-row">
+              {DRAFT_PROMPTS.map((p, i) => <QuickPrompt key={i} text={p.text} icon={p.icon} />)}
             </div>
           )}
 
