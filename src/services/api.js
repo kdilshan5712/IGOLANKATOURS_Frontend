@@ -184,20 +184,41 @@ export const chatAPI = {
 };
 
 // 📦 PACKAGES (Public - No Auth)
+
+// Module-level cache for package listings — persists for the browser tab lifetime
+// Keyed by stringified filters; expires after 60 seconds
+const _pkgCache = {};
+const PKG_CACHE_TTL = 60_000; // 60 seconds
+
 export const packageAPI = {
   // Get all packages with filters
   getAll: async (filters = {}) => {
+    const cacheKey = JSON.stringify(filters);
+    const now = Date.now();
+
+    // Serve from cache if still fresh
+    if (_pkgCache[cacheKey] && now - _pkgCache[cacheKey].ts < PKG_CACHE_TTL) {
+      return _pkgCache[cacheKey].data;
+    }
+
     try {
       const params = new URLSearchParams(filters).toString();
       const url = params ? `${API_BASE_URL}/packages?${params}` : `${API_BASE_URL}/packages`;
       const res = await fetch(url);
       const data = await res.json();
+
+      // Only cache successful responses
+      if (data.success) {
+        _pkgCache[cacheKey] = { data, ts: now };
+      }
+
       return data; // { success, count, total, packages }
     } catch (error) {
       console.error("Error fetching packages:", error);
       return { success: false, packages: [] };
     }
   },
+
 
   // Get single package by UUID
   getById: async (id) => {
@@ -1294,6 +1315,38 @@ export const adminAPI = {
     }
   },
 
+  deleteUser: async (userId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return { success: false, message: "Failed to delete user" };
+    }
+  },
+
+  createUser: async (userData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return { success: false, message: "Failed to create user" };
+    }
+  },
+
   // === CONTACT MESSAGES ===
   getContactMessages: async (token) => {
     try {
@@ -2212,6 +2265,9 @@ export const reviewAPI = {
         formData.append('rating', String(reviewData.rating));
         formData.append('title', reviewData.title || '');
         formData.append('comment', reviewData.comment);
+        if (reviewData.reviewType) {
+          formData.append('reviewType', reviewData.reviewType);
+        }
         reviewData.images.forEach(image => formData.append('images', image));
 
         res = await fetch(`${API_BASE_URL}/reviews`, {
@@ -2230,7 +2286,8 @@ export const reviewAPI = {
             packageId: reviewData.packageId,
             rating: reviewData.rating,
             title: reviewData.title || '',
-            comment: reviewData.comment
+            comment: reviewData.comment,
+            reviewType: reviewData.reviewType
           })
         });
       }

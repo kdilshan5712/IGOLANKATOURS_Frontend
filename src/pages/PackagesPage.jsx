@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PackageCard from "../components/PackageCard";
+import PackageCardSkeleton from "../components/PackageCardSkeleton";
 import FilterPanel from "../components/FilterPanel";
 import { packageAPI, transformPackages } from "../services/api";
 import SEO from "../components/SEO";
@@ -221,8 +222,10 @@ const PackagesPage = () => {
           {/* Results */}
           <section className="packages-page-results">
             {loading ? (
-              <div className="packages-loading">
-                <p>Loading packages...</p>
+              <div className="packages-page-grid">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <PackageCardSkeleton key={i} />
+                ))}
               </div>
             ) : error ? (
               <div className="packages-error">
