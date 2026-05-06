@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Lock, ArrowLeft, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { Button, Card } from "../components/shared";
-import { validatePassword } from "../utils/validators";
+import { validatePassword } from "../utils/passwordValidation";
 import "./ResetPasswordPage.css";
 
 /**

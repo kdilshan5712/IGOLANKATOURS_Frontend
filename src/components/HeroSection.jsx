@@ -7,8 +7,14 @@ const HeroSection = () => {
     <section className="hero-section">
       {/* Background */}
       <div className="hero-background">
+        {/* @ASSETS: Primary brand hero image (Supabase sourced) with Unsplash fallback */}
         <img
-          src="https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/hero/hero%20image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9oZXJvL2hlcm8gaW1hZ2UucG5nIiwiaWF0IjoxNzY5NTEzOTYyLCJleHAiOjE4MDEwNDk5NjJ9.Gk4tkmnz9yqSbqlnr2KSiDhPYcbUARemGZdapthaaYY"
+          src={
+            "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/hero/hero%20image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9oZXJvL2hlcm8gaW1hZ2UucG5nIiwiaWF0IjoxNzY5NTEzOTYyLCJleHAiOjE4MDEwNDk5NjJ9.Gk4tkmnz9yqSbqlnr2KSiDhPYcbUARemGZdapthaaYY"
+          }
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?q=80&w=2039"; // Professional Sri Lanka fallback
+          }}
           alt="Sri Lanka travel"
         />
         <div className="hero-overlay" />

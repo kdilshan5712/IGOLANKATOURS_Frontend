@@ -30,6 +30,8 @@ const ReviewForm = ({ packageId = null }) => {
     packageId: packageId || "",
   });
 
+  const [reviewType, setReviewType] = useState("tour"); // 'tour' or 'website'
+
   const [hoveredRating, setHoveredRating] = useState(0);
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -115,7 +117,7 @@ const ReviewForm = ({ packageId = null }) => {
       return;
     }
 
-    if (!formData.packageId) {
+    if (reviewType === 'tour' && !formData.packageId) {
       setMessage("Please select a package");
       setMessageType("error");
       return;
@@ -133,21 +135,24 @@ const ReviewForm = ({ packageId = null }) => {
       return;
     }
 
-    // Verify user has a confirmed booking for this package
-    const hasBooking = confirmedBookings.some(b =>
-      String(b.package_id) === String(formData.packageId)
-    );
+    if (reviewType === 'tour') {
+      // Verify user has a confirmed booking for this package
+      const hasBooking = confirmedBookings.some(b =>
+        String(b.package_id) === String(formData.packageId)
+      );
 
-    if (!hasBooking) {
-      setMessage("You can only review packages you have booked and completed.");
-      setMessageType("error");
-      return;
+      if (!hasBooking) {
+        setMessage("You can only review packages you have booked and completed.");
+        setMessageType("error");
+        return;
+      }
     }
 
     setLoading(true);
     try {
       const reviewPayload = {
-        packageId: formData.packageId,
+        reviewType: reviewType,
+        packageId: reviewType === 'tour' ? formData.packageId : null,
         rating: formData.rating,
         title: formData.title || "",
         comment: formData.comment,
@@ -221,7 +226,29 @@ const ReviewForm = ({ packageId = null }) => {
         </p>
       </div>
 
-      {packages.length === 0 && !loading && (
+      {/* Review Type Tabs */}
+      <div className="review-type-selector">
+        <button
+          className={`review-type-btn ${reviewType === 'tour' ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setReviewType('tour');
+          }}
+        >
+          Tour Experience
+        </button>
+        <button
+          className={`review-type-btn ${reviewType === 'website' ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setReviewType('website');
+          }}
+        >
+          Website Experience
+        </button>
+      </div>
+
+      {reviewType === 'tour' && packages.length === 0 && !loading && (
         <div className="review-form-warning">
           <AlertCircle size={20} />
           <p>You can only review packages you have booked and completed. We couldn't find any confirmed bookings in your history.</p>
@@ -236,7 +263,7 @@ const ReviewForm = ({ packageId = null }) => {
           </div>
         )}
 
-        {!packageId && (
+        {reviewType === 'tour' && !packageId && (
           <div className="review-form-group">
             <label className="review-form-label">Select Package *</label>
             <select

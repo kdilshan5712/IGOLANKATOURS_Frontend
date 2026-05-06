@@ -10,7 +10,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Shield, Calendar, CheckCircle, Camera, Trash2, Loader } from "lucide-center";
+import { User, Mail, Shield, Calendar, CheckCircle, Camera, Trash2, Loader } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import "./AdminProfile.css";
 

@@ -57,8 +57,12 @@ const DestinationsSection = () => {
               className="destination-card"
             >
               <div className="destination-image-wrapper">
+                {/* @ASSETS: High-impact destination images for home page (static/Supabase sourced) */}
                 <img
                   src={destination.image}
+                  onError={(e) => {
+                    e.target.src = "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070";
+                  }}
                   alt={destination.name}
                   className="destination-image"
                   loading="lazy"

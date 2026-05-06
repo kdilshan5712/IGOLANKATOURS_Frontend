@@ -109,8 +109,9 @@ const DestinationsPage = () => {
           {destinations.map((destination, index) => (
             <div key={index} className="destination-page-card">
               <div className="destination-page-image-wrapper">
+                {/* @ASSETS: Destination images are dynamically sourced from backend API with Unsplash fallback */}
                 <img
-                  src={destination.image_url || destination.image}
+                  src={destination.image_url || destination.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070"}
                   alt={destination.name}
                   className="destination-page-image"
                 />

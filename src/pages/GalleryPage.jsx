@@ -153,6 +153,7 @@ const GalleryPage = () => {
               onClick={() => handleImageClick(image)}
             >
               <div className="gallery-image-wrapper">
+                {/* @ASSETS: Gallery images are served via external URLs provided by the galleryAPI */}
                 <img
                   src={image.image_url}
                   alt={image.title || image.destination}

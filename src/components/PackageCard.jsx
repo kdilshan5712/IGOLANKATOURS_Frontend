@@ -36,8 +36,9 @@ const PackageCard = ({ pkg }) => {
     <div className="package-card">
       {/* Image */}
       <div className="package-image-wrapper">
+        {/* @ASSETS: Package images are dynamically sourced from backend with Unsplash fallback */}
         <img
-          src={pkg.image}
+          src={pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070"}
           alt={pkg.name}
           className="package-image"
           loading="lazy"

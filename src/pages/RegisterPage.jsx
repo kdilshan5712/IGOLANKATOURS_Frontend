@@ -14,7 +14,7 @@ import { User, Mail, Lock, Eye, EyeOff, AlertCircle, MapPin, Phone } from "lucid
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { authAPI } from "../services/api";
-import { validatePassword } from "../utils/validators";
+import { validatePassword } from "../utils/passwordValidation";
 import Card from "../components/shared/Card";
 import Button from "../components/shared/Button";
 import "./RegisterPage.css";

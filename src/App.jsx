@@ -1,3 +1,85 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Layouts
+import AdminLayout from './layouts/AdminLayout';
+import GuideLayout from './layouts/GuideLayout';
+import UserLayout from './layouts/UserLayout';
+
+// Components
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Services
+import { authAPI } from './services/api';
+
+// Pages
+import HomePage from './pages/HomePage';
+import PackagesPage from './pages/PackagesPage';
+import PackageDetailsPage from './pages/PackageDetailsPage';
+import WishlistPage from './pages/WishlistPage';
+import DestinationsPage from './pages/DestinationsPage';
+import DestinationDetailsPage from './pages/DestinationDetailsPage';
+import FAQPage from './pages/FAQPage';
+import GalleryPage from './pages/GalleryPage';
+import AboutPage from './pages/AboutPage';
+import ReviewsPage from './pages/ReviewsPage';
+import ChatAgentPage from './pages/ChatAgentPage';
+import ContactPage from './pages/ContactPage';
+import BookingStartPage from './pages/BookingStartPage';
+import BookingTravellersPage from './pages/BookingTravellersPage';
+import BookingPaymentPage from './pages/BookingPaymentPage';
+import BookingSuccessPage from './pages/BookingSuccessPage';
+import BookingFailurePage from './pages/BookingFailurePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import CheckEmailPage from './pages/CheckEmailPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import MyBookingsPage from './pages/MyBookingsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
+import CancellationPolicyPage from './pages/CancellationPolicyPage';
+
+// User Dashboard Pages
+import UserDashboard from './pages/UserDashboard';
+import UserProfile from './pages/UserProfile';
+import UserBookings from './pages/UserBookings';
+import UserCustomTours from './pages/UserCustomTours';
+import UserBookingDetails from './pages/UserBookingDetails';
+
+// Admin Pages
+import AdminDashboardPage from './pages/management/AdminDashboardPage';
+import AdminPackagesPage from './pages/management/AdminPackagesPage';
+import AdminDestinationsPage from './pages/management/AdminDestinationsPage';
+import AdminBookingsPage from './pages/management/AdminBookingsPage';
+import AdminGuidesPage from './pages/management/AdminGuidesPage';
+import AdminGalleryPage from './pages/management/AdminGalleryPage';
+import AdminReviewsPage from './pages/management/AdminReviewsPage';
+import AdminUsersPage from './pages/management/AdminUsersPage';
+import AdminContactsPage from './pages/management/AdminContactsPage';
+import AdminCustomToursPage from './pages/management/AdminCustomToursPage';
+import AdminProfilePage from './pages/management/AdminProfilePage';
+import AdminManagementPage from './pages/management/AdminManagementPage';
+import AdminPricingRulesPage from './pages/management/AdminPricingRulesPage';
+import AdminPayoutsPage from './pages/management/AdminPayoutsPage';
+import AdminFAQPage from './pages/management/AdminFAQPage';
+import AdminAuditLogsPage from './pages/management/AdminAuditLogsPage';
+import AdminLoginPage from './pages/management/AdminLoginPage';
+
+// Guide Pages
+import GuideDashboardPage from './pages/guide/GuideDashboardPage';
+import GuideBookingsPage from './pages/guide/GuideBookingsPage';
+import GuideAvailabilityPage from './pages/guide/GuideAvailabilityPage';
+import GuideProfilePage from './pages/guide/GuideProfilePage';
+import GuideReviewsPage from './pages/guide/GuideReviewsPage';
+import GuideRegisterPage from './pages/guide/GuideRegisterPage';
+import GuideDocumentsPage from './pages/guide/GuideDocumentsPage';
+import GuidePendingPage from './pages/guide/GuidePendingPage';
+import GuideRejectedPage from './pages/guide/GuideRejectedPage';
+
 /**
  * 📱 I GO LANKA TOURS - Main App Component
  * 
