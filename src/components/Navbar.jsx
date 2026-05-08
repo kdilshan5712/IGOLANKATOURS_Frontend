@@ -140,7 +140,7 @@ const Navbar = () => {
                           {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
                         </Link>
                       )}
-                      {userRole === "admin" && (
+                      {(userRole === "admin" || userRole === "superadmin") && (
                         <Link
                           to="/admin/dashboard"
                           onClick={() => setShowUserMenu(false)}
@@ -239,7 +239,7 @@ const Navbar = () => {
                     {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
                   </Link>
                 )}
-                {userRole === "admin" && (
+                {(userRole === "admin" || userRole === "superadmin") && (
                   <Link
                     to="/admin/dashboard"
                     onClick={() => setMobileOpen(false)}

@@ -73,7 +73,7 @@ const LoginPage = () => {
         localStorage.setItem("loginTimestamp", Date.now().toString());
 
         // ROLE-BASED REDIRECTION LOGIC
-        if (data.user.role === "admin") {
+        if (data.user.role === "admin" || data.user.role === "superadmin") {
           // Admin → redirect to admin dashboard
           navigate("/admin/dashboard", { replace: true });
         } else if (data.user.role === "guide") {

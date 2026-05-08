@@ -48,8 +48,15 @@ function ProtectedRoute({ children, requiredRole = null, redirectTo = "/login" }
     />;
   }
 
+  // Check role authorization (superadmin can access admin routes)
+  const isAuthorizedRole = () => {
+    if (userRole === requiredRole) return true;
+    if (requiredRole === "admin" && userRole === "superadmin") return true;
+    return false;
+  };
+
   // Logged in but wrong role - redirect
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole && !isAuthorizedRole()) {
     // Tourist trying to access admin routes → redirect to login with message
     if (requiredRole === "admin" && userRole === "tourist") {
       return <Navigate to="/login" state={{ error: "Access denied. Admin credentials required." }} replace />;
