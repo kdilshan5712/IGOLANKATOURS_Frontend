@@ -51,13 +51,13 @@ function AdminLoginPage() {
       const result = await authAPI.login(formData.email, formData.password);
 
       // @VALIDATION: Ensure the authenticated user has administrative privileges
-      if (result.success && result.user.role === "admin") {
+      if (result.success && (result.user.role === "admin" || result.user.role === "superadmin")) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("userRole", result.user.role);
         localStorage.setItem("userEmail", result.user.email);
         localStorage.setItem("userName", result.user.name || "Admin");
         navigate("/admin/dashboard", { replace: true });
-      } else if (result.success && result.user.role !== "admin") {
+      } else if (result.success && result.user.role !== "admin" && result.user.role !== "superadmin") {
         // @ERROR_HANDLING: Access denied for non-admin accounts
         setError("Access denied. Admin credentials required.");
       } else {
