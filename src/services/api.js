@@ -825,6 +825,38 @@ export const adminAPI = {
     }
   },
 
+  // Update Admin Status (Super Admin Only)
+  updateAdminStatus: async (adminId, status, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/admins/${adminId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status })
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating admin status:", error);
+      return { success: false, message: "Failed to update admin status" };
+    }
+  },
+
+  // Delete Admin (Super Admin Only)
+  deleteAdmin: async (adminId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/admins/${adminId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting admin:", error);
+      return { success: false, message: "Failed to delete admin" };
+    }
+  },
+
   // Dashboard Stats
   getDashboardStats: async (token) => {
     try {

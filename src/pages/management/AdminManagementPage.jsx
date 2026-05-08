@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
-import { Shield, UserPlus, Trash2, AlertCircle } from 'lucide-react';
+import { Shield, UserPlus, Trash2, AlertCircle, CheckCircle, XCircle, AlertTriangle, X } from 'lucide-react';
 import './AdminManagement.css';
 
 const AdminManagementPage = () => {
@@ -11,11 +11,17 @@ const AdminManagementPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    full_name: ''
+    full_name: '',
+    role: 'admin'
   });
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
 
   const fetchAdmins = async () => {
     setLoading(true);
@@ -33,9 +39,57 @@ const AdminManagementPage = () => {
 
   useEffect(() => {
     (async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const res = await adminAPI.getProfile(token);
+        if (res.success && res.profile) {
+          setCurrentUserId(res.profile.user_id);
+          setCurrentUserRole(res.profile.role);
+        }
+      }
       await fetchAdmins();
     })();
   }, []);
+
+  const handleStatusChange = async (adminId, newStatus) => {
+    setActionLoading(adminId + newStatus);
+    const token = localStorage.getItem('token');
+    try {
+      const result = await adminAPI.updateAdminStatus(adminId, newStatus, token);
+      if (result.success) {
+        setAdmins(prev => prev.map(a => a.user_id === adminId ? { ...a, status: newStatus } : a));
+        setFormSuccess(`Admin ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`);
+        setTimeout(() => setFormSuccess(''), 3000);
+      } else {
+        setError(result.message || "Failed to update status");
+      }
+    } catch (err) {
+      setError("An error occurred");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setActionLoading("delete-" + deleteTarget.user_id);
+    const token = localStorage.getItem('token');
+    try {
+      const result = await adminAPI.deleteAdmin(deleteTarget.user_id, token);
+      if (result.success) {
+        setAdmins(prev => prev.filter(a => a.user_id !== deleteTarget.user_id));
+        setFormSuccess("Admin deleted successfully");
+        setTimeout(() => setFormSuccess(''), 3000);
+      } else {
+        setError(result.message || "Failed to delete admin");
+      }
+    } catch (err) {
+      setError("An error occurred");
+    } finally {
+      setActionLoading(null);
+      setDeleteTarget(null);
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -76,7 +130,7 @@ const AdminManagementPage = () => {
 
     if (result.success) {
       setFormSuccess('Admin created successfully!');
-      setFormData({ email: '', password: '', full_name: '' });
+      setFormData({ email: '', password: '', full_name: '', role: 'admin' });
       setShowCreateForm(false);
       fetchAdmins(); // Refresh the list
       
@@ -170,6 +224,22 @@ const AdminManagementPage = () => {
               />
             </div>
 
+            {currentUserRole === 'superadmin' && (
+              <div className="form-group">
+                <label htmlFor="role">Role *</label>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc', backgroundColor: '#fff' }}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="superadmin">Super Admin</option>
+                </select>
+              </div>
+            )}
+
             {formError && (
               <div className="form-error">
                 <AlertCircle size={16} />
@@ -183,7 +253,7 @@ const AdminManagementPage = () => {
                 className="btn-secondary"
                 onClick={() => {
                   setShowCreateForm(false);
-                  setFormData({ email: '', password: '', full_name: '' });
+                  setFormData({ email: '', password: '', full_name: '', role: 'admin' });
                   setFormError('');
                 }}
               >
@@ -222,6 +292,7 @@ const AdminManagementPage = () => {
                   <th>Status</th>
                   <th>Email Verified</th>
                   <th>Created</th>
+                  {currentUserRole === 'superadmin' && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -245,6 +316,42 @@ const AdminManagementPage = () => {
                       </span>
                     </td>
                     <td>{formatDate(admin.created_at)}</td>
+                    {currentUserRole === 'superadmin' && (
+                      <td>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {admin.user_id !== currentUserId && (
+                            <>
+                              {admin.status !== 'active' ? (
+                                <button
+                                  title="Activate"
+                                  disabled={actionLoading === admin.user_id + "active"}
+                                  onClick={() => handleStatusChange(admin.user_id, "active")}
+                                  style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer' }}
+                                >
+                                  <CheckCircle size={18} />
+                                </button>
+                              ) : (
+                                <button
+                                  title="Suspend"
+                                  disabled={actionLoading === admin.user_id + "suspended"}
+                                  onClick={() => handleStatusChange(admin.user_id, "suspended")}
+                                  style={{ background: 'none', border: 'none', color: '#f59e0b', cursor: 'pointer' }}
+                                >
+                                  <XCircle size={18} />
+                                </button>
+                              )}
+                              <button
+                                title="Delete Admin"
+                                onClick={() => setDeleteTarget(admin)}
+                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -252,6 +359,29 @@ const AdminManagementPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '100%' }}>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', marginBottom: '1rem', marginTop: 0 }}><AlertTriangle size={24} /> Confirm Delete</h2>
+            <p style={{ marginBottom: '1.5rem', color: '#4b5563', lineHeight: 1.5 }}>
+              Are you sure you want to permanently delete <strong>{deleteTarget.full_name || deleteTarget.email}</strong>?
+              This action <strong>cannot be undone</strong>.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <button onClick={() => setDeleteTarget(null)} style={{ padding: '0.5rem 1rem', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 500 }}>Cancel</button>
+              <button 
+                onClick={handleDelete} 
+                disabled={actionLoading === "delete-" + deleteTarget.user_id}
+                style={{ padding: '0.5rem 1rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 500 }}
+              >
+                {actionLoading === "delete-" + deleteTarget.user_id ? "Deleting..." : "Delete Admin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
