@@ -259,7 +259,7 @@ function AdminPackagesPage() {
                 <td className="package-name-cell">
                   <div className="package-info">
                     {pkg.image ? (
-                      <img src={pkg.image} alt={pkg.name} className="package-thumb" />
+                      <img src={pkg.image} alt={pkg.name} className="package-thumb" loading="lazy" />
                     ) : (
                       <div className="package-thumb-placeholder">
                         <ImageIcon size={20} />

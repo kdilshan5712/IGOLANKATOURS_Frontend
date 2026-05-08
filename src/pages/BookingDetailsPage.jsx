@@ -210,7 +210,7 @@ const BookingDetailsPage = () => {
             <div className="booking-summary-card">
               <h3 className="booking-summary-title">Package Summary</h3>
               <div className="booking-summary-image">
-                <img src={packageData.image} alt={packageData.name} />
+                <img src={packageData.image} alt={packageData.name} loading="lazy" />
               </div>
               <h4 className="booking-summary-package-name">
                 {packageData.name}
