@@ -116,6 +116,7 @@ const DestinationsPage = () => {
                   src={destination.image_url || destination.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070"}
                   alt={destination.name}
                   className="destination-page-image"
+                  loading="lazy"
                 />
                 <div className="destination-page-image-overlay" />
                 <span
