@@ -64,6 +64,7 @@ import AdminCustomToursPage from './pages/management/AdminCustomToursPage';
 import AdminProfilePage from './pages/management/AdminProfilePage';
 import AdminManagementPage from './pages/management/AdminManagementPage';
 import AdminPricingRulesPage from './pages/management/AdminPricingRulesPage';
+import AdminCouponsPage from './pages/management/AdminCouponsPage';
 import AdminPayoutsPage from './pages/management/AdminPayoutsPage';
 import AdminFAQPage from './pages/management/AdminFAQPage';
 import AdminAuditLogsPage from './pages/management/AdminAuditLogsPage';
@@ -141,6 +142,7 @@ function App() {
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="admins" element={<AdminManagementPage />} />
             <Route path="pricing-rules" element={<AdminPricingRulesPage />} />
+            <Route path="coupons" element={<AdminCouponsPage />} />
             <Route path="payouts" element={<AdminPayoutsPage />} />
             <Route path="faqs" element={<AdminFAQPage />} />
             <Route path="audit-logs" element={<AdminAuditLogsPage />} />
