@@ -114,9 +114,10 @@ const ContactPage = () => {
   return (
     <main className="contact-page">
       <SEO 
-        title="Contact Us"
-        description="Have questions about your Sri Lanka trip? Contact I GO LANKA TOURS via email, phone, or WhatsApp. Our travel experts are here to help."
-        keywords="contact Sri Lanka tours, travel inquiry Sri Lanka, I GO LANKA TOURS support"
+        title="Contact I GO LANKA TOURS – Plan Your Sri Lanka Trip Today"
+        description="Contact I GO LANKA TOURS to plan your perfect Sri Lanka vacation. Reach our expert travel team via email, phone, or WhatsApp. Get a free custom tour quote for Sigiriya, Ella, Kandy, Galle & more."
+        keywords="contact sri lanka tour operator, book sri lanka tour, sri lanka travel inquiry, igolanka tours contact, custom tour quote sri lanka, whatsapp sri lanka tours, sri lanka holiday booking, plan sri lanka trip"
+        canonicalUrl="https://www.igolankatours.com/contact"
       />
       <div className="contact-page-container">
         <div className="contact-page-header">

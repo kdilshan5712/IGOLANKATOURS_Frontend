@@ -172,9 +172,11 @@ const PackagesPage = () => {
   return (
     <main className="packages-page">
       <SEO 
-        title="Tour Packages in Sri Lanka"
-        description="Browse our wide selection of SRI Lanka tour packages. From cultural heritage to adventure and beach holidays, find your perfect Sri Lankan escape."
-        keywords="Sri Lanka tour packages, Sri Lanka vacation deals, best tours in Sri Lanka, affordable Sri Lanka tours"
+        title="Sri Lanka Tour Packages 2025 – Cultural, Beach & Wildlife"
+        description="Browse curated Sri Lanka tour packages for 2025. Choose from cultural heritage tours, beach holidays in Mirissa & Galle, wildlife safaris in Yala, and hill country adventures in Ella & Nuwara Eliya. Best prices guaranteed."
+        keywords="sri lanka tour packages, sri lanka holiday packages, best tours in sri lanka, affordable sri lanka tours, luxury sri lanka tours, 7 day sri lanka itinerary, 10 day sri lanka tour, sri lanka beach packages, sri lanka cultural tour, yala safari package, ella tour package, sigiriya day tour, sri lanka family packages, sri lanka honeymoon packages"
+        canonicalUrl="https://www.igolankatours.com/packages"
+        ogImage="https://www.igolankatours.com/og-image.jpg"
       />
       <div className="packages-page-container">
         {/* Page header */}

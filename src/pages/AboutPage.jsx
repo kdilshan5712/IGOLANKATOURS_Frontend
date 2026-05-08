@@ -45,9 +45,10 @@ const AboutPage = () => {
   return (
     <main className="about-page">
       <SEO 
-        title="About Us"
-        description="Learn more about I GO LANKA TOURS, our mission, and our founder Indika Sampath. We provide authentic and personalized Sri Lankan travel experiences."
-        keywords="about I GO LANKA TOURS, Sri Lanka tour operator, Indika Sampath, Sri Lanka travel agency"
+        title="About I GO LANKA TOURS – Sri Lanka's Trusted Local Tour Operator"
+        description="I GO LANKA TOURS is a trusted Sri Lanka tour operator with 15+ years of experience. Founded by Indika Sampath, we specialize in authentic, personalized Sri Lanka travel experiences for cultural, wildlife, beach, and adventure tours."
+        keywords="i go lanka tours, sri lanka tour operator, local sri lanka travel agency, trusted sri lanka tours, indika sampath tour guide, authentic sri lanka travel, best sri lanka travel company, sri lankan tourism expert, sri lanka travel specialist, sri lanka trip planner"
+        canonicalUrl="https://www.igolankatours.com/about"
       />
       <div className="about-page-container">
         {/* Hero Section */}

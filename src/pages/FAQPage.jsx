@@ -63,9 +63,10 @@ const FAQPage = () => {
     return (
         <main className="legal-page-layout">
             <SEO 
-                title="Frequently Asked Questions"
-                description="Find answers to common questions about Sri Lanka tours, booking processes, payment methods, and travel requirements."
-                keywords="FAQ Sri Lanka tours, travel questions Sri Lanka, I GO LANKA TOURS help"
+                title="Sri Lanka Travel FAQ – Your Questions Answered"
+                description="Find answers to the most common questions about Sri Lanka tours, booking process, visa requirements, best time to visit, what to pack, and tour costs. I GO LANKA TOURS experts answer your travel questions."
+                keywords="sri lanka travel faq, questions about sri lanka tours, best time to visit sri lanka, sri lanka visa requirements, how to book sri lanka tour, sri lanka tour cost, what to pack for sri lanka, sri lanka travel tips, igolanka faq, sri lanka tour questions"
+                canonicalUrl="https://www.igolankatours.com/faq"
             />
             <div className="legal-container">
                 <div className="legal-glass-panel">

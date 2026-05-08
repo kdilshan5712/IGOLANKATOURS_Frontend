@@ -1,0 +1,24 @@
+# IGO LANKA TOURS - robots.txt
+# https://www.igolankatours.com
+
+User-agent: *
+Allow: /
+
+# Block private dashboard routes from indexing
+Disallow: /management/
+Disallow: /guide/
+Disallow: /user/
+Disallow: /booking/
+Disallow: /payment/
+
+# Allow important public pages
+Allow: /destinations
+Allow: /packages
+Allow: /about
+Allow: /contact
+Allow: /gallery
+Allow: /faq
+Allow: /custom-tour-chat
+
+# Sitemap location
+Sitemap: https://www.igolankatours.com/sitemap.xml

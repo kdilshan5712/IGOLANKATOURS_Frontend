@@ -11,6 +11,7 @@
 import { useState, useEffect } from "react";
 import { X, Camera, Star, Heart, MapPin, Loader } from "lucide-react";
 import { galleryAPI } from "../services/api";
+import SEO from "../components/SEO";
 import "./GalleryPage.css";
 
 /**
@@ -112,6 +113,13 @@ const GalleryPage = () => {
 
   return (
     <main className="gallery-page">
+      <SEO
+        title="Sri Lanka Travel Photos & Gallery – Beautiful Destinations"
+        description="Explore stunning photos of Sri Lanka's most beautiful destinations. See real travel photography of Sigiriya, Ella, Kandy, Galle, Mirissa beach, Yala wildlife, and more before you book your tour."
+        keywords="sri lanka photos, sri lanka travel gallery, sri lanka destination pictures, sigiriya photos, ella sri lanka pictures, kandy photos, mirissa beach photos, yala safari photos, sri lanka landscape, beautiful sri lanka, sri lanka tourism photos"
+        canonicalUrl="https://www.igolankatours.com/gallery"
+        ogImage="https://www.igolankatours.com/og-image.jpg"
+      />
       <div className="gallery-page-container">
         {/* Hero Section */}
         <div className="gallery-page-hero">

@@ -88,9 +88,11 @@ const DestinationsPage = () => {
   return (
     <main className="destinations-page">
       <SEO 
-        title="Explore Sri Lanka Destinations"
-        description="Discover the most beautiful destinations in Sri Lanka. From the ancient cities of the Cultural Triangle to the pristine beaches of the South Coast."
-        keywords="Sri Lanka destinations, visit Sri Lanka, Sri Lanka travel guide, best places in Sri Lanka"
+        title="Best Places to Visit in Sri Lanka – Top Destinations 2025"
+        description="Discover the most beautiful places to visit in Sri Lanka. Explore Sigiriya Rock Fortress, Ella's Nine Arch Bridge, Kandy's Temple of the Tooth, pristine Mirissa & Unawatuna beaches, Galle Dutch Fort, Yala wildlife, and lush Nuwara Eliya tea country."
+        keywords="best places to visit in sri lanka, sri lanka destinations, sigiriya sri lanka, ella sri lanka, kandy sri lanka, galle fort sri lanka, mirissa beach, unawatuna beach, yala national park, nuwara eliya, dambulla cave temple, anuradhapura, polonnaruwa, sri lanka travel guide, things to do in sri lanka, sri lanka must see places"
+        canonicalUrl="https://www.igolankatours.com/destinations"
+        ogImage="https://www.igolankatours.com/og-image.jpg"
       />
       <div className="destinations-page-container">
         {/* Hero Header */}
