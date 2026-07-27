@@ -11,9 +11,23 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, MessageCircle, AlertCircle, CheckCircle, HelpCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { contactAPI } from "../services/api";
 import SEO from "../components/SEO";
 import "./ContactPage.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 }
+  }
+};
 
 /**
  * ContactPage Component
@@ -49,7 +63,12 @@ const ContactPage = () => {
           message: `I would like to request an official quote to book this custom AI-generated itinerary:\n\n${location.state.aiItinerary}\n\nEstimated Target Price: $${location.state.aiPrice || 'TBD'}\n\nPlease let me know the final price and how to proceed with booking.`
         }));
       } else if (location.state.packageName) {
-        // ... (existing packageName logic)
+        // Handle packageName prefill
+        setFormData(prev => ({
+          ...prev,
+          subject: `Inquiry about ${location.state.packageName} package`,
+          message: `Hello, I am interested in your "${location.state.packageName}" tour package and would like to receive more details or customizable options for this trip.`
+        }));
       }
     }
   }, [location.state]);
@@ -60,6 +79,8 @@ const ContactPage = () => {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     // @VALIDATION: Basic presence checks before submission
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       setMessage("Please fill in all required fields.");
@@ -89,6 +110,7 @@ const ContactPage = () => {
           subject: "",
           message: "",
         });
+        setFieldErrors({});
         // Clear message after 5 seconds
         setTimeout(() => setMessage(null), 5000);
       } else {
@@ -119,27 +141,54 @@ const ContactPage = () => {
         keywords="contact sri lanka tour operator, book sri lanka tour, sri lanka travel inquiry, igolanka tours contact, custom tour quote sri lanka, whatsapp sri lanka tours, sri lanka holiday booking, plan sri lanka trip"
         canonicalUrl="https://www.igolankatours.com/contact"
       />
+
+      {/* Ambient Effects */}
+      <div className="contact-ambient-glow-1"></div>
+      <div className="contact-ambient-glow-2"></div>
+
       <div className="contact-page-container">
-        <div className="contact-page-header">
-          <h1 className="contact-page-title">Get In Touch</h1>
-          <p className="contact-page-subtitle">
+        {/* Header */}
+        <motion.div 
+          className="contact-page-header"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          <motion.h1 className="contact-page-title" variants={fadeUp}>
+            Get In <span>Touch</span>
+          </motion.h1>
+          <motion.p className="contact-page-subtitle" variants={fadeUp}>
             Have questions? We'd love to hear from you. Send us a message and
             we'll respond as soon as possible.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="contact-layout">
-          <div className="contact-form-section">
+        <motion.div 
+          className="contact-layout"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          {/* Form Card */}
+          <motion.div className="contact-form-section" variants={fadeUp}>
             <div className="contact-form-card">
-              <h2 className="contact-form-title">Send Us a Message</h2>
+              <h2 className="contact-form-title">Send Us a <span>Message</span></h2>
 
               <form onSubmit={handleSubmit}>
-                {message && (
-                  <div className={`contact-form-message contact-form-message-${messageType}`}>
-                    {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-                    <p>{message}</p>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {message && (
+                    <motion.div 
+                      className={`contact-form-message contact-form-message-${messageType}`}
+                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      animate={{ opacity: 1, height: "auto", y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -10 }}
+                    >
+                      {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                      <p>{message}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div className="contact-form-group">
                   <label className="contact-form-label">Your Name *</label>
@@ -223,14 +272,15 @@ const ContactPage = () => {
                   className="contact-form-submit-btn"
                   disabled={loading}
                 >
-                  <Send size={20} />
+                  <Send size={18} />
                   <span>{loading ? "Sending..." : "Send Message"}</span>
                 </button>
               </form>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="contact-info-section">
+          {/* Info Side Section */}
+          <motion.div className="contact-info-section" variants={fadeUp}>
             <div className="contact-info-card">
               <h3 className="contact-info-title">Contact Information</h3>
               <p className="contact-info-subtitle">
@@ -240,31 +290,29 @@ const ContactPage = () => {
               <div className="contact-info-items">
                 <div className="contact-info-item">
                   <div className="contact-info-icon">
-                    <Phone size={24} />
+                    <Phone size={22} />
                   </div>
                   <div>
                     <h4 className="contact-info-item-title">Phone</h4>
                     <p className="contact-info-item-value">+94 77 763 9196</p>
-
                   </div>
                 </div>
 
                 <div className="contact-info-item">
                   <div className="contact-info-icon">
-                    <Mail size={24} />
+                    <Mail size={22} />
                   </div>
                   <div>
                     <h4 className="contact-info-item-title">Email</h4>
                     <p className="contact-info-item-value">
                       tours.igolanka@gmail.com
                     </p>
-
                   </div>
                 </div>
 
                 <div className="contact-info-item">
                   <div className="contact-info-icon">
-                    <MessageCircle size={24} />
+                    <MessageCircle size={22} />
                   </div>
                   <div>
                     <h4 className="contact-info-item-title">WhatsApp</h4>
@@ -277,7 +325,7 @@ const ContactPage = () => {
 
                 <div className="contact-info-item">
                   <div className="contact-info-icon">
-                    <MapPin size={24} />
+                    <MapPin size={22} />
                   </div>
                   <div>
                     <h4 className="contact-info-item-title">Office Address</h4>
@@ -290,9 +338,10 @@ const ContactPage = () => {
               </div>
             </div>
             
+            {/* FAQ Redirect Card */}
             <div className="contact-faq-card">
               <div className="contact-faq-icon">
-                <HelpCircle size={32} />
+                <HelpCircle size={28} />
               </div>
               <div className="contact-faq-content">
                 <h3 className="contact-faq-title">Frequently Asked Questions</h3>
@@ -305,6 +354,7 @@ const ContactPage = () => {
               </div>
             </div>
 
+            {/* Hours Card */}
             <div className="contact-hours-card">
               <h3 className="contact-hours-title">Business Hours</h3>
               <div className="contact-hours-item">
@@ -320,8 +370,8 @@ const ContactPage = () => {
                 <span>Closed</span>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </main>
   );

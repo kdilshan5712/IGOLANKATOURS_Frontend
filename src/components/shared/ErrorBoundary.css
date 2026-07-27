@@ -3,14 +3,14 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-card);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   padding: 2rem;
   text-align: center;
 }
 
 .error-content {
-  background: white;
+  background: var(--color-bg-card);
   padding: 3rem;
   border-radius: 1.5rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -24,14 +24,14 @@
 }
 
 .error-content h1 {
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .error-content p {
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
   line-height: 1.6;
 }

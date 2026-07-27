@@ -19,7 +19,8 @@ import {
   HelpCircle,
   UserCircle,
   Home,
-  History
+  History,
+  Megaphone
 } from "lucide-react";
 
 import { adminAPI } from "../../services/api";
@@ -76,7 +77,8 @@ function AdminSidebar({ isOpen, onClose }) {
     { to: "/admin/packages", icon: Package, label: "Packages" },
     { to: "/admin/destinations", icon: MapPin, label: "Destinations" },
     { to: "/admin/pricing-rules", icon: Tag, label: "Pricing Rules" },
-    { to: "/admin/coupons", icon: Ticket, label: "Coupons" }, // Added Coupons
+    { to: "/admin/coupons", icon: Ticket, label: "Coupons" },
+    { to: "/admin/promotions", icon: Megaphone, label: "Promotions & Banners" },
     { to: "/admin/bookings", icon: CalendarDays, label: "Bookings" },
     { 
       to: "/admin/guides", 

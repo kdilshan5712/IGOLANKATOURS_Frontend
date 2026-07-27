@@ -69,7 +69,7 @@ const DestinationsMap = () => {
   return (
     <div className="destinations-map-section">
       <div className="destinations-map-header">
-        <h2>Explore Sri Lanka's Top Destinations</h2>
+        <h2>Explore Sri Lanka's <span>Top Destinations</span></h2>
         <p>Interactive map showing the most popular tourist attractions across the island</p>
       </div>
       <TourMap 

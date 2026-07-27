@@ -25,7 +25,7 @@
 
 /* Card shell — same size/border-radius as .package-card */
 .pkg-skeleton {
-  background: #ffffff;
+  background: var(--color-bg-card);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);

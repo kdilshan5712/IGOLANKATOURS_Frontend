@@ -252,8 +252,9 @@ const TourChatWindow = ({ bookingId, initialAuthStatus = false, onClose, onAuthC
                         </div>
                     ) : (
                         messages.map((msg) => {
-                            const senderId = localStorage.getItem('userId');
-                            const isMine = msg.sender_role === currentUserRole;
+                            const user = JSON.parse(localStorage.getItem('user') || '{}');
+                            const currentUserId = user.id || user.user_id;
+                            const isMine = String(msg.sender_id) === String(currentUserId);
                             const isSystem = msg.sender_role === 'admin' && msg.message.startsWith('🛡️ System:');
                             const isAdminMsg = msg.sender_role === 'admin' && !isSystem;
 

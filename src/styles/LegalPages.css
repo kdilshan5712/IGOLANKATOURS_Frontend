@@ -2,8 +2,8 @@
 .legal-page-layout {
   min-height: 100vh;
   padding: 120px 20px 80px;
-  background-color: #f8fafc; /* Light slate background */
-  color: #1e293b;
+  background-color: var(--color-bg-card); /* Light slate background */
+  color: var(--color-text-primary);
   position: relative;
   overflow: hidden;
 }
@@ -28,8 +28,8 @@
 }
 
 .legal-glass-panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 60px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
@@ -52,7 +52,7 @@
 }
 
 .legal-subtitle {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1.125rem;
 }
 
@@ -63,7 +63,7 @@
 .legal-section-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -79,7 +79,7 @@
 }
 
 .legal-text {
-  color: #475569;
+  color: var(--color-text-secondary);
   line-height: 1.8;
   font-size: 1.0625rem;
   margin-bottom: 20px;
@@ -95,7 +95,7 @@
   position: relative;
   padding-left: 28px;
   margin-bottom: 12px;
-  color: #475569;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -109,7 +109,7 @@
 
 .legal-contact-card {
   background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 30px;
   margin-top: 40px;
@@ -120,7 +120,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-  color: #334155;
+  color: var(--color-text-secondary);
 }
 
 .legal-contact-item:last-child {

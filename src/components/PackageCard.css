@@ -1,7 +1,7 @@
 /* PackageCard Styles */
 
 .package-card {
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   border-radius: var(--radius-xl);
   overflow: hidden;
   border: 1px solid var(--color-gray-200);
@@ -97,7 +97,7 @@
   justify-content: center;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.9);
-  color: #9ca3af;
+  color: var(--color-text-muted);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   z-index: 10;
@@ -124,7 +124,7 @@
 .package-rating-value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 /* Content Section */
@@ -135,13 +135,13 @@
 .package-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .package-description {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -155,7 +155,7 @@
   align-items: center;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 1.25rem;
 }
 
@@ -171,25 +171,25 @@
   align-items: center;
   justify-content: space-between;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--glass-border);
 }
 
 .package-price-label {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   display: block;
 }
 
 .package-price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .package-price-per {
   font-size: 0.875rem;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .package-actions {
@@ -223,8 +223,8 @@
 }
 
 .package-button-outline {
-  background: #ffffff;
-  color: var(--color-primary);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   border: 2px solid var(--color-primary);
 }
 

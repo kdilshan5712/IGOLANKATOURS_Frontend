@@ -34,7 +34,7 @@ const AdminProfilePage = () => {
     const token = localStorage.getItem("token");
     const userRole = localStorage.getItem("userRole");
 
-    if (!token || userRole !== "admin") {
+    if (!token || (userRole !== "admin" && userRole !== "superadmin")) {
       navigate("/login");
       return;
     }

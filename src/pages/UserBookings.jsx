@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userAPI } from "../services/api";
 import "./UserBookings.css";
 
@@ -20,6 +20,7 @@ import "./UserBookings.css";
  * @returns {JSX.Element}
  */
 const UserBookings = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -94,6 +95,16 @@ const UserBookings = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return travel > today;
+  };
+
+  const canContinuePayment = (booking) => {
+    if (booking.status?.toLowerCase() !== 'pending') {
+      return false;
+    }
+    const travelDate = new Date(booking.travel_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return travelDate >= today;
   };
 
   const getStatusBadge = (status) => {
@@ -202,6 +213,28 @@ const UserBookings = () => {
                     >
                       View Details
                     </Link>
+
+                    {canContinuePayment(booking) && (
+                      <button
+                        onClick={() => navigate(`/booking/${booking.package_id}/payment`, {
+                          state: {
+                            isDirect: true,
+                            booking: {
+                              booking_id: booking.booking_id,
+                              package_id: booking.package_id,
+                              package_name: booking.package_name,
+                              total_price: parseFloat(booking.total_price),
+                              deposit_amount: booking.deposit_amount ? parseFloat(booking.deposit_amount) : null,
+                              travel_date: booking.travel_date,
+                              travelers: booking.travelers,
+                            }
+                          }
+                        })}
+                        className="btn-pay"
+                      >
+                        💳 Continue Payment
+                      </button>
+                    )}
 
                     {canCancel(booking.travel_date, booking.status) && (
                       <button

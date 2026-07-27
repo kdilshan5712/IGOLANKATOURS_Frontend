@@ -2,7 +2,7 @@
 
 .package-details-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
 }
 
 /* Hero Section */
@@ -98,7 +98,7 @@
 }
 
 .package-details-content {
-  background-color: white;
+  background-color: var(--color-bg-card);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -107,7 +107,7 @@
 /* Sections */
 .package-details-section {
   padding: 2rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .package-details-section:last-child {
@@ -117,27 +117,27 @@
 .package-details-section-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
 }
 
 .package-details-subsection-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .package-details-description {
   font-size: 1.125rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.75;
   margin-bottom: 1rem;
 }
 
 .package-details-full-description {
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   line-height: 1.75;
 }
 
@@ -153,7 +153,7 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.75rem 0;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -199,23 +199,23 @@
 }
 
 .package-details-booking-card {
-  background-color: white;
+  background-color: var(--color-bg-card);
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--glass-border);
 }
 
 .package-details-price-section {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--glass-border);
   margin-bottom: 1.5rem;
 }
 
 .package-details-price-label {
   display: block;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
@@ -228,7 +228,7 @@
 .package-details-price-per {
   font-size: 1rem;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 /* CTA Section */
@@ -262,7 +262,7 @@
 .package-details-btn-primary:hover {
   background-color: #1d4ed8;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .package-details-btn-secondary {
@@ -273,11 +273,11 @@
 .package-details-btn-secondary:hover {
   background-color: #d97706;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .package-details-btn-outline {
-  background-color: white;
+  background-color: var(--color-bg-card);
   color: #2563eb;
   border: 2px solid #2563eb;
 }
@@ -307,7 +307,7 @@
 }
 
 .locations-list {
-  background: #f9fafb;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 1.5rem;
   height: fit-content;
@@ -316,7 +316,7 @@
 .locations-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
@@ -331,7 +331,7 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem;
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -351,13 +351,13 @@
 .location-item strong {
   display: block;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 0.25rem;
 }
 
 .location-item p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -378,14 +378,14 @@
 
 .package-details-info-text {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   margin-bottom: 0.75rem;
 }
 
 .package-details-info-contact {
   font-size: 0.875rem;
-  color: #1f2937;
+  color: var(--color-text-primary);
   line-height: 1.75;
   font-weight: 500;
 }
@@ -442,15 +442,15 @@
 
 .itinerary-content {
   flex: 1;
-  background-color: #f8fafc;
+  background-color: var(--color-bg-card);
   border-radius: 0.75rem;
   padding: 1.25rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--glass-border);
   transition: all 0.2s ease;
 }
 
 .itinerary-content:hover {
-  border-color: #cbd5e1;
+  border-color: var(--glass-border);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -466,7 +466,7 @@
 .itinerary-location {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .itinerary-nights {
@@ -484,8 +484,8 @@
   gap: 0.5rem;
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
-  color: #475569;
-  background-color: white;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-card);
   padding: 0.5rem;
   border-radius: 0.5rem;
   border: 1px solid #f1f5f9;
@@ -499,7 +499,7 @@
   display: block;
   font-weight: 600;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -518,7 +518,7 @@
   position: relative;
   padding-left: 1.25rem;
   font-size: 0.95rem;
-  color: #334155;
+  color: var(--color-text-secondary);
 }
 
 .itinerary-activity-list li::before {
@@ -602,7 +602,7 @@
 /* Review Stats Section */
 .package-details-stats-section {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--glass-border);
   margin-bottom: 1.5rem;
 }
 
@@ -616,11 +616,11 @@
 .stats-rating-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 .stats-rating-count {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -639,7 +639,7 @@
 }
 
 .stats-bar-label {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
@@ -658,7 +658,7 @@
 }
 
 .stats-bar-count {
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-align: right;
 }
 
@@ -732,13 +732,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: white;
+  background-color: var(--color-bg-card);
   padding: 1rem 1.5rem;
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--glass-border);
 }
 
 .mobile-cta-price {
@@ -748,7 +748,7 @@
 
 .mobile-cta-label {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
@@ -813,7 +813,7 @@
 
 .package-details-loading p {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .package-details-error {

@@ -27,7 +27,7 @@
 .details-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .details-grid {
@@ -74,7 +74,7 @@
 }
 
 .package-info {
-  background: white;
+  background: var(--color-bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -83,19 +83,19 @@
 .package-info h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .package-category,
 .package-duration {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .booking-info-section {
-  background: white;
+  background: var(--color-bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -104,7 +104,7 @@
 .booking-info-section h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -123,7 +123,7 @@
 .info-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -131,7 +131,7 @@
 .info-value {
   font-size: 1rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .details-sidebar {
@@ -141,7 +141,7 @@
 }
 
 .price-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -150,7 +150,7 @@
 .price-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -211,7 +211,7 @@
   align-items: center;
   min-height: 400px;
   font-size: 1.125rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .error-message {
@@ -259,4 +259,213 @@
   }
 }
   
-/* Guide Info Section */ 
+/* Guide Info Section */
+.guide-info-section {
+  background: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
+  margin-top: 2rem;
+}
+
+.guide-info-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 0.75rem;
+}
+
+.guide-info-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.guide-avatar-large {
+  width: 60px;
+  height: 60px;
+  background: rgba(197, 160, 89, 0.12);
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);
+}
+
+.guide-avatar-large svg {
+  width: 28px;
+  height: 28px;
+}
+
+.guide-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.guide-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.guide-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.guide-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.guide-contact-item svg {
+  color: var(--color-accent-light);
+}
+
+.guide-assigned-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.guide-assigned-date svg {
+  color: var(--color-accent);
+}
+
+.guide-info-section .chat-btn {
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 100%) !important;
+  color: #030812 !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
+  width: fit-content;
+}
+
+.guide-info-section .chat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(197, 160, 89, 0.4);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%) !important;
+}
+
+.price-amount {
+  color: var(--color-accent) !important;
+}
+
+.back-btn {
+  color: var(--color-accent) !important;
+}
+
+.back-btn:hover {
+  color: var(--color-accent-light) !important;
+}
+
+.price-row {
+  border-top: 1px solid var(--glass-border) !important;
+}
+
+.cancelled-notice,
+.error-message {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  color: var(--color-error) !important;
+}
+
+/* Payment Pending Banner */
+.payment-pending-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.banner-icon {
+  font-size: 1.5rem;
+}
+
+.banner-text h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d97706;
+}
+
+.banner-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.banner-pay-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(245, 158, 11, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.banner-pay-btn:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3);
+}
+
+@media (max-width: 768px) {
+  .payment-pending-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .banner-pay-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

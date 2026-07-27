@@ -194,8 +194,8 @@
   width: 100%;
   padding: 1rem;
   border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid var(--glass-border);
+  background: var(--color-bg-card);
   color: var(--admin-text-primary);
   font-family: inherit;
   font-size: 0.95rem;
@@ -208,12 +208,12 @@
 .reject-reason-input:focus {
   outline: none;
   border-color: var(--admin-primary);
-  background: #ffffff;
+  background: var(--color-bg-card);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .reject-reason-input::placeholder {
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 /* Guide Info Section */
@@ -374,7 +374,7 @@
 }
 
 .success-message {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 1rem;
   line-height: 1.6;
   margin: 0 0 1.5rem 0;
@@ -427,7 +427,7 @@
 }
 
 .error-message {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 1rem;
   line-height: 1.6;
   margin: 0;

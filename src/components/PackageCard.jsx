@@ -11,6 +11,7 @@
 import { Star, Clock, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../hooks/useWishlist";
+import { usePromotions } from "../context/PromotionsContext";
 import "./PackageCard.css";
 
 /**
@@ -23,8 +24,14 @@ import "./PackageCard.css";
  * @returns {JSX.Element}
  */
 const PackageCard = ({ pkg }) => {
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const isSaved = isInWishlist(pkg.id);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { maxDiscount } = usePromotions();
+
+  const isSaved = isInWishlist(pkg.package_id);
+
+  // Price calculations
+  const displayPrice = pkg.currentPrice || pkg.price;
+  const discountedPrice = maxDiscount > 0 ? Math.round(displayPrice * (1 - maxDiscount / 100)) : displayPrice;
 
   const handleWishlistClick = (e) => {
     e.preventDefault();
@@ -36,12 +43,18 @@ const PackageCard = ({ pkg }) => {
     <div className="package-card">
       {/* Image */}
       <div className="package-image-wrapper">
+        {maxDiscount > 0 && (
+          <div style={{ position: 'absolute', top: '10px', left: '10px', background: '#e53e3e', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', zIndex: 10 }}>
+            {maxDiscount}% OFF
+          </div>
+        )}
         {/* @ASSETS: Package images are dynamically sourced from backend with Unsplash fallback */}
         <img
           src={pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070"}
           alt={pkg.name}
           className="package-image"
           loading="lazy"
+          decoding="async"
         />
 
         {/* Wishlist Button */}
@@ -91,7 +104,16 @@ const PackageCard = ({ pkg }) => {
           <div>
             <span className="package-price-label">From</span>
             <div className="package-price">
-              ${pkg.currentPrice || pkg.price}
+              {maxDiscount > 0 ? (
+                <>
+                  <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.85em', marginRight: '6px' }}>
+                    ${displayPrice}
+                  </span>
+                  <span style={{ color: '#e53e3e' }}>${discountedPrice}</span>
+                </>
+              ) : (
+                <span>${displayPrice}</span>
+              )}
               <span className="package-price-per">
                 {" "}
                 / person

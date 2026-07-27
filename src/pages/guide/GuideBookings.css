@@ -1,3 +1,7 @@
+/* =========================================================
+   🎯 I GO LANKA TOURS — GUIDE BOOKINGS PREMIUM STYLES
+   ========================================================= */
+
 .guide-bookings-page {
   padding: 24px;
   max-width: 1400px;
@@ -9,67 +13,83 @@
 }
 
 .page-header h1 {
+  font-family: 'Outfit', sans-serif;
   font-size: 32px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
+  letter-spacing: 0.5px;
 }
 
 .subtitle {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
-.loading,
+.loading {
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
 .error-alert {
   text-align: center;
-  padding: 40px;
-  font-size: 16px;
-}
-
-.error-alert {
-  background: #fee2e2;
-  color: #991b1b;
-  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 15px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--color-error);
+  border-radius: 12px;
   margin-bottom: 24px;
+  font-weight: 500;
 }
 
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 2px dashed #d1d5db;
+  background: var(--color-bg-card);
+  border-radius: 16px;
+  border: 1.5px dashed rgba(197, 160, 89, 0.25);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
 }
 
 .empty-state h3 {
   margin: 20px 0 8px;
+  font-family: 'Outfit', sans-serif;
   font-size: 24px;
-  color: #374151;
+  color: var(--color-accent);
 }
 
 .empty-state p {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 16px;
 }
 
 .bookings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 24px;
+  gap: 28px;
 }
 
 .booking-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-card);
+  backdrop-filter: var(--glass-blur);
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s;
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .booking-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-4px);
+  border-color: rgba(197, 160, 89, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(197, 160, 89, 0.08);
 }
 
 .booking-card-header {
@@ -78,49 +98,53 @@
   align-items: flex-start;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .package-info h3 {
   margin: 0 0 6px 0;
+  font-family: 'Outfit', sans-serif;
   font-size: 20px;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.3;
 }
 
 .booking-reference {
   font-family: monospace;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--color-accent-light);
   margin: 0;
 }
 
 .status-badge {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: white;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .booking-details {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .detail-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
   font-size: 14px;
 }
 
 .detail-row svg {
-  color: #10b981;
+  color: var(--color-accent);
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .detail-row > div {
@@ -130,37 +154,43 @@
 }
 
 .detail-label {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: 11px;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 .detail-value {
-  font-weight: 500;
-  color: #374151;
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
+/* Tourist Info Section (translucent emerald green) */
 .tourist-info {
-  background: #f0fdf4;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 16px;
+  margin-top: auto; /* Push to bottom to align grids */
 }
 
 .tourist-info h4 {
   margin: 0 0 12px 0;
-  font-size: 14px;
-  color: #166534;
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  color: #34d399;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
 }
 
 .tourist-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .tourist-details .detail-row {
@@ -169,14 +199,44 @@
 }
 
 .tourist-details .detail-row svg {
-  color: #059669;
+  color: #10b981;
 }
 
+.tourist-details .detail-value {
+  color: var(--color-text-secondary);
+}
+
+/* Action Button inside Tourist Block */
+.tourist-details .chat-btn {
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 100%) !important;
+  color: #030812 !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700 !important;
+  transition: all 0.25s ease !important;
+  margin-top: 4px;
+  box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2);
+}
+
+.tourist-details .chat-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 14px rgba(197, 160, 89, 0.35);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%) !important;
+}
+
+/* Administrative Notes & Special Requests (translucent amber) */
 .admin-notes,
 .special-requests {
-  background: #fef3c7;
-  padding: 12px;
-  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 12px 14px;
+  border-radius: 8px;
   margin-bottom: 12px;
   font-size: 13px;
 }
@@ -185,29 +245,77 @@
 .special-requests strong {
   display: block;
   margin-bottom: 6px;
-  color: #92400e;
-  font-size: 12px;
+  color: #fbbf24;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+  font-weight: 700;
 }
 
 .admin-notes p,
 .special-requests p {
   margin: 0;
-  color: #78350f;
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
+/* Footer Section */
 .assignment-info {
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
-  text-align: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
 }
 
-.assignment-info small {
+.assignment-info .assigned-date {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-style: italic;
+}
+
+.completion-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.complete-tour-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+}
+
+.complete-tour-btn:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+}
+
+.complete-tour-btn:disabled {
+  background: var(--color-gray-300) !important;
+  color: var(--color-text-muted) !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.completion-warning {
+  color: var(--color-error);
+  font-size: 11px;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
@@ -216,6 +324,6 @@
   }
   
   .page-header h1 {
-    font-size: 24px;
+    font-size: 26px;
   }
 }

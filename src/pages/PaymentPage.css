@@ -62,14 +62,14 @@
 }
 
 .payment-notice svg {
-  color: #6b7280;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
 .payment-notice p {
   margin: 0;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .payment-btn {

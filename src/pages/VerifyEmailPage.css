@@ -8,7 +8,7 @@
 }
 
 .verify-email-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 16px;
   padding: 3rem 2rem;
   max-width: 500px;
@@ -59,12 +59,12 @@
 .verify-email-card h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .verify-email-card p {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 1rem;
@@ -108,14 +108,14 @@
 }
 
 .btn-secondary {
-  background: white;
-  color: #64748b;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
   border: 2px solid #e2e8f0;
 }
 
 .btn-secondary:hover {
-  border-color: #cbd5e1;
-  color: #475569;
+  border-color: var(--glass-border);
+  color: var(--color-text-secondary);
   transform: translateY(-2px);
 }
 

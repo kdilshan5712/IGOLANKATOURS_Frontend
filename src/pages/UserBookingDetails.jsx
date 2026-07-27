@@ -20,21 +20,20 @@ const UserBookingDetails = () => {
   const fetchBookingDetails = async () => {
     try {
       const token = localStorage.getItem("token");
-      const data = await userAPI.getBookings(token);
-
-      if (data.bookings) {
-        const found = data.bookings.find(
-          (b) => b.booking_id === parseInt(bookingId)
-        );
-        if (found) {
-          setBooking(found);
-        } else {
-          setError("Booking not found");
-        }
-      } else {
-        setError(data.message || "Failed to load booking");
+      if (!token) {
+        setError("Not logged in. Please log in first.");
+        setLoading(false);
+        return;
       }
-    } catch {
+      const data = await bookingAPI.getById(bookingId, token);
+
+      if (data && data.success && data.booking) {
+        setBooking(data.booking);
+      } else {
+        setError(data?.message || "Booking not found");
+      }
+    } catch (err) {
+      console.error("Error fetching booking details:", err);
       setError("Failed to connect to server");
     } finally {
       setLoading(false);
@@ -145,6 +144,37 @@ const UserBookingDetails = () => {
         <h1>Booking Details</h1>
       </div>
 
+      {booking.status?.toLowerCase() === 'pending' && (
+        <div className="payment-pending-banner">
+          <div className="banner-content">
+            <span className="banner-icon">⚠️</span>
+            <div className="banner-text">
+              <h4>Payment Pending</h4>
+              <p>Your booking is secured but payment has not been completed. Please complete your payment to confirm your booking.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate(`/booking/${booking.package_id}/payment`, {
+              state: {
+                isDirect: true,
+                booking: {
+                  booking_id: booking.booking_id,
+                  package_id: booking.package_id,
+                  package_name: booking.package_name,
+                  total_price: parseFloat(booking.total_price),
+                  deposit_amount: booking.deposit_amount ? parseFloat(booking.deposit_amount) : null,
+                  travel_date: booking.travel_date,
+                  travelers: booking.travelers,
+                }
+              }
+            })}
+            className="banner-pay-btn"
+          >
+            💳 Continue Payment
+          </button>
+        </div>
+      )}
+
       <div className="details-grid">
         <div className="details-main">
           <div className="package-showcase">
@@ -208,6 +238,68 @@ const UserBookingDetails = () => {
             </div>
           </div>
 
+          {/* Travelers Details Section */}
+          {booking.travellers && booking.travellers.length > 0 && (
+            <div className="booking-info-section" style={{ marginTop: '2rem' }}>
+              <h3>Traveler Information</h3>
+              <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+                {booking.travellers.map((traveller, idx) => (
+                  <div 
+                    key={traveller.id || idx} 
+                    style={{ 
+                      background: '#f8fafc', 
+                      border: '1px solid #e2e8f0', 
+                      borderRadius: '8px', 
+                      padding: '1.25rem', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '0.75rem' 
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #edf2f7', paddingBottom: '0.5rem' }}>
+                      <strong style={{ fontSize: '1.1rem', color: '#1e293b' }}>
+                        {traveller.full_name} {traveller.is_primary && <span style={{ fontSize: '0.8rem', background: '#dbeafe', color: '#1e40af', padding: '0.1rem 0.4rem', borderRadius: '4rem', marginLeft: '0.5rem' }}>Primary</span>}
+                      </strong>
+                      <span style={{ fontSize: '0.85rem', background: traveller.type === 'Adult' ? '#dcfce7' : '#fef9c3', color: traveller.type === 'Adult' ? '#166534' : '#854d0e', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>
+                        {traveller.type}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}>
+                      <div>
+                        <strong>Nationality:</strong> {traveller.nationality}
+                      </div>
+                      <div>
+                        <strong>Passport Number:</strong> {traveller.passport_number ? `${traveller.passport_number.substring(0, 3)}***${traveller.passport_number.substring(traveller.passport_number.length - 2)}` : 'N/A'}
+                      </div>
+                      <div>
+                        <strong>Passport Expiry:</strong> {traveller.passport_expiry ? new Date(traveller.passport_expiry).toLocaleDateString() : 'N/A'}
+                      </div>
+                      <div>
+                        <strong>Date of Birth:</strong> {traveller.date_of_birth ? new Date(traveller.date_of_birth).toLocaleDateString() : 'N/A'}
+                      </div>
+                    </div>
+
+                    {(traveller.dietary_restrictions || traveller.medical_conditions) && (
+                      <div style={{ display: 'flex', gap: '1rem', borderTop: '1px dashed #e2e8f0', paddingTop: '0.5rem', fontSize: '0.85rem' }}>
+                        {traveller.dietary_restrictions && (
+                          <div>
+                            <strong style={{ color: '#166534' }}>Dietary:</strong> {traveller.dietary_restrictions}
+                          </div>
+                        )}
+                        {traveller.medical_conditions && (
+                          <div>
+                            <strong style={{ color: '#991b1b' }}>Medical:</strong> {traveller.medical_conditions}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Guide Information Section */}
           {booking.guide_name && (
             <div className="guide-info-section">
@@ -251,30 +343,7 @@ const UserBookingDetails = () => {
               </div>
               <button
                 onClick={() => setIsChatOpen(true)}
-                className="chat-btn mt-4"
-                style={{
-                  background: '#eff6ff',
-                  color: '#2563eb',
-                  border: '1px solid #bfdbfe',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                  marginTop: '1rem'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#dbeafe';
-                  e.currentTarget.style.borderColor = '#93c5fd';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = '#eff6ff';
-                  e.currentTarget.style.borderColor = '#bfdbfe';
-                }}
+                className="chat-btn"
               >
                 <MessageCircle size={16} />
                 Chat with Guide

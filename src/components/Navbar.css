@@ -1,4 +1,6 @@
-/* Navbar Styles - Glassmorphism */
+/* ==========================================================================
+   🎯 I GO LANKA TOURS - Core Navigation Stylesheet (Premium Dark Glassmorphism)
+   ========================================================================== */
 
 .navbar {
   position: fixed;
@@ -9,34 +11,30 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Scrolled Premium Glass State */
 .navbar.scrolled {
-  background: linear-gradient(135deg,
-      rgba(15, 23, 42, 0.85) 0%,
-      rgba(30, 41, 59, 0.75) 50%,
-      rgba(51, 65, 85, 0.7) 100%);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shadow),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  border-bottom: 1px solid var(--glass-border);
+  background: rgba(3, 8, 12, 0.75);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4),
+              0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
 }
 
+/* Transparent State */
 .navbar.transparent {
-  background: linear-gradient(135deg,
-      rgba(15, 23, 42, 0.4) 0%,
-      rgba(30, 41, 59, 0.3) 100%);
-  -webkit-backdrop-filter: blur(10px) saturate(150%);
-  backdrop-filter: blur(10px) saturate(150%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(3, 8, 12, 0.3);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .navbar-container {
   max-width: 100%;
   height: 100%;
   margin: 0;
-  padding: 0 2rem;
+  padding: 0 2.5rem;
 }
 
 .navbar-content {
@@ -46,7 +44,9 @@
   justify-content: space-between;
 }
 
-/* Logo */
+/* ==========================================================================
+   Logo Styles
+   ========================================================================== */
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -62,6 +62,7 @@
   background: transparent;
   mix-blend-mode: multiply;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .navbar-logo-text-container {
@@ -72,34 +73,40 @@
 }
 
 .navbar-logo-text {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
-  transition: color 0.3s;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
 }
 
 .navbar-logo-text.scrolled {
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-logo-text.transparent {
   color: #ffffff;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .navbar-logo-accent {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-accent);
   text-shadow: 0 2px 8px rgba(197, 160, 89, 0.4);
+  letter-spacing: 0.05em;
 }
 
-/* Desktop Navigation */
+/* ==========================================================================
+   Desktop Navigation Links
+   ========================================================================== */
 .navbar-nav {
   display: none;
   align-items: center;
-  gap: 2rem;
+  gap: 2.25rem;
 }
 
 @media (min-width: 1024px) {
@@ -110,30 +117,33 @@
 
 .nav-link {
   position: relative;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .nav-link.scrolled {
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .nav-link.scrolled:hover {
-  color: #fbbf24;
-  text-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  color: var(--color-accent);
+  text-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
 }
 
 .nav-link.transparent {
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .nav-link.transparent:hover {
-  color: #fbbf24;
-  text-shadow: 0 2px 12px rgba(251, 191, 36, 0.5);
+  color: var(--color-accent);
+  text-shadow: 0 0 12px rgba(197, 160, 89, 0.5);
 }
 
 .nav-link::after {
@@ -142,17 +152,23 @@
   left: 0;
   bottom: -0.25rem;
   height: 2px;
-  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
-  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.5);
+  background: linear-gradient(90deg, var(--color-accent) 0%, #fcd34d 100%);
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.8);
   width: 0;
-  transition: width 0.3s;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link.nav-item-active {
+  color: var(--color-accent) !important;
 }
 
 .nav-link.nav-item-active::after {
   width: 100%;
 }
 
-/* Desktop CTA */
+/* ==========================================================================
+   Desktop Action Controls (CTA)
+   ========================================================================== */
 .navbar-cta {
   display: none;
 }
@@ -161,26 +177,23 @@
   .navbar-cta {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.75rem;
   }
 }
 
-/* Wishlist Icon in Navbar */
+/* Wishlist Icon */
 .navbar-wishlist-icon {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  transition: color 0.3s;
-}
-
-.navbar-wishlist-icon.scrolled {
-  color: #1e293b;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.3s ease;
 }
 
 .navbar-wishlist-icon:hover {
   color: #ef4444;
+  transform: scale(1.1);
 }
 
 .navbar-wishlist-badge,
@@ -190,6 +203,7 @@
   right: -8px;
   background-color: #ef4444;
   color: white;
+  font-family: 'Outfit', sans-serif;
   font-size: 0.7rem;
   font-weight: 700;
   height: 18px;
@@ -199,61 +213,67 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
 .mobile-wishlist-badge {
   position: relative;
   top: 0;
   right: 0;
+  box-shadow: none;
 }
 
+/* CTA Login Button */
 .cta-button {
   padding: 0.75rem 1.75rem;
   border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   line-height: 1;
   text-decoration: none;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
 }
 
 .cta-button.scrolled {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
-  color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(197, 160, 89, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #b08d4b 100%);
+  color: #030812;
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
 }
 
 .cta-button.scrolled:hover {
-  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+  background: linear-gradient(135deg, #fcd34d 0%, var(--color-accent) 100%);
+  color: #030812;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: 0 6px 22px rgba(251, 191, 36, 0.5);
 }
 
 .cta-button.transparent {
-  background: rgba(255, 255, 255, 0.15);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .cta-button.transparent:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.25);
 }
 
-/* User Menu */
+/* ==========================================================================
+   User Account Controls & Dropdown (Premium Dark)
+   ========================================================================== */
 .navbar-user-menu {
   position: relative;
 }
@@ -264,99 +284,109 @@
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   line-height: 1;
   background: none;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .user-menu-button.scrolled {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-menu-button.scrolled:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
 }
 
 .user-menu-button.transparent {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .user-menu-button.transparent:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
 }
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.75rem);
   right: 0;
-  min-width: 180px;
-  background: rgba(255, 255, 255, 0.95);
+  min-width: 220px;
+  background: rgba(10, 17, 30, 0.9);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+              0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  border: 1px solid rgba(197, 160, 89, 0.2);
   overflow: hidden;
   z-index: 100;
+  padding: 0.5rem 0;
 }
 
 .user-dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.875rem 1.25rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: #374151;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   background: none;
   border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
   text-align: left;
 }
 
 .user-dropdown-item:hover {
-  background-color: #f3f4f6;
-  color: #2563eb;
+  background-color: rgba(197, 160, 89, 0.1);
+  color: var(--color-accent);
+  padding-left: 1.5rem;
 }
 
 .user-dropdown-item.logout {
-  color: #dc2626;
-  border-top: 1px solid #e5e7eb;
+  color: #ef4444;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0.25rem;
 }
 
 .user-dropdown-item.logout:hover {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  padding-left: 1.5rem;
 }
 
-/* Mobile Menu Button */
+/* ==========================================================================
+   Mobile Trigger Button
+   ========================================================================== */
 .mobile-menu-btn {
   display: block;
   padding: 0.5rem;
@@ -364,7 +394,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
 }
 
 @media (min-width: 1024px) {
@@ -383,17 +413,18 @@
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Mobile Menu */
+/* ==========================================================================
+   Mobile Menu Drawer (Premium Dark Glassmorphism)
+   ========================================================================== */
 .mobile-menu {
   display: block;
-  background: linear-gradient(135deg,
-      rgba(15, 23, 42, 0.95) 0%,
-      rgba(30, 41, 59, 0.9) 100%);
+  background: rgba(3, 8, 12, 0.95);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
+              0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  border-top: 1px solid rgba(197, 160, 89, 0.15);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
 }
 
 @media (min-width: 1024px) {
@@ -403,81 +434,87 @@
 }
 
 .mobile-menu-content {
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .mobile-nav-links {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .mobile-nav-link {
   display: block;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   border-radius: 0.75rem;
-  font-size: 0.875rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: all 0.3s;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .mobile-nav-link:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #fbbf24;
-  transform: translateX(4px);
+  background: rgba(197, 160, 89, 0.08);
+  border-color: rgba(197, 160, 89, 0.3);
+  color: var(--color-accent);
+  transform: translateX(6px);
 }
 
 .mobile-nav-link.nav-item-active {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-color: rgba(251, 191, 36, 0.4);
-  color: #fbbf24;
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.05) 100%);
+  border-color: rgba(197, 160, 89, 0.4);
+  color: var(--color-accent);
+  box-shadow: 0 0 15px rgba(197, 160, 89, 0.15);
+  font-weight: 600;
 }
 
 .mobile-cta {
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #1e293b;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #b08d4b 100%);
+  color: #030812;
   text-decoration: none;
   display: inline-block;
   width: 100%;
   text-align: center;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+  border: 1px solid rgba(197, 160, 89, 0.4);
 }
 
 .mobile-cta:hover {
-  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+  background: linear-gradient(135deg, #fcd34d 0%, var(--color-accent) 100%);
+  color: #030812;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
 }
 
 .mobile-logout {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .mobile-logout:hover {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
 }

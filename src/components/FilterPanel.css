@@ -1,9 +1,9 @@
 /* FilterPanel Styles */
 
 .filter-panel {
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   border-radius: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   padding: 1.5rem;
   position: sticky;
   top: 7rem;
@@ -23,7 +23,7 @@
 .filter-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .filter-groups {
@@ -41,17 +41,17 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
 .filter-select {
   width: 100%;
   border-radius: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--glass-border);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text-secondary);
   outline: none;
   transition: all 0.3s;
 }
@@ -67,7 +67,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   background: none;
   border: none;
   cursor: pointer;
@@ -76,5 +76,5 @@
 }
 
 .filter-reset:hover {
-  color: #374151;
+  color: var(--color-text-secondary);
 }

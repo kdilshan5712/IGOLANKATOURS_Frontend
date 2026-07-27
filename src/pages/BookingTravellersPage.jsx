@@ -11,6 +11,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { authAPI } from "../services/api";
+import { User, Shield, Calendar, Globe, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import "./BookingTravellersPage.css";
 
 /**
  * BookingTravellersPage Component
@@ -53,8 +55,11 @@ const BookingTravellersPage = () => {
                 id: index,
                 fullName: index === 0 && currentUser ? currentUser.name : "",
                 passportNumber: "",
+                passportExpiry: "",
                 nationality: "",
                 dateOfBirth: "",
+                dietaryRestrictions: "",
+                medicalConditions: "",
                 isPrimary: index === 0, // First one is primary contact
                 type: index < (parsedData.adults || 0) ? 'Adult' : 'Child'
             }));
@@ -92,16 +97,49 @@ const BookingTravellersPage = () => {
             const t = travellers[i];
             
             // @VALIDATION: Basic required check for individual fields
-            if (!t.fullName.trim() || !t.passportNumber.trim() || !t.nationality.trim() || !t.dateOfBirth) {
+            if (!t.fullName.trim() || !t.passportNumber.trim() || !t.passportExpiry || !t.nationality.trim() || !t.dateOfBirth) {
                 alert(`Please fill in all details for Traveller ${i + 1}`);
                 return;
             }
 
-            // @VALIDATION: Business Rule - Age validation for Children (must be <= 16)
+            // @VALIDATION: Passport number format check
+            const passportRegex = /^[A-Z0-9]{6,20}$/i;
+            if (!passportRegex.test(t.passportNumber.trim())) {
+                alert(`Invalid passport number for Traveller ${i + 1}. It must be 6-20 alphanumeric characters.`);
+                return;
+            }
+
+            // @VALIDATION: Passport expiry check (must be at least 6 months after travel date)
+            if (bookingData.travel_date) {
+                const travelDateObj = new Date(bookingData.travel_date);
+                const expiryDateObj = new Date(t.passportExpiry);
+                const minExpiry = new Date(travelDateObj);
+                minExpiry.setMonth(minExpiry.getMonth() + 6);
+                
+                if (expiryDateObj < minExpiry) {
+                    alert(`Passport expiry date for Traveller ${i + 1} must be at least 6 months after the travel date (${new Date(bookingData.travel_date).toLocaleDateString()}).`);
+                    return;
+                }
+            }
+
+            // @VALIDATION: Business Rule - Age validation for Adults (must be >= 18)
+            if (t.type === 'Adult' && bookingData.travel_date) {
+                const age = calculateAge(t.dateOfBirth, bookingData.travel_date);
+                if (age < 18) {
+                    alert(`Traveller ${i + 1} is listed as an Adult but is ${age} years old on the travel date. Adults must be 18 years or older.`);
+                    return;
+                }
+            }
+
+            // @VALIDATION: Business Rule - Age validation for Children (must be under 18 and at least 2)
             if (t.type === 'Child' && bookingData.travel_date) {
                 const age = calculateAge(t.dateOfBirth, bookingData.travel_date);
-                if (age > 16) {
-                    alert(`Traveller ${i + 1} is listed as a Child but is ${age} years old. Children must be 16 years or younger at the time of travel.`);
+                if (age >= 18) {
+                    alert(`Traveller ${i + 1} is listed as a Child but is ${age} years old on the travel date. Children must be under 18 years.`);
+                    return;
+                }
+                if (age < 2) {
+                    alert(`Traveller ${i + 1} is listed as a Child but is ${age} years old on the travel date. Children must be 2 years or older.`);
                     return;
                 }
             }
@@ -118,18 +156,27 @@ const BookingTravellersPage = () => {
 
     return (
         <div className="traveller-page-container">
-            <div className="traveller-page-content">
-                <h1>Traveller Information</h1>
 
+            {/* Hero Banner */}
+            <div className="traveller-hero">
+                <div className="traveller-hero-text">
+                    <h1>Traveller <span>Information</span></h1>
+                    <p>Step 2 of 3 — Enter passport details exactly as they appear</p>
+                </div>
+            </div>
+
+            <div className="traveller-page-content">
                 <div className="steps-indicator">
-                    <div className="step">
-                        <div className="step-number">1</div>
+                    <div className="step completed">
+                        <div className="step-number"><CheckCircle size={16} /></div>
                         <span>Details</span>
                     </div>
+                    <div className="step-connector"></div>
                     <div className="step active">
                         <div className="step-number">2</div>
                         <span>Travellers</span>
                     </div>
+                    <div className="step-connector"></div>
                     <div className="step">
                         <div className="step-number">3</div>
                         <span>Payment</span>
@@ -137,21 +184,29 @@ const BookingTravellersPage = () => {
                 </div>
 
                 <div className="primary-contact-notice">
-                    <span>ℹ️</span>
-                    <span>The first traveller will be considered the Primary Contact for this booking.</span>
+                    <Shield size={18} />
+                    <span>The first traveller will be the <strong>Primary Contact</strong> for this booking. Their details are pre-filled from your account.</span>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     {travellers.map((traveller, index) => (
                         <div key={index} className="traveller-card">
                             <div className="traveller-header">
-                                <h3>Traveller {index + 1} {index === 0 && "(Primary)"}</h3>
+                                <div className="traveller-header-left">
+                                    <div className="traveller-icon">
+                                        <User size={20} />
+                                    </div>
+                                    <h3>
+                                        Traveller {index + 1}
+                                        {index === 0 && <small>(Primary)</small>}
+                                    </h3>
+                                </div>
                                 <span className="traveller-type-badge">{traveller.type}</span>
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Full Name (as in Passport)</label>
+                                    <label><User size={14} />Full Name (as in Passport)</label>
                                     <input
                                         type="text"
                                         value={traveller.fullName}
@@ -161,30 +216,45 @@ const BookingTravellersPage = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Nationality</label>
+                                    <label><Globe size={14} />Nationality</label>
                                     <input
                                         type="text"
                                         value={traveller.nationality}
                                         onChange={(e) => handleInputChange(index, 'nationality', e.target.value)}
                                         placeholder="e.g. American"
+                                        list="nationalities-list"
                                         required
                                     />
+                                    <datalist id="nationalities-list">
+                                        <option value="American" />
+                                        <option value="British" />
+                                        <option value="Canadian" />
+                                        <option value="Australian" />
+                                        <option value="Indian" />
+                                        <option value="German" />
+                                        <option value="French" />
+                                        <option value="Japanese" />
+                                        <option value="Chinese" />
+                                        <option value="Maldivian" />
+                                        <option value="Russian" />
+                                        <option value="Sri Lankan" />
+                                    </datalist>
                                 </div>
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Passport Number</label>
+                                    <label><Shield size={14} />Passport Number</label>
                                     <input
                                         type="text"
                                         value={traveller.passportNumber}
-                                        onChange={(e) => handleInputChange(index, 'passportNumber', e.target.value)}
-                                        placeholder="Enter passport number"
+                                        onChange={(e) => handleInputChange(index, 'passportNumber', e.target.value.toUpperCase())}
+                                        placeholder="e.g. A12345678"
                                         required
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Date of Birth</label>
+                                    <label><Calendar size={14} />Date of Birth</label>
                                     <input
                                         type="date"
                                         value={traveller.dateOfBirth}
@@ -192,6 +262,37 @@ const BookingTravellersPage = () => {
                                         max={new Date().toISOString().split('T')[0]}
                                         required
                                     />
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label><Calendar size={14} />Passport Expiry Date</label>
+                                    <input
+                                        type="date"
+                                        value={traveller.passportExpiry || ""}
+                                        onChange={(e) => handleInputChange(index, 'passportExpiry', e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Dietary & Medical Requirements (Optional)</label>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            type="text"
+                                            value={traveller.dietaryRestrictions || ""}
+                                            onChange={(e) => handleInputChange(index, 'dietaryRestrictions', e.target.value)}
+                                            placeholder="e.g. Vegetarian"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={traveller.medicalConditions || ""}
+                                            onChange={(e) => handleInputChange(index, 'medicalConditions', e.target.value)}
+                                            placeholder="e.g. Asthma"
+                                            style={{ flex: 1 }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -203,10 +304,10 @@ const BookingTravellersPage = () => {
                             className="btn-back"
                             onClick={() => navigate(`/booking/${id}`)}
                         >
-                            ← Back to Details
+                            <ArrowLeft size={16} /> Back to Details
                         </button>
                         <button type="submit" className="btn-continue">
-                            Continue to Payment →
+                            Continue to Payment <ArrowRight size={16} />
                         </button>
                     </div>
                 </form>

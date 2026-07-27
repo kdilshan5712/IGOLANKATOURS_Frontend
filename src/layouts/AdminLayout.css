@@ -1,4 +1,7 @@
-/* Admin Layout Structure */
+/* ==========================================================================
+   🎯 I GO LANKA TOURS - Administrative Layout Framing (Premium Dark)
+   ========================================================================== */
+
 .admin-layout {
   display: flex;
   height: 100vh;
@@ -6,33 +9,39 @@
   background: var(--admin-bg-gradient);
   font-family: 'Inter', sans-serif;
   overflow: hidden;
+  position: relative;
 }
 
-/* Sidebar Container */
+/* Sidebar Container Framing */
 .admin-sidebar-container {
-  width: 280px;
+  width: 290px;
   flex-shrink: 0;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
+  background: rgba(12, 20, 36, 0.85);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid var(--admin-glass-border);
   height: 100%;
   overflow-y: auto;
   position: relative;
   z-index: 50;
+  box-shadow: 4px 0 25px rgba(0, 0, 0, 0.3);
 }
 
-/* --- MOBILE TOPBAR --- */
+/* --- MOBILE TOPBAR (Frosted Dark Glass) --- */
 .admin-mobile-topbar {
   display: none;
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: var(--admin-glass-bg);
-  backdrop-filter: var(--admin-glass-blur);
+  background: rgba(12, 20, 36, 0.8);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   color: var(--admin-text-primary);
   border-bottom: 1px solid var(--admin-glass-border);
   position: sticky;
   top: 0;
   z-index: 101;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .mobile-menu-btn {
@@ -43,13 +52,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.3s ease;
 }
 
-/* --- OVERLAY --- */
+.mobile-menu-btn:hover {
+  color: var(--admin-primary);
+}
+
+.mobile-logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--admin-primary);
+}
+
+/* --- MOBILE OVERLAY --- */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(3, 8, 12, 0.7);
   z-index: 110;
   backdrop-filter: blur(4px);
 }
@@ -73,7 +95,7 @@
   scroll-behavior: smooth;
 }
 
-/* Custom Scrollbar for Main Content */
+/* Custom Scrollbar for Main Admin Content */
 .admin-content-scroll::-webkit-scrollbar {
   width: 8px;
 }
@@ -83,18 +105,19 @@
 }
 
 .admin-content-scroll::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.1);
+  background: rgba(197, 160, 89, 0.2);
   border-radius: 10px;
+  border: 1px solid rgba(3, 8, 12, 0.5);
 }
 
 .admin-content-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 23, 42, 0.2);
+  background: rgba(197, 160, 89, 0.45);
 }
 
-/* Responsive adjustments */
+/* Responsive Scaling Viewports */
 @media (max-width: 1024px) {
     .admin-sidebar-container {
-        width: 240px;
+        width: 250px;
     }
 }
 
@@ -110,8 +133,9 @@
     width: 280px;
     height: 100vh;
     z-index: 120;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #0f172a; /* Solid dark for mobile sidebar */
+    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #060b13; /* Deep solid space color for mobile panel drawer */
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.7);
   }
 
   .admin-sidebar-container.mobile-open {
@@ -121,4 +145,4 @@
   .admin-content-scroll {
     padding: 1.5rem;
   }
-}
+}

@@ -1,26 +1,33 @@
 /**
- * 🎯 I GO LANKA TOURS - Visual Experience Gallery
+ * 🎯 I GO LANKA TOURS - Premium Visual Experience Gallery
  * 
  * Displays a curated collection of Sri Lankan travel photography,
- * categorized by destination and experience. Includes lightbox functionality
- * and dynamic filtering from the centralized gallery service.
+ * categorized by destination and experience. Includes a cinematic
+ * lightbox functionality and dynamic filtering.
  * 
  * @module GalleryPage
  */
 
 import { useState, useEffect } from "react";
-import { X, Camera, Star, Heart, MapPin, Loader } from "lucide-react";
+import { X, Camera, MapPin, Loader } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { galleryAPI } from "../services/api";
 import SEO from "../components/SEO";
 import "./GalleryPage.css";
 
-/**
- * GalleryPage Component
- * 
- * Coordinates image fetching, filtering, and full-screen visualization.
- * 
- * @returns {JSX.Element}
- */
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
 const GalleryPage = () => {
   const [images, setImages] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
@@ -30,7 +37,6 @@ const GalleryPage = () => {
 
   const [categories, setCategories] = useState(["all"]);
 
-  // @SIDE_EFFECTS: Load gallery images and category filters on mount
   useEffect(() => {
     fetchGalleryData();
   }, []);
@@ -39,7 +45,6 @@ const GalleryPage = () => {
     setLoading(true);
     setError(null);
     try {
-      // @API_CALL: Fetch images and categories in parallel for efficiency
       const [imagesRes, categoriesRes] = await Promise.all([
         galleryAPI.getAll({ status: 'active' }),
         galleryAPI.getCategories()
@@ -55,7 +60,6 @@ const GalleryPage = () => {
         setCategories(["all", ...categoriesRes.categories]);
       }
     } catch (err) {
-      // @ERROR_HANDLING: Handle concurrent fetch failures
       console.error("Error loading gallery data:", err);
       setError("An unexpected error occurred while loading the gallery");
     } finally {
@@ -63,14 +67,6 @@ const GalleryPage = () => {
     }
   };
 
-  // Separate images by type logic, inferring 'official' if category exists, else 'traveler'
-  // Alternatively, use is_featured or simply treat all as official for now if no specific column differentiates them.
-  // For this implementation, we assume all uploaded via Admin are 'official'.
-  // Traveler images would typically come from approved reviews.
-  const officialImages = images; // Update this logic if you have a specific flag differentiating traveler images
-  const travelerImages = []; // Placeholder until review images show in gallery
-
-  // Filter images based on active tab
   const filteredImages = activeTab === "all" 
     ? images 
     : images.filter(img => img.category === activeTab);
@@ -87,7 +83,7 @@ const GalleryPage = () => {
     return (
       <main className="gallery-page">
         <div className="gallery-page-container flex justify-center items-center min-h-[50vh]">
-          <Loader className="animate-spin text-blue-600" size={48} />
+          <Loader className="animate-spin text-yellow-500" size={48} />
         </div>
       </main>
     );
@@ -98,10 +94,10 @@ const GalleryPage = () => {
       <main className="gallery-page">
         <div className="gallery-page-container flex justify-center items-center min-h-[50vh]">
           <div className="text-center">
-            <p className="text-red-500 mb-4">{error}</p>
+            <p className="text-red-400 mb-4">{error}</p>
             <button
               onClick={fetchGalleryData}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-500 transition"
             >
               Try Again
             </button>
@@ -115,112 +111,149 @@ const GalleryPage = () => {
     <main className="gallery-page">
       <SEO
         title="Sri Lanka Travel Photos & Gallery – Beautiful Destinations"
-        description="Explore stunning photos of Sri Lanka's most beautiful destinations. See real travel photography of Sigiriya, Ella, Kandy, Galle, Mirissa beach, Yala wildlife, and more before you book your tour."
-        keywords="sri lanka photos, sri lanka travel gallery, sri lanka destination pictures, sigiriya photos, ella sri lanka pictures, kandy photos, mirissa beach photos, yala safari photos, sri lanka landscape, beautiful sri lanka, sri lanka tourism photos"
+        description="Explore stunning photos of Sri Lanka's most beautiful destinations. See real travel photography of Sigiriya, Ella, Kandy, Galle, and more."
+        keywords="sri lanka photos, sri lanka travel gallery, sri lanka destination pictures"
         canonicalUrl="https://www.igolankatours.com/gallery"
-        ogImage="https://www.igolankatours.com/og-image.jpg"
       />
+
+      {/* Ambient Glow Effects */}
+      <div className="gallery-ambient-1"></div>
+      <div className="gallery-ambient-2"></div>
+
       <div className="gallery-page-container">
         {/* Hero Section */}
-        <div className="gallery-page-hero">
-          <div className="gallery-hero-icon">
-            <Camera size={48} />
-          </div>
-          <h1 className="gallery-page-title">Gallery</h1>
-          <p className="gallery-page-subtitle">
-            Travel Memories from Sri Lanka
-          </p>
-        </div>
+        <motion.div 
+          className="gallery-page-hero"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          <motion.div className="gallery-hero-icon" variants={fadeUp}>
+            <Camera size={36} />
+          </motion.div>
+          <motion.h1 className="gallery-page-title" variants={fadeUp}>
+            Curated <span className="accent">Moments</span>
+          </motion.h1>
+          <motion.p className="gallery-page-subtitle" variants={fadeUp}>
+            Immerse yourself in the breathtaking beauty of Sri Lanka.
+          </motion.p>
+        </motion.div>
 
         {/* Filter Tabs */}
-        <div className="gallery-tabs">
+        <motion.div 
+          className="gallery-tabs"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+        >
           {categories.map((cat) => (
             <button
               key={cat}
               className={`gallery-tab ${activeTab === cat ? "active" : ""}`}
               onClick={() => setActiveTab(cat)}
             >
-              {cat === "all" ? (
-                "All Photos"
-              ) : (
-                <>
-                  <Camera size={16} />
-                  {cat}
-                </>
-              )}
+              {cat === "all" ? "All Experiences" : cat}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Gallery Grid */}
-        <div className="gallery-grid">
-          {filteredImages.map((image) => (
-            <div
-              key={image.gallery_id || image.id}
-              className="gallery-item"
-              onClick={() => handleImageClick(image)}
-            >
-              <div className="gallery-image-wrapper">
-                {/* @ASSETS: Gallery images are served via external URLs provided by the galleryAPI */}
-                <img
-                  src={image.image_url}
-                  alt={image.title || image.destination}
-                  className="gallery-image"
-                  loading="lazy"
-                />
-                <div className="gallery-overlay">
-                  <div className="gallery-overlay-content">
-                    <h3 className="gallery-item-title">{image.title || 'Sri Lanka Tourism'}</h3>
-                    {image.category && (
-                      <span className="gallery-item-category">
-                        <MapPin size={14} />
-                        {image.category}
-                      </span>
-                    )}
+        <motion.div 
+          className="gallery-grid"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredImages.map((image) => (
+              <motion.div
+                key={image.gallery_id || image.id}
+                className="gallery-item"
+                onClick={() => handleImageClick(image)}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="gallery-image-wrapper">
+                  <img
+                    src={image.image_url}
+                    alt={image.title || image.destination}
+                    className="gallery-image"
+                    loading="lazy"
+                  />
+                  <div className="gallery-overlay">
+                    <div className="gallery-overlay-content">
+                      <h3 className="gallery-item-title">{image.title || 'Sri Lanka Tourism'}</h3>
+                      {image.category && (
+                        <span className="gallery-item-category">
+                          <MapPin size={12} />
+                          {image.category}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Empty State */}
         {filteredImages.length === 0 && (
-          <div className="gallery-empty">
-            <Camera size={64} />
-            <h2>No images found</h2>
-            <p>Try selecting a different filter to view images.</p>
-          </div>
+          <motion.div className="gallery-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <Camera size={48} />
+            <h2>No moments found</h2>
+            <p>Try selecting a different category to view our gallery.</p>
+          </motion.div>
         )}
       </div>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
-        <div className="lightbox-overlay" onClick={closeLightbox}>
-          <button className="lightbox-close" onClick={closeLightbox}>
-            <X size={24} />
-          </button>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={selectedImage.image_url}
-              alt={selectedImage.title || selectedImage.destination}
-              className="lightbox-image"
-            />
-            <div className="lightbox-info">
-              <h2 className="lightbox-title">{selectedImage.title || 'Sri Lanka Tourism'}</h2>
-              {selectedImage.category && (
-                <div className="lightbox-category">
-                  <MapPin size={18} />
-                  <span>{selectedImage.category}</span>
-                </div>
-              )}
-              {selectedImage.description && (
-                <p className="lightbox-description mt-2 text-white/80">{selectedImage.description}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div 
+            className="lightbox-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeLightbox}
+          >
+            <button className="lightbox-close" onClick={closeLightbox}>
+              <X size={24} />
+            </button>
+            <motion.div 
+              className="lightbox-content"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <img
+                src={selectedImage.image_url}
+                alt={selectedImage.title || selectedImage.destination}
+                className="lightbox-image"
+              />
+              <div className="lightbox-info">
+                <h2 className="lightbox-title">{selectedImage.title || 'Sri Lanka Tourism'}</h2>
+                {selectedImage.category && (
+                  <div className="lightbox-category">
+                    <MapPin size={16} />
+                    <span>{selectedImage.category}</span>
+                  </div>
+                )}
+                {selectedImage.description && (
+                  <p className="mt-3 text-white/80 leading-relaxed text-sm">
+                    {selectedImage.description}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 };

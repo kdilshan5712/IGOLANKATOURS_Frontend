@@ -2,7 +2,7 @@
 
 .terms-page {
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   padding-top: 7rem;
   padding-bottom: 5rem;
 }
@@ -23,12 +23,12 @@
 .terms-title {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 0.75rem;
 }
 
 .terms-updated {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.9375rem;
 }
 
@@ -40,7 +40,7 @@
 
 .terms-section {
   padding-bottom: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .terms-section:last-child {
@@ -51,12 +51,12 @@
 .terms-section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .terms-text {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.75;
   margin-bottom: 1rem;
 }
@@ -68,7 +68,7 @@
 .terms-list {
   list-style: disc;
   padding-left: 1.75rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.75;
   margin-bottom: 1rem;
 }
@@ -82,16 +82,16 @@
 }
 
 .terms-contact-box {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
   padding: 1.5rem;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   margin-top: 1rem;
   line-height: 1.75;
 }
 
 .terms-contact-box p {
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -100,5 +100,5 @@
 }
 
 .terms-contact-box strong {
-  color: #111827;
+  color: var(--color-text-primary);
 }

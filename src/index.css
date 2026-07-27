@@ -1,56 +1,63 @@
 /* Google Font */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
 @import "./styles/Modals.css";
 
 /* ===============================
-   CSS Variables - Design System
+   CSS Variables - Design System (Premium Dark)
    =============================== */
 :root {
-  /* Signature Primary Palette - Royal Navy & Deep Indigo */
-  --color-primary: #0f172a;
-  --color-primary-dark: #020617;
-  --color-primary-light: #1e293b;
+  /* Signature Primary Palette - Deep Space & Royal Navy */
+  --color-primary: #0a1128;
+  --color-primary-dark: #030812;
+  --color-primary-light: #162241;
 
   /* Signature Accents - Luxury Gold & Emerald */
   --color-accent: #c5a059;       /* Signature Gold */
   --color-accent-dark: #a38241;
   --color-accent-light: #d4b476;
-  --color-emerald: #064e3b;      /* Tropical Emerald */
+  --color-emerald: #0f4c4a;      /* Tropical Emerald Dark */
   --color-emerald-light: #10b981;
 
   /* Premium Backgrounds */
-  --color-bg-page: #f8fafc;
-  --color-bg-card: #ffffff;
+  --color-bg-page: #030812;
+  --color-bg-card: rgba(20, 25, 35, 0.6);
+  --color-bg-card-solid: #0c1424;
 
-  /* Neutral Spectrum */
-  --color-gray-50: #f8fafc;
-  --color-gray-100: #f1f5f9;
-  --color-gray-200: #e2e8f0;
-  --color-gray-300: #cbd5e1;
-  --color-gray-400: #94a3b8;
-  --color-gray-500: #64748b;
-  --color-gray-600: #475569;
-  --color-gray-700: #334155;
-  --color-gray-800: #1e293b;
-  --color-gray-900: #0f172a;
+  /* Neutral Spectrum (Inverted for Dark Mode) */
+  --color-gray-50: #0f172a;
+  --color-gray-100: #1e293b;
+  --color-gray-200: #334155;
+  --color-gray-300: #475569;
+  --color-gray-400: #64748b;
+  --color-gray-500: #94a3b8;
+  --color-gray-600: #cbd5e1;
+  --color-gray-700: #e2e8f0;
+  --color-gray-800: #f1f5f9;
+  --color-gray-900: #f8fafc;
+  
+  /* Text Colors */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
 
   /* Semantic Messaging */
-  --color-success: #059669;
-  --color-error: #dc2626;
-  --color-warning: #d97706;
-  --color-info: #2563eb;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
 
   /* Glassmorphism Infrastructure */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-blur: blur(12px) saturate(180%);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --glass-bg: rgba(20, 25, 35, 0.5);
+  --glass-border: rgba(197, 160, 89, 0.2);
+  --glass-blur: blur(16px) saturate(180%);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
   /* Elite Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
-  --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 160, 89, 0.05);
 
   /* Radius System */
   --radius-sm: 4px;
@@ -82,19 +89,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  background-color: #ffffff;
-  color: #111827;
-  /* Tailwind gray-900 */
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
 
 html {
   scroll-behavior: smooth;
-  /* Prevent layout shift when scrollbar appears/disappears (fixes blue bar vibration) */
   scrollbar-gutter: stable;
 }
 
 /* ===============================
-   Custom scrollbar (optional)
+   Custom scrollbar (Premium Dark)
    =============================== */
 
 ::-webkit-scrollbar {
@@ -102,15 +107,20 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  /* slate-100 */
+  background: var(--color-primary-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #0ea5e9, #0284c7);
+  background: rgba(197, 160, 89, 0.3);
   border-radius: 10px;
+  border: 2px solid var(--color-primary-dark);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #0284c7, #0369a1);
+  background: rgba(197, 160, 89, 0.6);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
 }

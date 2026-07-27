@@ -16,107 +16,7 @@ import { packageAPI, authAPI, bookingAPI, couponAPI } from "../services/api";
 import paymentService from "../services/paymentService";
 import "./BookingPaymentPage.css";
 
-/**
- * DummyCheckoutForm Component
- * 
- * Mock credit card input form for demonstration purposes.
- * 
- * @param {Object} props
- * @param {number} props.amount - Total amount to pay
- * @param {Function} props.onPay - Success callback
- * @param {boolean} props.processing - Loading state
- * @returns {JSX.Element}
- */
-const DummyCheckoutForm = ({ amount, onPay, processing }) => {
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardHolder: ""
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv || !cardDetails.cardHolder) {
-      alert("Please fill in all dummy card details (any values work)");
-      return;
-    }
-    onPay();
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="form-group">
-        <label>Card Number</label>
-        <div className="card-input-wrapper">
-          <input
-            type="text"
-            name="cardNumber"
-            placeholder="0000 0000 0000 0000"
-            maxLength="19"
-            value={cardDetails.cardNumber}
-            onChange={handleInputChange}
-          />
-          <CreditCard className="icon-right" size={18} style={{ position: 'absolute', right: '10px', top: '10px', color: '#999' }} />
-        </div>
-      </div>
-
-      <div className="form-row">
-        <div className="form-group">
-          <label>Expiry Date</label>
-          <input
-            type="text"
-            name="expiryDate"
-            placeholder="MM/YY"
-            maxLength="5"
-            value={cardDetails.expiryDate}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label>CVV</label>
-          <input
-            type="text"
-            name="cvv"
-            placeholder="123"
-            maxLength="4"
-            value={cardDetails.cvv}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label>Cardholder Name</label>
-        <input
-          type="text"
-          name="cardHolder"
-          placeholder="Name on Card"
-          value={cardDetails.cardHolder}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="btn-primary"
-        disabled={processing}
-        style={{ width: '100%', marginTop: '1rem' }}
-      >
-        {processing ? (
-          <>Processing...</>
-        ) : (
-          <>Pay ${amount} Now</>
-        )}
-      </button>
-    </form>
-  );
-};
+// Removed DummyCheckoutForm to use PayHere secure overlay
 
 /**
  * 💳 BookingPaymentPage Component
@@ -147,8 +47,11 @@ const BookingPaymentPage = () => {
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [promoError, setPromoError] = useState(null);
+  const [payhereReady] = useState(true); // Always ready - using hosted checkout (no JS SDK)
 
-
+  useEffect(() => {
+    // PayHere hosted checkout does not require JS SDK - no script loading needed
+  }, []);
   useEffect(() => {
     // @VALIDATION: 1. Auth Check - Redirect if session expired
     if (!authAPI.isAuthenticated()) {
@@ -298,10 +201,8 @@ const BookingPaymentPage = () => {
         bookingId = existingBooking.booking_id;
         finalPrice = existingBooking.total_price;
       } else {
-        // --- CASE 2: Create New Booking (Wizard Flow) ---
         const payload = {
           package_id: step1Data.package_id,
-          // ... (payload assembly)
           travel_date: step1Data.travel_date,
           adults: step1Data.adults,
           children: step1Data.children,
@@ -310,9 +211,12 @@ const BookingPaymentPage = () => {
           travellers: travellers.map(t => ({
             full_name: t.fullName || t.full_name || '',
             passport_number: t.passportNumber || t.passport_number || '',
+            passport_expiry: t.passportExpiry || t.passport_expiry || '',
             nationality: t.nationality || '',
             date_of_birth: t.dateOfBirth || t.date_of_birth || '',
             type: t.type || 'adult',
+            dietary_restrictions: t.dietaryRestrictions || t.dietary_restrictions || '',
+            medical_conditions: t.medicalConditions || t.medical_conditions || '',
           })),
           promo_code: appliedPromo ? appliedPromo.code : null,
         };
@@ -339,36 +243,90 @@ const BookingPaymentPage = () => {
       today.setHours(0, 0, 0, 0);
       const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
       
-      // For custom bookings (Direct), we usually require full payment as finalized by admin
-      const paymentAmount = isDirectBooking ? finalPrice : (daysUntilTravel <= 30 ? finalPrice : (finalPrice * 0.3).toFixed(2));
+      const paymentAmount = (isDirectBooking && existingBooking && existingBooking.deposit_amount !== undefined && existingBooking.deposit_amount !== null)
+        ? existingBooking.deposit_amount
+        : (daysUntilTravel <= 30 ? finalPrice : (finalPrice * 0.3).toFixed(2));
       
-      // @API_CALL: Execute payment transaction
-      const paymentRes = await paymentService.processDummyPayment(bookingId, paymentAmount, token);
-
-      if (paymentRes.success) {
-        // Success! Cleanup session storage
-        sessionStorage.removeItem('booking_step1');
-        sessionStorage.removeItem('booking_travellers');
-
-        navigate(`/booking/${id}/success`, {
-          state: {
-            booking: {
-              ...(isDirectBooking ? existingBooking : null),
-              booking_id: bookingId,
-              total_price: finalPrice,
-              package_name: isDirectBooking ? (existingBooking.package_name || "Custom Tour") : packageData.name
-            }
-          }
-        });
-      } else {
-        // @ERROR_HANDLING: Payment gateway error
-        throw new Error("Payment failed: " + paymentRes.message);
+      // @API_CALL: Fetch Secure Hash from Backend
+      const hashRes = await paymentService.generatePayHereHash(bookingId, paymentAmount, token);
+      
+      if (!hashRes.success) {
+          throw new Error("Failed to secure payment channel: " + hashRes.message);
       }
+
+      // Dynamically resolve backend base URL.
+      // CRITICAL: Must point to the backend, NOT the frontend origin.
+      // VITE_API_URL is set at build time to the backend container app URL.
+      const BACKEND_URL = import.meta.env.VITE_API_URL || 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+          ? 'http://localhost:5000/api' 
+          : 'https://api-backend.wonderfulsmoke-82355efd.centralindia.azurecontainerapps.io/api');
+
+      // Safe name extraction
+      const primaryTraveller = travellers.length > 0 ? travellers[0] : null;
+      const fullName = primaryTraveller?.fullName || authAPI.getCurrentUser()?.name || 'Guest';
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0] || 'Guest';
+      const lastName = nameParts.slice(1).join(' ') || '-';
+
+      // Save booking info to sessionStorage BEFORE redirecting
+      // PayHere will redirect back to return_url after payment
+      const bookingInfoForSuccess = {
+        booking_id: bookingId,
+        total_price: finalPrice,
+        package_name: isDirectBooking ? (existingBooking?.package_name || 'Custom Tour') : packageData?.name,
+        travel_date: isDirectBooking ? existingBooking?.travel_date : step1Data?.travel_date,
+        travelers: travellers.length || 1,
+        ...(isDirectBooking ? existingBooking : {})
+      };
+      sessionStorage.setItem('completedBooking', JSON.stringify(bookingInfoForSuccess));
+      // Clear wizard data before redirect
+      sessionStorage.removeItem('booking_step1');
+      sessionStorage.removeItem('booking_travellers');
+
+      // --- PAYHERE HOSTED CHECKOUT (Form POST Redirect) ---
+      // Use dynamic checkout URL returned by backend (or fallback automatically to sandbox in local dev)
+      const PAYHERE_CHECKOUT_URL = hashRes.checkoutUrl || 
+        (import.meta.env.DEV ? 'https://sandbox.payhere.lk/pay/checkout' : 'https://www.payhere.lk/pay/checkout');
+
+      const fields = {
+        merchant_id:  hashRes.merchantId,
+        return_url:   `${window.location.origin}/booking/${id}/success`,
+        cancel_url:   `${window.location.origin}/booking/${id}/payment`,
+        notify_url:   `${BACKEND_URL}/payments/payhere/webhook`,
+        order_id:     hashRes.safeOrderId,
+        items:        isDirectBooking ? (existingBooking?.package_name || 'Custom Tour') : (packageData?.name || 'Tour Package'),
+        currency:     hashRes.currency,       // LKR (from backend env config)
+        amount:       hashRes.chargeAmount,   // LKR amount = USD × rate (must match hash)
+        first_name:   firstName,
+        last_name:    lastName,
+        email:        authAPI.getCurrentUser()?.email || 'guest@example.com',
+        phone:        '0000000000',
+        address:      'Sri Lanka',
+        city:         'Colombo',
+        country:      'Sri Lanka',
+        hash:         hashRes.hash,
+      };
+
+      // Build and submit a hidden form - this is the standard PayHere hosted integration
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = PAYHERE_CHECKOUT_URL;
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit(); // Browser navigates to PayHere's payment page
 
     } catch (err) {
       console.error("Booking Error:", err);
       setError(err.message || "An error occurred during booking.");
-    } finally {
       setProcessing(false);
     }
   };
@@ -389,6 +347,13 @@ const BookingPaymentPage = () => {
       <div className="booking-payment-content">
         <h1>Review & Pay</h1>
 
+        {isDirectBooking && existingBooking && (
+          <div className="existing-booking-badge" style={{ background: '#ebf8ff', color: '#2b6cb0', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem', fontWeight: 500, border: '1px solid #bee3f8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>ℹ️</span>
+            <span>Completing payment for existing booking <strong>#{existingBooking.booking_id}</strong></span>
+          </div>
+        )}
+
         {/* Steps - Only show for standard bookings */}
         {!isDirectBooking && (
           <div className="steps-indicator" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -405,10 +370,18 @@ const BookingPaymentPage = () => {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
-          const isCloseIn = daysUntilTravel <= 30;
           const totalPrice = parseFloat(step1Data.total_price) || 0;
-          const depositAmount = isCloseIn ? totalPrice : (totalPrice * 0.3);
-          const balanceAmount = isCloseIn ? 0 : (totalPrice * 0.7);
+          
+          let depositAmount, balanceAmount, isCloseIn;
+          if (isDirectBooking && existingBooking && existingBooking.deposit_amount !== undefined && existingBooking.deposit_amount !== null) {
+            depositAmount = parseFloat(existingBooking.deposit_amount);
+            balanceAmount = totalPrice - depositAmount;
+            isCloseIn = depositAmount >= totalPrice;
+          } else {
+            isCloseIn = daysUntilTravel <= 30;
+            depositAmount = isCloseIn ? totalPrice : (totalPrice * 0.3);
+            balanceAmount = isCloseIn ? 0 : (totalPrice * 0.7);
+          }
 
           return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
@@ -538,19 +511,29 @@ const BookingPaymentPage = () => {
                     <span>SSL Encrypted Transaction</span>
                   </div>
 
-                  <DummyCheckoutForm
-                    amount={depositAmount.toFixed(2)}
-                    onPay={handlePay}
-                    processing={processing}
-                  />
+                  <button
+                    onClick={handlePay}
+                    disabled={processing || !payhereReady}
+                    className="btn-primary"
+                    style={{ width: '100%', marginTop: '2rem', padding: '1rem', fontSize: '1.1rem', background: payhereReady ? '#0055ff' : '#aaa', cursor: payhereReady ? 'pointer' : 'not-allowed' }}
+                  >
+                    {processing
+                      ? "Opening Payment Gateway..."
+                      : !payhereReady
+                      ? "Loading Payment Gateway..."
+                      : `Pay $${depositAmount.toFixed(2)} Securely`}
+                  </button>
+                  <p style={{ fontSize: '0.8rem', color: '#666', textAlign: 'center', marginTop: '1rem' }}>
+                    Powered by <strong>PayHere</strong>. We do not store your credit card details.
+                  </p>
 
                   <button
-                    onClick={() => isDirectBooking ? navigate('/custom-tours') : navigate(`/booking/${id}/travellers`)}
+                    onClick={() => isDirectBooking ? navigate(-1) : navigate(`/booking/${id}/travellers`)}
                     className="btn-secondary"
                     style={{ marginTop: '1rem', width: '100%', background: 'transparent', color: '#666', border: '1px solid #ddd' }}
                     disabled={processing}
                   >
-                    {isDirectBooking ? "Back to Custom Tours" : "Back to Travellers"}
+                    {isDirectBooking ? "Go Back" : "Back to Travellers"}
                   </button>
                 </div>
               </div>

@@ -54,7 +54,7 @@
 
 .guide-availability-subtitle {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -127,7 +127,7 @@
 
 /* === SECTION CARDS === */
 .section-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
@@ -146,7 +146,7 @@
 .section-card-header h2 {
   font-size: 1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -171,7 +171,7 @@
   gap: 0.4rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .legend-dot {
@@ -217,7 +217,7 @@
   height: 36px;
   background: transparent;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   font-size: 0.875rem;
   border-radius: 8px;
 }
@@ -232,7 +232,7 @@
   text-transform: uppercase;
   font-weight: 700;
   font-size: 0.65rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   padding: 0.5rem 0;
 }
 
@@ -243,7 +243,7 @@
 .react-calendar__tile {
   padding: 0.6rem 0.25rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   border-radius: 8px !important;
   aspect-ratio: 1;
@@ -276,14 +276,14 @@
 }
 
 .react-calendar__tile:disabled {
-  background: #f9fafb;
+  background: var(--color-bg-card);
   color: #d1d5db;
   cursor: not-allowed;
 }
 
 .calendar-hint {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   text-align: center;
   margin-top: 1rem;
   line-height: 1.6;
@@ -304,7 +304,7 @@
 .empty-schedule p {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -327,7 +327,7 @@
 }
 
 .schedule-list::-webkit-scrollbar-track {
-  background: #f9fafb;
+  background: var(--color-bg-card);
 }
 
 .schedule-list::-webkit-scrollbar-thumb {
@@ -339,7 +339,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f9fafb;
+  background: var(--color-bg-card);
   border: 1px solid #f3f4f6;
   border-radius: 12px;
   padding: 0.75rem 1rem;
@@ -347,7 +347,7 @@
 }
 
 .schedule-item:hover {
-  background: white;
+  background: var(--color-bg-card);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -386,7 +386,7 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -498,7 +498,7 @@
 
 .guide-availability-loading p {
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 

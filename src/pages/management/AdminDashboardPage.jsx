@@ -431,11 +431,11 @@ function AdminDashboardPage() {
             {stats?.revenueTrends?.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={stats.revenueTrends} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
-                  <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(val) => [`$${val}`, 'Revenue']} />
-                  <Area type="monotone" dataKey="revenue" stroke="#4f46e5" fill="#4f46e5" fillOpacity={0.1} strokeWidth={3} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(197, 160, 89, 0.08)" />
+                  <XAxis dataKey="name" stroke="var(--admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: 'rgba(10, 17, 30, 0.95)', border: '1px solid rgba(197, 160, 89, 0.3)', borderRadius: '12px', color: '#f8fafc' }} itemStyle={{ color: '#cbd5e1' }} labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }} formatter={(val) => [`$${val}`, 'Revenue']} />
+                  <Area type="monotone" dataKey="revenue" stroke="var(--admin-primary)" fill="var(--admin-primary)" fillOpacity={0.1} strokeWidth={3} />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
@@ -462,12 +462,12 @@ function AdminDashboardPage() {
                     dataKey="value"
                   >
                     {stats.bookingDistribution.map((entry, index) => {
-                      const colors = { confirmed: '#10b981', pending: '#f59e0b', completed: '#3b82f6', cancelled: '#ef4444' };
+                      const colors = { confirmed: 'var(--admin-success)', pending: 'var(--admin-warning)', completed: 'var(--admin-primary)', cancelled: 'var(--admin-danger)' };
                       return <Cell key={`cell-${index}`} fill={colors[entry.name.toLowerCase()] || '#94a3b8'} />;
                     })}
                   </Pie>
-                  <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                  <Legend formatter={(value) => <span style={{ textTransform: 'capitalize', color: '#4b5563' }}>{value}</span>} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: 'rgba(10, 17, 30, 0.95)', border: '1px solid rgba(197, 160, 89, 0.3)', borderRadius: '12px', color: '#f8fafc' }} itemStyle={{ color: '#cbd5e1' }} />
+                  <Legend formatter={(value) => <span style={{ textTransform: 'capitalize', color: 'var(--admin-text-secondary)' }}>{value}</span>} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -487,25 +487,25 @@ function AdminDashboardPage() {
               <BarChart data={stats.topPackages} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <defs>
                   <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ec4899" stopOpacity={1}/>
-                    <stop offset="100%" stopColor="#be185d" stopOpacity={0.8}/>
+                    <stop offset="0%" stopColor="var(--admin-primary)" stopOpacity={1}/>
+                    <stop offset="100%" stopColor="#a38241" stopOpacity={0.7}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(197, 160, 89, 0.08)" />
                 <XAxis 
                   dataKey="name" 
                   angle={-45} 
                   textAnchor="end" 
                   height={80} 
-                  stroke="#6b7280" 
+                  stroke="var(--admin-text-muted)" 
                   fontSize={11} 
                   tickLine={false} 
                   axisLine={false} 
                 />
-                <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
                 <RechartsTooltip 
-                  cursor={{ fill: 'rgba(236, 72, 153, 0.05)' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  cursor={{ fill: 'rgba(197, 160, 89, 0.05)' }}
+                  contentStyle={{ backgroundColor: 'rgba(10, 17, 30, 0.95)', border: '1px solid rgba(197, 160, 89, 0.3)', borderRadius: '12px', color: '#f8fafc' }} itemStyle={{ color: '#cbd5e1' }} labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
                 />
                 <Bar 
                   dataKey="bookings" 
@@ -825,19 +825,21 @@ function AdminDashboardPage() {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: '1rem' }} onClick={() => setShowConfirmModal(false)}>
-          <div style={{ backgroundColor: '#fff', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-xl)', maxWidth: '28rem', width: '100%', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '500', marginBottom: '0.5rem' }}>Confirm Action</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-500)', marginBottom: '1.5rem' }}>{confirmMessage}</p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-container" style={{ maxWidth: '450px', padding: '2rem' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', fontFamily: 'Outfit, sans-serif', color: 'var(--admin-text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Confirm Action</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--admin-text-secondary)', lineHeight: '1.5', marginBottom: '2rem' }}>{confirmMessage}</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
               <button
-                style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--color-gray-100)', color: 'var(--color-gray-700)', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+                className="btn btn-success"
+                style={{ height: '2.5rem', padding: '0 1.25rem' }}
                 onClick={() => setShowConfirmModal(false)}
               >
                 Cancel
               </button>
               <button
-                style={{ padding: '0.5rem 1rem', backgroundColor: '#4f46e5', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+                className="btn btn-primary"
+                style={{ height: '2.5rem', padding: '0 1.25rem' }}
                 onClick={() => {
                   if (confirmAction) confirmAction();
                 }}

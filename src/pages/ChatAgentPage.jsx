@@ -14,19 +14,85 @@ import axios from "axios";
 import { chatAPI } from "../services/api";
 import "./ChatAgentPage.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? "http://localhost:5000/api" 
+    : "/api");
 
-// ─── Hero Image Mapping ────────────────────────────────────────────────────────
+// ─── Hero Image Mapping ─── (Supabase-hosted assets)
 const HERO_IMAGES = {
-  sigiriya: "/ai-tours/sigiriya.png",
-  ella: "/ai-tours/ella.png",
-  beach: "/ai-tours/beach.png",
-  mirissa: "/ai-tours/beach.png",
-  bentota: "/ai-tours/beach.png",
-  yala: "/ai-tours/yala.png",
-  safari: "/ai-tours/yala.png",
-  default: "/ai-tours/sigiriya.png"
+  sigiriya:  "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  ella:      "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/Ella.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvRWxsYS5wbmciLCJpYXQiOjE3Njg1ODY2MzEsImV4cCI6MTgwMDEyMjYzMX0.IeMAt_w-TgDGBIDv6kDt7Y2FFf9CjfDVN6wN5n5Qrdo",
+  kandy:     "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/kandy.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMva2FuZHkucG5nIiwiaWF0IjoxNzY4NTg2NjU1LCJleHAiOjE4MDAxMjI2NTV9.v-Hpb3q5bbyAWt2e-FdMhCjMQbtRtTRrl3c1tkmqug0",
+  nuwara:    "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/nuwaraeliya.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvbnV3YXJhZWxpeWEucG5nIiwiaWF0IjoxNzY4NTg2Njc3LCJleHAiOjE4MDAxMjI2Nzd9.TOhXfG0ELcdYtm_kA3TURlVIfhO-wdgSaFuAYQgbN7s",
+  tea:       "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/nuwaraeliya.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvbnV3YXJhZWxpeWEucG5nIiwiaWF0IjoxNzY4NTg2Njc3LCJleHAiOjE4MDAxMjI2Nzd9.TOhXfG0ELcdYtm_kA3TURlVIfhO-wdgSaFuAYQgbN7s",
+  // beach/coastal/wildlife → Sigiriya as scenic fallback until beach image is added
+  beach:     "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  mirissa:   "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  bentota:   "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  yala:      "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  safari:    "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/destinations/sigiriyaRock.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9kZXN0aW5hdGlvbnMvc2lnaXJpeWFSb2NrLnBuZyIsImlhdCI6MTc2ODU4NjYwMSwiZXhwIjoxODAwMTIyNjAxfQ.kJbe9kw-E0sHyWzKD1iHnkYNS5YBIkp-nezrLGprqbM",
+  default:   "https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/hero/hero%20image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9oZXJvL2hlcm8gaW1hZ2UucG5nIiwiaWF0IjoxNzY5NTEzOTYyLCJleHAiOjE4MDEwNDk5NjJ9.Gk4tkmnz9yqSbqlnr2KSiDhPYcbUARemGZdapthaaYY",
 };
+
+// ─── Interactive Map Coordinate Mappings ───
+const CITY_COORDS = {
+  colombo: { x: 50, y: 155, label: "Colombo" },
+  negombo: { x: 45, y: 135, label: "Negombo" },
+  sigiriya: { x: 90, y: 80, label: "Sigiriya" },
+  dambulla: { x: 85, y: 85, label: "Dambulla" },
+  anuradhapura: { x: 80, y: 55, label: "Anuradhapura" },
+  trincomalee: { x: 120, y: 50, label: "Trincomalee" },
+  jaffna: { x: 50, y: 15, label: "Jaffna" },
+  kandy: { x: 92, y: 110, label: "Kandy" },
+  nuwara: { x: 95, y: 128, label: "Nuwara Eliya" },
+  "nuwara eliya": { x: 95, y: 128, label: "Nuwara Eliya" },
+  ella: { x: 112, y: 135, label: "Ella" },
+  yala: { x: 125, y: 165, label: "Yala" },
+  galle: { x: 65, y: 188, label: "Galle" },
+  mirissa: { x: 80, y: 190, label: "Mirissa" },
+  bentota: { x: 52, y: 172, label: "Bentota" },
+  hikkaduwa: { x: 58, y: 180, label: "Hikkaduwa" },
+  arugam: { x: 140, y: 140, label: "Arugam Bay" },
+  "arugam bay": { x: 140, y: 140, label: "Arugam Bay" },
+};
+
+// ─── Dynamic Experience Guide Matcher ───
+const selectGuide = (tags = []) => {
+  const t = (tags || []).map(tag => tag.toLowerCase());
+  if (t.some(tag => tag.includes('culture') || tag.includes('history') || tag.includes('heritage') || tag.includes('temple'))) {
+    return {
+      name: "Dinesh Perera",
+      role: "Senior Heritage Specialist Guide",
+      rating: "4.95",
+      reviews: "184",
+      languages: "English, German, Sinhala",
+      bio: "12+ years detailing the stories of Sigiriya, Polonnaruwa, and the Kandyan Kingdom. Passionate historian.",
+      avatar: "🏛️"
+    };
+  }
+  if (t.some(tag => tag.includes('safari') || tag.includes('wildlife') || tag.includes('yala') || tag.includes('nature') || tag.includes('national'))) {
+    return {
+      name: "Ruwan Silva",
+      role: "Wildlife Specialist & Chauffeur Guide",
+      rating: "4.92",
+      reviews: "142",
+      languages: "English, Italian, Sinhala",
+      bio: "Avid naturalist specializing in Yala leopard tracing and elephant biology. Dedicated nature chauffeur.",
+      avatar: "🐆"
+    };
+  }
+  return {
+    name: "Nihal Jayasinghe",
+    role: "Coastal Experience Chauffeur Guide",
+    rating: "4.98",
+    reviews: "216",
+    languages: "English, French, Sinhala",
+    bio: "Surf enthusiast and southern coast expert. Best spots for Mirissa whale watching and Galle boutique stays.",
+    avatar: "🌊"
+  };
+};
+
 
 // ─── Signature Seal Component ──────────────────────────────────────────────────
 const SignatureSeal = () => (
@@ -227,6 +293,32 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
   const dailyPlan = draft.daily_plan || [];
   const days = draft.duration_days || dailyPlan.length || 7;
 
+  const [hoveredDay, setHoveredDay] = useState(null);
+
+  // ─── Parse Route Coordinates for Map ───
+  const activeRoutePoints = (draft.route || [])
+    .map(city => {
+      const key = city.toLowerCase().trim();
+      for (const name in CITY_COORDS) {
+        if (key.includes(name)) return CITY_COORDS[name];
+      }
+      return null;
+    })
+    .filter(p => p !== null);
+
+  // Build route path line
+  let pathD = "";
+  activeRoutePoints.forEach((pt, idx) => {
+    if (idx === 0) pathD += `M ${pt.x} ${pt.y}`;
+    else pathD += ` L ${pt.x} ${pt.y}`;
+  });
+
+  const hoveredPoint = hoveredDay !== null && dailyPlan[hoveredDay]
+    ? activeRoutePoints.find(p => dailyPlan[hoveredDay].location.toLowerCase().includes(p.label.toLowerCase().slice(0, 4)))
+    : null;
+
+  const recommendedGuide = selectGuide(draft.experience_tags);
+
   // ─── PDF Download ────────────────────────────────────────────────────────────
   const downloadProposalAsPDF = async () => {
     try {
@@ -308,13 +400,13 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
         </div>
 
         {/* 1. Cinematic Hero */}
-        <div className="hero-section">
-          <img src={getHeroImage(draft.route)} alt="Tour Hero" className="hero-image" />
-          <div className="hero-overlay"></div>
-          <div className="hero-content">
-            <div className="hero-badge"><Sparkles size={12} /> SIGNATURE AI DESIGN</div>
-            <h2 className="hero-title">{draft.title || `${days}-Day Sri Lanka Experience`}</h2>
-            <div className="hero-meta">
+        <div className="proposal-hero-section">
+          <img src={getHeroImage(draft.route)} alt="Tour Hero" className="proposal-hero-image" />
+          <div className="proposal-hero-overlay"></div>
+          <div className="proposal-hero-content">
+            <div className="proposal-hero-badge"><Sparkles size={12} /> SIGNATURE AI DESIGN</div>
+            <h2 className="proposal-hero-title">{draft.title || `${days}-Day Sri Lanka Experience`}</h2>
+            <div className="proposal-hero-meta">
               <span className="meta-item"><Clock size={16} /> {days} Days</span>
               <span className="meta-item"><Users size={16} /> {draft.group_type || "Couple"}</span>
             </div>
@@ -387,23 +479,124 @@ const ProposalCard = ({ draft, onSendToTeam, onModify, onChange }) => {
           </button>
           
           {isItineraryExpanded && (
-            <div className="itinerary-scroll-v3">
-              {dailyPlan.map((day, idx) => (
-                <div key={idx} className="day-card-v3">
-                  <div className="day-label-v3">DAY {idx + 1}</div>
-                  <div className="day-info-v3">
-                    <h5>{day.location}</h5>
-                    <div className="day-acts-v3">
-                       {day.activities?.map((act, i) => (
-                         <span key={i} className="act-dot">✦ {act}</span>
-                       ))}
+            <div className="itinerary-details-expanded-v3">
+              {/* Dynamic Interactive SVG Sri Lanka Route Map */}
+              <div className="route-map-container-v3">
+                 <div className="map-header-v3">
+                    <span className="map-title-v3">🗺️ Interactive Journey Map</span>
+                    <span className="map-hint-v3">Hover over days below to track stops</span>
+                 </div>
+                 <div className="map-canvas-v3">
+                    <svg width="100%" height="220" viewBox="0 0 200 220" className="sri-lanka-svg">
+                       <defs>
+                          <filter id="glow-gold" x="-20%" y="-20%" width="140%" height="140%">
+                             <feGaussianBlur stdDeviation="3" result="blur" />
+                             <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                          </filter>
+                       </defs>
+                       
+                       {/* Abstract minimal tear-drop path of Sri Lanka */}
+                       <path 
+                          d="M95,15 C115,35 135,65 170,105 C180,125 185,145 165,170 C145,190 125,205 105,207 C85,205 70,185 65,165 C60,145 55,125 65,95 C70,80 75,50 95,15 Z" 
+                          fill="rgba(197, 160, 89, 0.04)" 
+                          stroke="rgba(197, 160, 89, 0.18)" 
+                          strokeWidth="1.5" 
+                          strokeDasharray="4 3" 
+                       />
+                       
+                       {/* Connection Path line */}
+                       {activeRoutePoints.length > 1 && (
+                          <path 
+                             d={pathD} 
+                             stroke="var(--gold-primary)" 
+                             strokeWidth="1.8" 
+                             fill="none" 
+                             strokeDasharray="4 4" 
+                             className="glowing-route-line" 
+                          />
+                       )}
+                       
+                       {/* City Markers & Labels */}
+                       {activeRoutePoints.map((pt, idx) => {
+                          const isCurrentlyHovered = hoveredPoint && hoveredPoint.label === pt.label;
+                          return (
+                             <g key={idx} className="map-node-group">
+                                {isCurrentlyHovered && (
+                                   <circle cx={pt.x} cy={pt.y} r="10" fill="none" stroke="var(--gold-primary)" strokeWidth="1.5" className="map-pulse" />
+                                )}
+                                <circle 
+                                   cx={pt.x} 
+                                   cy={pt.y} 
+                                   r={isCurrentlyHovered ? "6" : "4"} 
+                                   fill={idx === 0 ? "#10b981" : "var(--gold-primary)"} 
+                                   stroke="#030812" 
+                                   strokeWidth="1.5" 
+                                />
+                                <text 
+                                   x={pt.x + 8} 
+                                   y={pt.y + 3} 
+                                   fontSize="8" 
+                                   fill={isCurrentlyHovered ? "#ffffff" : "var(--slate-400)"} 
+                                   fontWeight={isCurrentlyHovered ? "bold" : "500"}
+                                   className="map-node-label"
+                                >
+                                   {pt.label}
+                                </text>
+                             </g>
+                          );
+                       })}
+                    </svg>
+                 </div>
+              </div>
+
+              {/* Day-by-Day scroll container with Hover interactions */}
+              <div className="itinerary-scroll-v3">
+                {dailyPlan.map((day, idx) => (
+                  <div 
+                    key={idx} 
+                    className="day-card-v3"
+                    onMouseEnter={() => setHoveredDay(idx)}
+                    onMouseLeave={() => setHoveredDay(null)}
+                  >
+                    <div className="day-label-v3">DAY {idx + 1}</div>
+                    <div className="day-info-v3">
+                      <h5>{day.location}</h5>
+                      <div className="day-acts-v3">
+                         {day.activities?.map((act, i) => (
+                           <span key={i} className="act-dot">✦ {act}</span>
+                         ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>
+
+        {/* Recommended Guide Profile Card */}
+        {recommendedGuide && (
+          <div className="proposal-guide-section-v3">
+            <div className="guide-header-v3">
+               <Award size={16} className="guide-award-icon" />
+               <h4>Recommended Specialty Guide</h4>
+            </div>
+            <div className="guide-card-v3">
+               <div className="guide-avatar-v3">
+                  {recommendedGuide.avatar}
+               </div>
+               <div className="guide-info-v3">
+                  <div className="guide-meta-v3">
+                     <h5>{recommendedGuide.name}</h5>
+                     <span className="guide-rating-v3">★ {recommendedGuide.rating} ({recommendedGuide.reviews} reviews)</span>
+                  </div>
+                  <p className="guide-role-v3">{recommendedGuide.role}</p>
+                  <p className="guide-languages-v3">🗣️ Speakes: {recommendedGuide.languages}</p>
+                  <p className="guide-bio-v3">"{recommendedGuide.bio}"</p>
+               </div>
+            </div>
+          </div>
+        )}
 
         {/* 5. Master Actions */}
          <div className="proposal-footer-v3">
@@ -444,21 +637,21 @@ const WeatherCard = ({ weather }) => {
   if (!weather) return null;
   const isGood = weather.is_good_for_travel;
   return (
-    <div className={`weather-card ${isGood ? "good" : "bad"}`} style={{ padding: '16px', borderRadius: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-      <div className="weather-head" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-        {isGood ? <Sun size={20} color="#f59e0b" /> : <CloudRain size={20} color="#0ea5e9" />}
+    <div className={`weather-card-premium ${isGood ? "good" : "bad"}`}>
+      <div className="weather-head-premium">
+        {isGood ? <Sun size={20} className="weather-sun-icon" /> : <CloudRain size={20} className="weather-rain-icon" />}
         <div className="w-city">
-          <strong style={{ display: 'block', fontSize: '0.9rem' }}>{weather.city}</strong>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{weather.condition}</span>
+          <strong className="weather-city-name">{weather.city}</strong>
+          <span className="weather-city-condition">{weather.condition}</span>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: '50px', background: isGood ? '#f0fdf4' : '#fef2f2', color: isGood ? '#166534' : '#991b1b' }}>
+        <span className={`weather-badge-premium ${isGood ? "good" : "bad"}`}>
           {isGood ? "PERFECT CONDITIONS" : "CHECK FORECAST"}
         </span>
       </div>
-      <div className="w-stats" style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: '#475569' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Thermometer size={12} /> {weather.temperature_c}°</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Droplets size={12} /> {weather.humidity}% Humidity</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Wind size={12} /> {weather.wind_kph}km/h</span>
+      <div className="weather-stats-premium">
+        <span><Thermometer size={13} /> {weather.temperature_c}°C</span>
+        <span><Droplets size={13} /> {weather.humidity}% Humidity</span>
+        <span><Wind size={13} /> {weather.wind_kph} km/h</span>
       </div>
     </div>
   );
@@ -707,7 +900,15 @@ const ChatAgentPage = () => {
         
         <header className="chat-header">
           <div className="header-ai">
-            <div className="avatar-orb"><Sparkles size={20} /></div>
+            <div className="chat-logo-wrapper">
+              <img
+                src="https://exfyprnpkplhzuuloebf.supabase.co/storage/v1/object/sign/tour-images/tour-images/Logo.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zMzVhYmI2Ny1lZDVkLTQ0MDktOGNiNS0wNGI4MjgzZGUxNmYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0b3VyLWltYWdlcy90b3VyLWltYWdlcy9Mb2dvLmpwZyIsImlhdCI6MTc3MDEzMzM2MywiZXhwIjoxOTI3ODEzMzYzfQ.2qbZSGwqCn0kGlcKWf8B1p5BQzYFVnUeXXJy-k2mRIA"
+                alt="I GO LANKA TOURS"
+                className="chat-header-logo"
+                onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+              />
+              <div className="avatar-orb avatar-orb-fallback" style={{display:'none'}}><Sparkles size={20} /></div>
+            </div>
             <div className="header-text">
               <h1>I GO LANKA <span className="ai-tag">SIGNATURE AI</span></h1>
               <p>Designing your bespoke journey to Sri Lanka</p>
@@ -751,7 +952,7 @@ const ChatAgentPage = () => {
             <div key={msg.id} className={`message-frame ${msg.sender}`}>
               
                 {msg.sender === "assistant" && (
-                    <div className="ai-mini-header" style={{ fontSize: '0.65rem', fontWeight: 900, color: '#c5a059', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div className="ai-mini-header">
                         <Bot size={14} /> <span>SIGNATURE AI AGENT</span>
                     </div>
                 )}

@@ -5,7 +5,7 @@
     margin-top: 8px;
     width: 380px;
     max-height: 500px;
-    background: white;
+    background: var(--color-bg-card);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1000;
@@ -19,15 +19,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f9fafb;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--color-bg-card);
 }
 
 .notification-header h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .notification-actions {
@@ -44,13 +44,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--color-text-muted);
     transition: all 0.2s ease;
 }
 
 .notification-action-btn:hover {
     background-color: #e5e7eb;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .notification-list {
@@ -67,7 +67,7 @@
     justify-content: center;
     padding: 40px 20px;
     text-align: center;
-    color: #6b7280;
+    color: var(--color-text-muted);
 }
 
 .notification-loading-icon,
@@ -92,12 +92,12 @@
 .notification-empty p {
     margin: 0 0 4px 0;
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 .notification-empty span {
     font-size: 14px;
-    color: #9ca3af;
+    color: var(--color-text-muted);
 }
 
 .notification-item {
@@ -111,7 +111,7 @@
 }
 
 .notification-item:hover {
-    background-color: #f9fafb;
+    background-color: var(--color-bg-card);
 }
 
 .notification-item.unread {
@@ -159,7 +159,7 @@
 
 .notification-icon-wrapper.warning {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #1e293b;
+    color: var(--color-text-primary);
     box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
 }
 
@@ -188,13 +188,13 @@
     margin: 0 0 4px 0;
     font-size: 14px;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .notification-content p {
     margin: 0 0 8px 0;
     font-size: 13px;
-    color: #4b5563;
+    color: var(--color-text-secondary);
     line-height: 1.4;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -205,7 +205,7 @@
 
 .notification-time {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--color-text-muted);
 }
 
 .notification-delete {
@@ -214,7 +214,7 @@
     cursor: pointer;
     padding: 6px;
     border-radius: 6px;
-    color: #9ca3af;
+    color: var(--color-text-muted);
     transition: all 0.2s ease;
     opacity: 0;
 }
@@ -230,15 +230,15 @@
 
 .notification-footer {
     padding: 12px 20px;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
+    border-top: 1px solid var(--glass-border);
+    background: var(--color-bg-card);
 }
 
 .notification-footer button {
     width: 100%;
     padding: 10px;
     background: none;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--glass-border);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;

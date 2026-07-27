@@ -65,6 +65,7 @@ import AdminProfilePage from './pages/management/AdminProfilePage';
 import AdminManagementPage from './pages/management/AdminManagementPage';
 import AdminPricingRulesPage from './pages/management/AdminPricingRulesPage';
 import AdminCouponsPage from './pages/management/AdminCouponsPage';
+import AdminPromotionsPage from './pages/management/AdminPromotionsPage';
 import AdminPayoutsPage from './pages/management/AdminPayoutsPage';
 import AdminFAQPage from './pages/management/AdminFAQPage';
 import AdminAuditLogsPage from './pages/management/AdminAuditLogsPage';
@@ -91,28 +92,28 @@ import GuideRejectedPage from './pages/guide/GuideRejectedPage';
  * @module App
  */
 function App() {
-  // Validate session on app load
+  // Silently refresh session token on app load (best-effort, never force-logout)
   useEffect(() => {
     const validateSession = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
       try {
-        // @API_CALL: Attempt silent token refresh to extend session
-        console.log('🔄 [App] Validating session via refresh token...');
+        console.log('🔄 [App] Attempting silent session refresh...');
         const result = await authAPI.refreshToken();
-        
-        if (!result.success) {
-          // @ERROR_HANDLING: Token expired or invalid, force logout
-          console.warn('⚠️ [App] Session refresh failed, logging out');
-          authAPI.logout();
-        } else {
+
+        if (result.success) {
           console.log('✅ [App] Session renewed');
           localStorage.setItem('loginTimestamp', Date.now().toString());
+        } else {
+          // Refresh cookie missing or expired — but DO NOT logout.
+          // The existing access token (15 min TTL) is still valid.
+          // The user will be naturally logged out when they hit a 401 on a real API call.
+          console.warn('⚠️ [App] Silent refresh skipped (cookie unavailable cross-origin) — keeping existing session');
         }
       } catch (err) {
-        // @ERROR_HANDLING: Persistent network/server error
-        console.error('❌ [App] Session validation error:', err);
+        // Network error — do nothing, keep user logged in
+        console.warn('⚠️ [App] Session refresh network error — keeping existing session:', err.message);
       }
     };
 
@@ -143,6 +144,7 @@ function App() {
             <Route path="admins" element={<AdminManagementPage />} />
             <Route path="pricing-rules" element={<AdminPricingRulesPage />} />
             <Route path="coupons" element={<AdminCouponsPage />} />
+            <Route path="promotions" element={<AdminPromotionsPage />} />
             <Route path="payouts" element={<AdminPayoutsPage />} />
             <Route path="faqs" element={<AdminFAQPage />} />
             <Route path="audit-logs" element={<AdminAuditLogsPage />} />

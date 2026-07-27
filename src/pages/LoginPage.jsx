@@ -10,10 +10,24 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { authAPI } from "../services/api";
 import Card from "../components/shared/Card";
 import Button from "../components/shared/Button";
 import "./LoginPage.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 25 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+};
 
 /**
  * LoginPage Component
@@ -121,25 +135,41 @@ const LoginPage = () => {
 
   return (
     <main className="login-page">
-      <div className="login-container">
+      {/* Ambient blurs */}
+      <div className="login-ambient-glow-1"></div>
+      <div className="login-ambient-glow-2"></div>
+
+      <motion.div 
+        className="login-container"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
         <Card className="login-card" padding="large">
-          <div className="login-header">
-            <h1 className="login-title">Welcome Back</h1>
+          <motion.div className="login-header" variants={fadeUp}>
+            <h1 className="login-title">Welcome <span>Back</span></h1>
             <p className="login-subtitle">Sign in to your account to continue</p>
             <p className="login-info-text">
               Tourist and Admin login supported
             </p>
-          </div>
+          </motion.div>
 
-          {error && (
-            <div className="login-error">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div 
+                className="login-error"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <AlertCircle size={18} />
+                <span>{error}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleSubmit} className="login-form">
-            <div className="login-form-group">
+            <motion.div className="login-form-group" variants={fadeUp}>
               <label className="login-label">
                 <Mail size={18} />
                 <span>Email Address</span>
@@ -153,9 +183,9 @@ const LoginPage = () => {
                 placeholder="your.email@example.com"
                 autoComplete="email"
               />
-            </div>
+            </motion.div>
 
-            <div className="login-form-group">
+            <motion.div className="login-form-group" variants={fadeUp}>
               <label className="login-label">
                 <Lock size={18} />
                 <span>Password</span>
@@ -179,34 +209,36 @@ const LoginPage = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="login-forgot">
+            <motion.div className="login-forgot" variants={fadeUp}>
               <Link to="/forgot-password" className="login-link">
                 Forgot password?
               </Link>
-            </div>
+            </motion.div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              loading={loading}
-              className="login-button-full"
-            >
-              Sign In
-            </Button>
+            <motion.div variants={fadeUp}>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                className="login-button-full"
+              >
+                Sign In
+              </Button>
+            </motion.div>
           </form>
 
-          <div className="login-footer">
+          <motion.div className="login-footer" variants={fadeUp}>
             <p className="login-footer-text">
               Don't have an account?{" "}
               <Link to="/register" className="login-link">
                 Create account
               </Link>
             </p>
-          </div>
+          </motion.div>
         </Card>
-      </div>
+      </motion.div>
     </main>
   );
 };

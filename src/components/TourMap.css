@@ -1,92 +1,229 @@
+/* 🎯 I GO LANKA TOURS - Premium TourMap Stylesheet */
+
 .tour-map-wrapper {
   position: relative;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(197, 160, 89, 0.05);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #030812;
+}
+
+.tour-map-wrapper:hover {
+  border-color: rgba(197, 160, 89, 0.45);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(197, 160, 89, 0.12);
 }
 
 .leaflet-container {
-  font-family: inherit;
+  font-family: 'Outfit', sans-serif !important;
+  background-color: #030812 !important;
 }
 
-.map-popup {
-  padding: 0.5rem;
-  min-width: 180px;
-}
-
-.map-popup h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-}
-
-.map-popup p {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.4;
-}
-
-.map-popup small {
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-style: italic;
-}
-
-/* Custom marker styles */
-.custom-marker {
+/* --- Premium Glowing Markers --- */
+.custom-premium-marker {
   background: transparent;
   border: none;
 }
 
-/* Leaflet popup customization */
+.marker-glowing-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.marker-core {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  position: relative;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.marker-core-inner {
+  width: 6px;
+  height: 6px;
+  background: #030812;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Double Ripple Pulse Animations */
+.marker-pulse-ring {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  background: transparent;
+  opacity: 0;
+  animation: markerPulse 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  z-index: 5;
+}
+
+.marker-pulse-ring-outer {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid;
+  background: transparent;
+  opacity: 0;
+  animation: markerPulseOuter 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  z-index: 4;
+  animation-delay: 0.4s;
+}
+
+@keyframes markerPulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes markerPulseOuter {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Hover Core Expansion */
+.custom-premium-marker:hover .marker-core {
+  transform: scale(1.35);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.9) !important;
+  border-color: #ffffff;
+}
+
+/* --- Premium Glassmorphic Popups --- */
 .leaflet-popup-content-wrapper {
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background: rgba(10, 15, 30, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(197, 160, 89, 0.25) !important;
+  color: #f3f4f6 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 160, 89, 0.05) !important;
+  padding: 0.5rem 0.25rem !important;
 }
 
 .leaflet-popup-tip {
-  background: white;
+  background: rgba(10, 15, 30, 0.85) !important;
+  border-left: 1px solid rgba(197, 160, 89, 0.25) !important;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.25) !important;
+  box-shadow: none !important;
 }
 
-/* Zoom control styling */
+.map-popup {
+  padding: 0.4rem 0.6rem;
+  min-width: 200px;
+}
+
+.map-popup h4 {
+  font-family: "Outfit", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-accent-light, #f5d08b) !important;
+  margin: 0 0 0.5rem 0;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+  padding-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+
+.map-popup p {
+  font-size: 0.875rem;
+  color: #e5e7eb !important;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.5;
+}
+
+.map-popup small {
+  font-size: 0.75rem;
+  color: var(--color-accent, #c5a059) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-style: normal !important;
+}
+
+/* --- Premium Zoom Controls --- */
 .leaflet-control-zoom {
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(197, 160, 89, 0.2) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
 }
 
 .leaflet-control-zoom a {
-  border-radius: 6px !important;
+  background: rgba(10, 15, 30, 0.85) !important;
+  color: var(--color-accent, #c5a059) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   border: none !important;
-  color: #374151 !important;
-  font-size: 20px !important;
-  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background: #f3f4f6 !important;
-  color: #d97706 !important;
+  background: rgba(197, 160, 89, 0.2) !important;
+  color: #ffffff !important;
 }
 
-/* Attribution */
+/* --- Sleek Attribution --- */
 .leaflet-control-attribution {
-  font-size: 10px;
-  background: rgba(255, 255, 255, 0.9) !important;
+  font-size: 9px !important;
+  background: rgba(3, 8, 18, 0.8) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  border-top-left-radius: 8px;
+  border-left: 1px solid rgba(197, 160, 89, 0.15) !important;
+  border-top: 1px solid rgba(197, 160, 89, 0.15) !important;
 }
 
-/* Responsive adjustments */
+.leaflet-control-attribution a {
+  color: rgba(197, 160, 89, 0.5) !important;
+  text-decoration: none;
+}
+
+.leaflet-control-attribution a:hover {
+  text-decoration: underline;
+}
+
+/* --- Responsive Layout adjustments --- */
 @media (max-width: 768px) {
   .map-popup {
-    min-width: 150px;
+    min-width: 160px;
+    padding: 0.25rem 0.4rem;
   }
 
   .map-popup h4 {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
   }
 
   .map-popup p {
-    font-size: 0.75rem;
+    font-size: 0.775rem;
   }
 }

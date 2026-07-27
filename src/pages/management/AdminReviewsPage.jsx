@@ -39,7 +39,7 @@ function AdminReviewsPage() {
   const role = localStorage.getItem("userRole");
 
   useEffect(() => {
-    if (!token || role !== "admin") {
+    if (!token || (role !== "admin" && role !== "superadmin")) {
       navigate("/login");
       return;
     }

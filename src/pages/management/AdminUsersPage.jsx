@@ -38,7 +38,7 @@ function AdminUsersPage() {
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
-    if (!token || role !== "admin") { navigate("/login"); return; }
+    if (!token || (role !== "admin" && role !== "superadmin")) { navigate("/login"); return; }
     fetchUsers();
   }, [navigate]);
 

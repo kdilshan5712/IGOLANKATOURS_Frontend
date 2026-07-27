@@ -190,7 +190,7 @@ const GuideBookingsPage = () => {
 
               <div className="tourist-info">
                 <h4>Tourist Information</h4>
-                <div className="tourist-details" style={{ flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                <div className="tourist-details">
                   <div className="detail-row">
                     <User size={16} />
                     <span>{booking.tourist_name || 'N/A'}</span>
@@ -198,29 +198,6 @@ const GuideBookingsPage = () => {
                   <button
                     onClick={() => setActiveChatBookingId(booking.booking_id)}
                     className="chat-btn"
-                    style={{
-                      background: '#eff6ff',
-                      color: '#2563eb',
-                      border: '1px solid #bfdbfe',
-                      padding: '8px 16px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      transition: 'all 0.2s',
-                      marginTop: '4px'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = '#dbeafe';
-                      e.currentTarget.style.borderColor = '#93c5fd';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = '#eff6ff';
-                      e.currentTarget.style.borderColor = '#bfdbfe';
-                    }}
                   >
                     <MessageCircle size={16} />
                     Chat with Tourist
@@ -242,37 +219,23 @@ const GuideBookingsPage = () => {
                 </div>
               )}
 
-              <div className="assignment-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
-                <small style={{ color: '#6b7280' }}>
+              <div className="assignment-info">
+                <small className="assigned-date">
                   Assigned on {new Date(booking.guide_assigned_at).toLocaleDateString()}
                 </small>
                 {booking.status === 'confirmed' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                  <div className="completion-controls">
                     <button
                       onClick={() => handleMarkCompleted(booking.booking_id)}
                       disabled={submittingId === booking.booking_id || !isTourComplete(booking.travel_date, booking.duration)}
                       title={!isTourComplete(booking.travel_date, booking.duration) ? "Tour is not completed yet" : ""}
-                      style={{
-                        background: (!isTourComplete(booking.travel_date, booking.duration) || submittingId === booking.booking_id) ? '#9ca3af' : '#10b981',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '6px',
-                        cursor: (!isTourComplete(booking.travel_date, booking.duration) || submittingId === booking.booking_id) ? 'not-allowed' : 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        opacity: 1,
-                        transition: 'all 0.2s'
-                      }}
+                      className="complete-tour-btn"
                     >
                       <CheckCircle size={16} />
                       {submittingId === booking.booking_id ? 'Updating...' : 'Mark as Completed'}
                     </button>
                     {!isTourComplete(booking.travel_date, booking.duration) && (
-                      <small style={{ color: '#ef4444', fontSize: '11px' }}>
+                      <small className="completion-warning">
                         Tour not completed yet
                       </small>
                     )}

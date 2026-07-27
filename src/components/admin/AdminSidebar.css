@@ -1,4 +1,7 @@
-/* Sidebar Global */
+/* ==========================================================================
+   🎯 I GO LANKA TOURS - Admin Navigation Sidebar Stylesheet (Premium Dark)
+   ========================================================================== */
+
 .admin-sidebar {
     height: 100%;
     display: flex;
@@ -7,28 +10,34 @@
     color: var(--admin-text-primary);
 }
 
-/* Header */
+/* Sidebar Header */
 .sidebar-header {
     padding: 2.5rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     border-bottom: 1px solid var(--admin-glass-border);
-    background: #f8fafc;
+    background: rgba(3, 8, 18, 0.4);
 }
 
 .admin-avatar-wrapper {
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 1.25rem;
-    border: 2px solid #e2e8f0;
-    background: #ffffff;
+    border: 2px solid rgba(197, 160, 89, 0.3);
+    background: rgba(3, 8, 18, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.admin-avatar-wrapper:hover {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
 }
 
 .admin-avatar {
@@ -38,23 +47,27 @@
 }
 
 .sidebar-title {
+    font-family: 'Outfit', sans-serif;
     font-size: 1.15rem;
     font-weight: 800;
     color: var(--admin-text-primary);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-subtitle {
+    font-family: 'Outfit', sans-serif;
     font-size: 0.7rem;
     color: var(--admin-text-secondary);
     font-weight: 600;
     margin-top: 0.25rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
-/* Navigation */
+/* Navigation List */
 .sidebar-nav {
     flex: 1;
     overflow-y: auto;
@@ -70,43 +83,47 @@
     gap: 0.85rem;
     padding: 0.85rem 1.15rem;
     border-radius: var(--radius-lg);
+    font-family: 'Outfit', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--admin-text-secondary);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid transparent;
 }
 
 .nav-link:hover {
-    background: rgba(15, 23, 42, 0.05);
-    color: var(--admin-text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--admin-primary);
     transform: translateX(6px);
+    border-color: rgba(197, 160, 89, 0.1);
 }
 
 .nav-link.active {
-    background: rgba(129, 140, 248, 0.1);
-    border: 1px solid rgba(129, 140, 248, 0.3);
+    background: rgba(197, 160, 89, 0.12);
+    border: 1px solid rgba(197, 160, 89, 0.3);
     color: var(--admin-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(197, 160, 89, 0.1) inset;
+    font-weight: 600;
 }
 
 .nav-link.active .nav-icon {
     color: var(--admin-primary);
-    filter: drop-shadow(0 0 5px rgba(129, 140, 248, 0.5));
+    filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.6));
 }
 
 .nav-icon {
     width: 1.25rem;
     height: 1.25rem;
     stroke-width: 2px;
+    transition: all 0.3s ease;
 }
 
-/* Footer */
+/* Sidebar Footer */
 .sidebar-footer {
     padding: 1.5rem 1rem;
     border-top: 1px solid var(--admin-glass-border);
-    background: #f8fafc;
+    background: rgba(3, 8, 18, 0.4);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -118,10 +135,11 @@
     gap: 0.85rem;
     padding: 0.75rem 1.15rem;
     border-radius: var(--radius-lg);
+    font-family: 'Outfit', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     background: none;
     border: none;
     cursor: pointer;
@@ -134,8 +152,9 @@
 }
 
 .footer-link:hover {
-    background: rgba(15, 23, 42, 0.05);
-    color: var(--admin-text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--admin-primary);
+    transform: translateX(4px);
 }
 
 .logout-btn {
@@ -143,11 +162,12 @@
 }
 
 .logout-btn:hover {
-    background: rgba(248, 113, 113, 0.1);
+    background: rgba(239, 68, 68, 0.1);
     color: #fca5a5;
+    transform: translateX(4px);
 }
 
-/* Custom Scrollbar for Sidebar */
+/* Custom Scrollbar for Sidebar Nav */
 .sidebar-nav::-webkit-scrollbar {
     width: 4px;
 }
@@ -157,6 +177,10 @@
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(15, 23, 42, 0.1);
+    background: rgba(197, 160, 89, 0.2);
     border-radius: 10px;
-}
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(197, 160, 89, 0.4);
+}

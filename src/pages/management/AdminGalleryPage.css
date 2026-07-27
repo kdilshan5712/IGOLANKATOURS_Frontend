@@ -9,7 +9,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-  background: white;
+  background: var(--color-bg-card);
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -64,7 +64,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -136,7 +136,7 @@
   display: flex;
   gap: 15px;
   margin-bottom: 30px;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -166,7 +166,7 @@
 }
 
 .gallery-item {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -352,7 +352,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 15px;
   max-width: 600px;
   width: 90%;

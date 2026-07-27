@@ -10,8 +10,15 @@
 
 import { useState, useEffect } from "react";
 import { Star, Send, AlertCircle, CheckCircle, Camera, X } from "lucide-react";
-import { reviewAPI, packageAPI, bookingAPI } from "../services/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { reviewAPI, bookingAPI } from "../services/api";
 import "./ReviewForm.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 25 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
 
 /**
  * ReviewForm Component
@@ -189,17 +196,25 @@ const ReviewForm = ({ packageId = null }) => {
   const renderStars = () => {
     return Array.from({ length: 5 }, (_, index) => {
       const starValue = index + 1;
+      const isActive = starValue <= (hoveredRating || formData.rating);
       return (
-        <Star
+        <motion.div
           key={index}
-          size={32}
-          className="review-form-star"
-          fill={starValue <= (hoveredRating || formData.rating) ? "#d97706" : "none"}
-          color={starValue <= (hoveredRating || formData.rating) ? "#d97706" : "#d1d5db"}
-          onMouseEnter={() => setHoveredRating(starValue)}
-          onMouseLeave={() => setHoveredRating(0)}
-          onClick={() => setFormData({ ...formData, rating: starValue })}
-        />
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 450, damping: 12 }}
+          style={{ display: "inline-block", cursor: "pointer" }}
+        >
+          <Star
+            size={36}
+            className="review-form-star"
+            fill={isActive ? "var(--color-accent)" : "none"}
+            color={isActive ? "var(--color-accent)" : "var(--color-gray-400)"}
+            onMouseEnter={() => setHoveredRating(starValue)}
+            onMouseLeave={() => setHoveredRating(0)}
+            onClick={() => setFormData({ ...formData, rating: starValue })}
+          />
+        </motion.div>
       );
     });
   };
@@ -207,10 +222,10 @@ const ReviewForm = ({ packageId = null }) => {
   if (!token) {
     return (
       <div className="review-form-section">
-        <div className="review-form-card">
+        <div className="review-form-card notice-card">
           <div className="review-form-notice">
-            <AlertCircle size={24} />
-            <p>Please <a href="/login">log in</a> to submit a review</p>
+            <AlertCircle size={32} className="notice-icon" />
+            <p>Please <Link to="/login" className="login-accent-link">log in</Link> to submit a review and share your story.</p>
           </div>
         </div>
       </div>
@@ -220,9 +235,9 @@ const ReviewForm = ({ packageId = null }) => {
   return (
     <div className="review-form-section">
       <div className="review-form-header">
-        <h2 className="review-form-title">Review Your Tour</h2>
+        <h2 className="review-form-title">Review Your <span>Experience</span></h2>
         <p className="review-form-subtitle">
-          Share your experience with other travelers
+          Share your journey and inspire other travelers
         </p>
       </div>
 
@@ -249,19 +264,37 @@ const ReviewForm = ({ packageId = null }) => {
       </div>
 
       {reviewType === 'tour' && packages.length === 0 && !loading && (
-        <div className="review-form-warning">
+        <motion.div 
+          className="review-form-warning"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <AlertCircle size={20} />
           <p>You can only review packages you have booked and completed. We couldn't find any confirmed bookings in your history.</p>
-        </div>
+        </motion.div>
       )}
 
-      <form onSubmit={handleSubmit} className="review-form-card">
-        {message && (
-          <div className={`review-form-message review-form-message-${messageType}`}>
-            {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-            <p>{message}</p>
-          </div>
-        )}
+      <motion.form 
+        onSubmit={handleSubmit} 
+        className="review-form-card"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeUp}
+      >
+        <AnimatePresence>
+          {message && (
+            <motion.div 
+              className={`review-form-message review-form-message-${messageType}`}
+              initial={{ opacity: 0, height: 0, y: -10 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -10 }}
+            >
+              {messageType === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+              <p>{message}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {reviewType === 'tour' && !packageId && (
           <div className="review-form-group">
@@ -371,10 +404,10 @@ const ReviewForm = ({ packageId = null }) => {
           className="review-form-submit-btn"
           disabled={loading}
         >
-          <Send size={20} />
+          <Send size={18} />
           <span>{loading ? "Submitting..." : "Submit Review"}</span>
         </button>
-      </form>
+      </motion.form>
     </div>
   );
 };

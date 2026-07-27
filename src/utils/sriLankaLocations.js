@@ -57,8 +57,7 @@ export const SRI_LANKA_LOCATIONS = {
     "Kitulgala": { lat: 6.9934, lng: 80.4230 },
     "Tissamaharama": { lat: 6.2800, lng: 81.2875 },
     "Habarana": { lat: 8.0333, lng: 80.7500 },
-    "Arugambe": { lat: 6.8408, lng: 81.8317 }, // Alias for Arugam Bay
-    "Pasikudah": { lat: 7.9238, lng: 81.5606 } // Ensure consistent casing if needed
+    "Arugambe": { lat: 6.8408, lng: 81.8317 } // Alias for Arugam Bay
 };
 
 /**

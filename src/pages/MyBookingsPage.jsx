@@ -81,6 +81,8 @@ const MyBookingsPage = () => {
             month: 'long',
             day: 'numeric'
           }),
+          rawTravelDate: booking.travel_date,
+          depositAmount: booking.deposit_amount ? parseFloat(booking.deposit_amount) : null,
           numberOfTravelers: booking.travelers,
           totalAmount: parseFloat(booking.total_price),
           status: booking.status.charAt(0).toUpperCase() + booking.status.slice(1),
@@ -128,6 +130,16 @@ const MyBookingsPage = () => {
     const today = new Date();
     const daysUntilTravel = Math.ceil((travelDate - today) / (1000 * 60 * 60 * 24));
     return daysUntilTravel >= 7;
+  };
+
+  const canContinuePayment = (booking) => {
+    if (booking.status !== 'Pending') {
+      return false;
+    }
+    const travelDate = new Date(booking.rawTravelDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return travelDate >= today;
   };
 
   const handleCancelBooking = (booking) => {
@@ -381,6 +393,27 @@ const MyBookingsPage = () => {
                     >
                       View Details
                     </button>
+                    {canContinuePayment(booking) && (
+                      <button
+                        onClick={() => navigate(`/booking/${booking.packageId}/payment`, {
+                          state: {
+                            isDirect: true,
+                            booking: {
+                              booking_id: booking.id,
+                              package_id: booking.packageId,
+                              package_name: booking.packageData?.name,
+                              total_price: booking.totalAmount,
+                              deposit_amount: booking.depositAmount,
+                              travel_date: booking.rawTravelDate,
+                              travelers: booking.numberOfTravelers,
+                            }
+                          }
+                        })}
+                        className="booking-action-btn booking-action-pay"
+                      >
+                        💳 Continue Payment
+                      </button>
+                    )}
                     {(booking.status === "Confirmed" || booking.status === "Completed") && (
                       <button
                         onClick={() => handleDownloadInvoice(booking.id)}

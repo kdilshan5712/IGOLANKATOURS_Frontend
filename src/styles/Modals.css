@@ -31,7 +31,7 @@
     0 20px 25px -5px rgba(0, 0, 0, 0.1), 
     0 10px 10px -5px rgba(0, 0, 0, 0.04),
     inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-  color: #0f172a; /* var(--admin-text-primary) equivalent */
+  color: var(--color-text-primary); /* var(--admin-text-primary) equivalent */
   animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
@@ -65,7 +65,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-text-primary);
   letter-spacing: -0.01em;
 }
 
@@ -78,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8; /* var(--admin-text-muted) */
+  color: var(--color-text-muted); /* var(--admin-text-muted) */
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -116,18 +116,18 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569; /* var(--admin-text-secondary) */
+  color: var(--color-text-secondary); /* var(--admin-text-secondary) */
   margin-bottom: 0.5rem;
 }
 
 .modal-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: all 0.2s;
-  background: #ffffff;
+  background: var(--color-bg-card);
 }
 
 .modal-input:focus {

@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star, Clock, MapPin, Calendar, Users, Mail, Download, Image as ImageIcon, Sparkles, Heart } from "lucide-react";
 import { packageAPI, authAPI } from "../services/api";
+import { usePromotions } from '../context/PromotionsContext';
 import { getCoordinates } from "../utils/sriLankaLocations";
 import { useWishlist } from "../hooks/useWishlist";
 import TourMap from "../components/TourMap";
@@ -81,6 +82,7 @@ const DUMMY_PACKAGE_DATA = {
 const PackageDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { maxDiscount } = usePromotions();
   const [packageData, setPackageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,7 +90,10 @@ const PackageDetailsPage = () => {
   const [travelers, setTravelers] = useState(1);
   const [calculatedPrice, setCalculatedPrice] = useState(null);
   const [calculating, setCalculating] = useState(false);
+  // We check authentication to allow saving to wishlist and writing reviews
   const isLoggedIn = authAPI.isAuthenticated();
+  const user = authAPI.getCurrentUser();
+  const isGuide = user?.role === 'guide';
   const { toggleWishlist, isInWishlist } = useWishlist();
   const isSaved = isInWishlist(id);
 
@@ -301,6 +306,7 @@ Thank you for choosing I GO LANKA TOURS!
         keywords={`${packageData.name}, Sri Lanka tour, ${packageData.category} tour Sri Lanka, ${packageData.duration}`}
         ogImage={packageData.image}
         ogType="product"
+        canonicalUrl={`https://www.igolankatours.com/packages/${id}`}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "Product",
@@ -573,12 +579,30 @@ Thank you for choosing I GO LANKA TOURS!
                   <span className="text-gray-400 text-sm">Calculating...</span>
                 ) : calculatedPrice ? (
                   <>
-                    ${calculatedPrice.totalPrice}
+                    {calculatedPrice.appliedPromotionDiscount > 0 && (
+                      <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.7em', marginRight: '8px' }}>
+                        ${calculatedPrice.originalTotalPrice}
+                      </span>
+                    )}
+                    <span style={{ color: calculatedPrice.appliedPromotionDiscount > 0 ? '#e53e3e' : 'inherit' }}>
+                      ${calculatedPrice.totalPrice}
+                    </span>
                     <span className="package-details-price-per"> / total</span>
                   </>
                 ) : (
                   <>
-                    ${packageData.price}
+                    {maxDiscount > 0 ? (
+                      <>
+                        <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.7em', marginRight: '8px' }}>
+                          ${packageData.price}
+                        </span>
+                        <span style={{ color: '#e53e3e' }}>
+                          ${Math.round(packageData.price * (1 - maxDiscount / 100))}
+                        </span>
+                      </>
+                    ) : (
+                      <span>${packageData.price}</span>
+                    )}
                     <span className="package-details-price-per"> / person</span>
                   </>
                 )}
@@ -764,7 +788,13 @@ Thank you for choosing I GO LANKA TOURS!
       <div className="mobile-floating-cta">
         <div className="mobile-cta-price">
           <span className="mobile-cta-label">From</span>
-          <span className="mobile-cta-amount">${calculatedPrice ? calculatedPrice.pricePerPerson : packageData.price}</span>
+          <span className="mobile-cta-amount">
+            ${calculatedPrice 
+              ? calculatedPrice.pricePerPerson 
+              : maxDiscount > 0 
+                ? Math.round(packageData.price * (1 - maxDiscount / 100)) 
+                : packageData.price}
+          </span>
         </div>
         <button
           className="mobile-cta-btn"

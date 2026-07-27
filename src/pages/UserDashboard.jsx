@@ -123,7 +123,7 @@ const UserDashboard = () => {
           <h1>Ayubowan, {userName}!</h1>
           <p>Ready for your next unforgettable Sri Lankan adventure?</p>
           <div className="hero-actions">
-            <Link to="/packages" className="btn-primary">
+            <Link to="/packages" className="btn btn-primary">
               <Map size={18} /> Discover Tours
             </Link>
           </div>
@@ -240,7 +240,7 @@ const UserDashboard = () => {
                 </div>
                 <h3>Your Passport is Empty</h3>
                 <p>Start exploring beautiful destinations and book your first tour with us.</p>
-                <Link to="/packages" className="btn-secondary">Explore Packages</Link>
+                <Link to="/packages" className="btn btn-secondary">Explore Packages</Link>
               </div>
             ) : (
               <div className="activity-feed">
@@ -287,7 +287,7 @@ const UserDashboard = () => {
               <h3>Looking for inspiration?</h3>
             </div>
             <p>Explore our trending Sri Lankan destinations and highly-rated signature packages curated just for you.</p>
-            <Link to="/destinations" className="btn-outline">View Destinations</Link>
+            <Link to="/destinations" className="btn btn-outline">View Destinations</Link>
           </div>
         </aside>
       </div>

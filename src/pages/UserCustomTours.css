@@ -11,21 +11,21 @@
 .custom-tours-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .custom-tours-header p {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1.1rem;
 }
 
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .empty-icon {
@@ -35,12 +35,12 @@
 
 .empty-state h3 {
   font-size: 1.5rem;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .empty-state p {
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
 }
 
@@ -66,33 +66,33 @@
 }
 
 .tour-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--glass-border);
 }
 
 .tour-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .tour-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  background: #f8fafc;
+  background: var(--color-bg-card);
 }
 
 .tour-title {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   flex: 1;
   padding-right: 1rem;
 }
@@ -111,7 +111,7 @@
 .status-needs_changes { background: #fce7f3; color: #db2777; }
 .status-approved { background: #dcfce7; color: #15803d; }
 .status-rejected { background: #fee2e2; color: #dc2626; }
-.status-draft { background: #f1f5f9; color: #64748b; }
+.status-draft { background: #f1f5f9; color: var(--color-text-muted); }
 
 .tour-details {
   padding: 1.5rem;
@@ -131,13 +131,13 @@
 }
 
 .info-label {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .info-value {
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -147,7 +147,7 @@
   border-radius: 12px;
   font-size: 0.95rem;
   margin-top: 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--glass-border);
 }
 
 .approved-offer {
@@ -202,7 +202,7 @@
 .admin-message-bubble {
   margin-top: 1.5rem;
   padding: 1.25rem;
-  background: #f8fafc;
+  background: var(--color-bg-card);
   border-left: 4px solid #3b82f6;
   border-radius: 0 12px 12px 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -220,7 +220,7 @@
 
 .bubble-text {
   margin: 0;
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-style: italic;
   font-size: 1rem;
   line-height: 1.6;
@@ -244,15 +244,15 @@
 
 .tour-footer {
   padding: 1rem 1.5rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--glass-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .date-submitted {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 

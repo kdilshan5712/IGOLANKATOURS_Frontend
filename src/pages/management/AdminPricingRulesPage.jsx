@@ -165,9 +165,15 @@ const AdminPricingRulesPage = () => {
 
     return (
         <div className="admin-pricing-page">
-            <div className="admin-header-actions">
-                <h1>Seasonal Pricing Rules</h1>
-                <button className="btn-primary" onClick={() => handleOpenModal()}>
+            <div className="admin-page-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <Calendar size={32} color="var(--admin-primary)" />
+                    <div>
+                        <h1>Seasonal Pricing Rules</h1>
+                        <p style={{ margin: '0.25rem 0 0 0' }}>Configure regional seasonal price adjustments and coast multipliers</p>
+                    </div>
+                </div>
+                <button className="btn btn-primary" onClick={() => handleOpenModal()}>
                     <Plus size={16} /> Add New Rule
                 </button>
             </div>
@@ -236,9 +242,9 @@ const AdminPricingRulesPage = () => {
                     <div className="modal-container" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingRule ? "Edit Pricing Rule" : "New Pricing Rule"}</h2>
-                            <button className="modal-close-btn" onClick={handleCloseModal}>
-                                <X size={20} />
-                            </button>
+                             <button className="modal-close-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={handleCloseModal}>
+                                 <X size={20} color="var(--admin-text-secondary)" />
+                             </button>
                         </div>
                         <div className="modal-body">
                             <form onSubmit={handleSave} className="modal-form">

@@ -11,12 +11,12 @@
 .admin-profile-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .admin-profile-header p {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1rem;
 }
 
@@ -25,7 +25,7 @@
   text-align: center;
   padding: 3rem;
   font-size: 1.1rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .admin-profile-error {
@@ -34,7 +34,7 @@
 
 /* Profile Card */
 .admin-profile-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -94,8 +94,8 @@
 }
 
 .admin-avatar-action-btn {
-  background: white;
-  color: #1e293b;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   border: none;
   width: 36px;
   height: 36px;
@@ -134,7 +134,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
+  background: var(--color-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease;
 }
@@ -186,7 +186,7 @@
 .admin-section-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid #e2e8f0;
@@ -209,7 +209,7 @@
   align-items: center;
   gap: 0.75rem;
   font-weight: 500;
-  color: #475569;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
 }
 
@@ -219,7 +219,7 @@
 
 .admin-detail-value {
   font-size: 1rem;
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 

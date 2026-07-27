@@ -184,8 +184,34 @@ const BookingStartPage = () => {
 
   return (
     <div className="booking-start-container">
+
+      {/* Hero Banner */}
+      <div className="booking-hero">
+        <div className="booking-hero-text">
+          <h1>Book Your Tour</h1>
+          <p>Step 1 of 3 — Select your travel date and group size</p>
+        </div>
+      </div>
+
       <div className="booking-start-content">
-        <h1>Booking Details</h1>
+
+        {/* Steps */}
+        <div className="booking-steps">
+          <div className="bs-step active">
+            <div className="bs-step-num">1</div>
+            <span>Details</span>
+          </div>
+          <div className="bs-connector" />
+          <div className="bs-step">
+            <div className="bs-step-num">2</div>
+            <span>Travellers</span>
+          </div>
+          <div className="bs-connector" />
+          <div className="bs-step">
+            <div className="bs-step-num">3</div>
+            <span>Payment</span>
+          </div>
+        </div>
 
         <div className="package-summary">
           <img
@@ -328,10 +354,10 @@ const BookingStartPage = () => {
               onClick={() => navigate(`/packages/${id}`)}
               className="btn-secondary"
             >
-              Back
+              ← Back
             </button>
             <button type="submit" className="btn-primary" disabled={!travelDate || calculating}>
-              Continue to Traveller Info →
+              {calculating ? 'Calculating…' : 'Continue to Travellers →'}
             </button>
           </div>
         </form>

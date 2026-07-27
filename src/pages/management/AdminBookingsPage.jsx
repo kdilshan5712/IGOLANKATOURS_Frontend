@@ -40,7 +40,7 @@ function AdminBookingsPage() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("userRole");
 
-    if (!token || role !== "admin") {
+    if (!token || (role !== "admin" && role !== "superadmin")) {
       navigate("/login");
       return;
     }

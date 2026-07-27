@@ -146,12 +146,15 @@ const AdminCouponsPage = () => {
 
     return (
         <div className="admin-coupons-page">
-            <div className="admin-header-actions">
+            <div className="admin-page-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Ticket size={32} color="#c5a059" />
-                    <h1>Promo Codes & Coupons</h1>
+                    <Ticket size={32} color="var(--admin-primary)" />
+                    <div>
+                        <h1>Promo Codes & Coupons</h1>
+                        <p style={{ margin: '0.25rem 0 0 0' }}>Configure promotional codes, custom discounts, and usage limits</p>
+                    </div>
                 </div>
-                <button className="btn-primary" onClick={() => handleOpenModal()}>
+                <button className="btn btn-primary" onClick={() => handleOpenModal()}>
                     <Plus size={16} /> Create New Coupon
                 </button>
             </div>
@@ -225,7 +228,7 @@ const AdminCouponsPage = () => {
                         <div className="modal-header">
                             <h2>{editingCoupon ? `Edit Coupon: ${editingCoupon.code}` : "Create New Coupon"}</h2>
                             <button className="modal-close-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={handleCloseModal}>
-                                <X size={24} color="#64748b" />
+                                <X size={24} color="var(--admin-text-secondary)" />
                             </button>
                         </div>
                         <div className="modal-body">
@@ -324,12 +327,12 @@ const AdminCouponsPage = () => {
                                         onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                                         style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer' }}
                                     />
-                                    <label htmlFor="is_active" style={{ cursor: 'pointer', fontWeight: 500, color: '#1e293b' }}>Coupon is active</label>
+                                    <label htmlFor="is_active" style={{ cursor: 'pointer', fontWeight: 500, color: 'var(--admin-text-secondary)' }}>Coupon is active</label>
                                 </div>
 
-                                <div className="modal-footer">
-                                    <button type="button" className="btn-secondary" onClick={handleCloseModal}>Cancel</button>
-                                    <button type="submit" className="btn-primary">
+                                <div className="modal-footer" style={{ border: 'none', background: 'transparent' }}>
+                                    <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary">
                                         <Save size={18} /> {editingCoupon ? "Save Changes" : "Create Coupon"}
                                     </button>
                                 </div>

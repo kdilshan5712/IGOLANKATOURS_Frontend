@@ -10,12 +10,12 @@
 .profile-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .profile-header p {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 1rem;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .profile-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -162,8 +162,8 @@
 }
 
 .avatar-action-btn {
-  background: white;
-  color: #1e293b;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   border: none;
   width: 36px;
   height: 36px;
@@ -202,7 +202,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
+  background: var(--color-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease;
 }
@@ -252,7 +252,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .detail-row:last-child {
@@ -261,12 +261,12 @@
 
 .detail-label {
   font-weight: 600;
-  color: #475569;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
 }
 
 .detail-value {
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-size: 1rem;
 }
 
@@ -286,7 +286,7 @@
   align-items: center;
   min-height: 400px;
   font-size: 1.125rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .error-message {

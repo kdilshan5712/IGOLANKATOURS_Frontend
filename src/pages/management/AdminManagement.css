@@ -16,12 +16,12 @@
 .admin-management-header h1 {
   margin: 0;
   font-size: 2rem;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 .admin-management-header p {
   margin: 0.5rem 0 0 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .btn-create-admin {
@@ -67,18 +67,18 @@
 
 /* Create Admin Form */
 .create-admin-form {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
 }
 
 .create-admin-form h2 {
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 .form-group {
@@ -89,14 +89,14 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -150,9 +150,9 @@
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  background: white;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
@@ -160,29 +160,29 @@
 }
 
 .btn-secondary:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
 }
 
 /* Admins List */
 .admins-list-section {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
 }
 
 .admins-list-section h2 {
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 .loading-state,
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .empty-state {
@@ -209,7 +209,7 @@
 }
 
 .admins-table thead {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
   border-bottom: 2px solid #e5e7eb;
 }
 
@@ -217,7 +217,7 @@
   text-align: left;
   padding: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -226,11 +226,11 @@
 .admins-table td {
   padding: 1rem;
   border-bottom: 1px solid #f3f4f6;
-  color: #1f2937;
+  color: var(--color-text-primary);
 }
 
 .admins-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
 }
 
 .admin-email {

@@ -13,11 +13,27 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff, AlertCircle, MapPin, Phone } from "lucide-react";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { motion, AnimatePresence } from "framer-motion";
 import { authAPI } from "../services/api";
 import { validatePassword } from "../utils/passwordValidation";
 import Card from "../components/shared/Card";
 import Button from "../components/shared/Button";
 import "./RegisterPage.css";
+
+const PhoneInputComponent = PhoneInput.default || PhoneInput;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 25 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 }
+  }
+};
 
 /**
  * RegisterPage Component
@@ -122,23 +138,39 @@ const RegisterPage = () => {
 
   return (
     <main className="register-page">
-      <div className="register-container">
+      {/* Ambient blurs */}
+      <div className="register-ambient-glow-1"></div>
+      <div className="register-ambient-glow-2"></div>
+
+      <motion.div 
+        className="register-container"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
         <Card className="register-card" padding="large">
-          <div className="register-header">
-            <h1 className="register-title">Create Account</h1>
+          <motion.div className="register-header" variants={fadeUp}>
+            <h1 className="register-title">Create <span>Account</span></h1>
             <p className="register-subtitle">Join us and start your Sri Lankan adventure</p>
-          </div>
+          </motion.div>
 
           {/* @ERROR_HANDLING: Global error alert display */}
-          {error && (
-            <div className="register-error">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div 
+                className="register-error"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <AlertCircle size={18} />
+                <span>{error}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleSubmit} className="register-form">
-            <div className="register-form-group">
+            <motion.div className="register-form-group" variants={fadeUp}>
               <label className="register-label">
                 <User size={18} />
                 <span>Full Name</span>
@@ -153,9 +185,9 @@ const RegisterPage = () => {
                 autoComplete="name"
               />
               {fieldErrors.name && <span className="field-error-message">{fieldErrors.name}</span>}
-            </div>
+            </motion.div>
 
-            <div className="register-form-group">
+            <motion.div className="register-form-group" variants={fadeUp}>
               <label className="register-label">
                 <Mail size={18} />
                 <span>Email Address</span>
@@ -170,9 +202,9 @@ const RegisterPage = () => {
                 autoComplete="email"
               />
               {fieldErrors.email && <span className="field-error-message">{fieldErrors.email}</span>}
-            </div>
+            </motion.div>
 
-            <div className="register-form-row">
+            <motion.div className="register-form-row" variants={fadeUp}>
               <div className="register-form-group">
                 <label className="register-label">
                   <MapPin size={18} />
@@ -196,7 +228,7 @@ const RegisterPage = () => {
                   <span>Mobile</span>
                 </label>
                 <div className="phone-input-container">
-                  <PhoneInput
+                  <PhoneInputComponent
                     country={'lk'}
                     value={formData.phone}
                     onChange={handlePhoneChange}
@@ -208,9 +240,9 @@ const RegisterPage = () => {
                 </div>
                 {fieldErrors.phone && <span className="field-error-message">{fieldErrors.phone}</span>}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="register-form-group">
+            <motion.div className="register-form-group" variants={fadeUp}>
               <label className="register-label">
                 <Lock size={18} />
                 <span>Password</span>
@@ -238,9 +270,9 @@ const RegisterPage = () => {
               <small className="password-hint">
                 Must contain: 8+ characters, uppercase, lowercase, number, special character
               </small>
-            </div>
+            </motion.div>
 
-            <div className="register-form-group">
+            <motion.div className="register-form-group" variants={fadeUp}>
               <label className="register-label">
                 <Lock size={18} />
                 <span>Confirm Password</span>
@@ -264,28 +296,30 @@ const RegisterPage = () => {
                   {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-            </div>
+            </motion.div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              loading={loading}
-              className="register-button-full"
-            >
-              Create Account
-            </Button>
+            <motion.div variants={fadeUp}>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                className="register-button-full"
+              >
+                Create Account
+              </Button>
+            </motion.div>
           </form>
 
-          <div className="register-footer">
+          <motion.div className="register-footer" variants={fadeUp}>
             <p className="register-footer-text">
               Already have an account?{" "}
               <Link to="/login" className="register-link">
                 Sign in
               </Link>
             </p>
-          </div>
+          </motion.div>
         </Card>
-      </div>
+      </motion.div>
     </main>
   );
 };

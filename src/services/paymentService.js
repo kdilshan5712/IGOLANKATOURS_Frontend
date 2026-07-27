@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:5000/api' 
+    : 'https://api-backend.wonderfulsmoke-82355efd.centralindia.azurecontainerapps.io/api');
 
 /**
  * Payment Service
@@ -152,12 +155,62 @@ export const getPaymentHistory = async (userId, token) => {
     }
 };
 
+/**
+ * Generate MD5 hash from backend for PayHere SDK
+ */
+export const generatePayHereHash = async (orderId, amount, token) => {
+    try {
+        const response = await axios.post(
+            `${API_URL}/payments/payhere/hash`,
+            { orderId, amount },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error generating PayHere hash:', error);
+        return {
+            success: false,
+            message: error.response?.data?.message || 'Failed to generate payment hash'
+        };
+    }
+};
+
+/**
+ * Verify a PayHere payment via REST API (App ID + App Secret)
+ * Called from success page to confirm booking after redirect from PayHere
+ */
+export const verifyPayHerePayment = async (orderId, token) => {
+    try {
+        const response = await axios.get(
+            `${API_URL}/payments/payhere/verify/${orderId}`,
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error verifying PayHere payment:', error);
+        return {
+            success: false,
+            verified: false,
+            message: error.response?.data?.message || 'Verification failed'
+        };
+    }
+};
+
 const paymentService = {
     createPaymentIntent,
     confirmPayment,
     processRefund,
     getPaymentHistory,
-    processDummyPayment
+    processDummyPayment,
+    generatePayHereHash,
+    verifyPayHerePayment
 };
 
 export default paymentService;

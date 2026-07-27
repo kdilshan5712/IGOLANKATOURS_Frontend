@@ -12,14 +12,22 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom marker icon
-const createCustomIcon = (color = '#d97706') => {
+// Custom premium marker icon with glowing ripple effects
+const createCustomIcon = (color = '#c5a059') => {
   return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><div style="transform: rotate(45deg); margin-top: 6px; margin-left: 8px; color: white; font-size: 16px;">📍</div></div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30]
+    className: 'custom-premium-marker',
+    html: `
+      <div class="marker-glowing-wrapper">
+        <div class="marker-pulse-ring" style="border-color: ${color}"></div>
+        <div class="marker-pulse-ring-outer" style="border-color: ${color}"></div>
+        <div class="marker-core" style="background-color: ${color}; box-shadow: 0 0 10px ${color}">
+          <div class="marker-core-inner"></div>
+        </div>
+      </div>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20]
   });
 };
 
@@ -59,20 +67,20 @@ const TourMap = ({ locations, routePath = true, height = '400px' }) => {
   // Create route path coordinates
   const routeCoordinates = tourLocations.map(loc => [loc.lat, loc.lng]);
 
-  // Color palette for markers
-  const colors = ['#d97706', '#0891b2', '#16a34a', '#dc2626', '#7c3aed'];
+  // Premium Luxury Jewel Tone Color Palette
+  const colors = ['#c5a059', '#0f766e', '#047857', '#be123c', '#4338ca'];
 
   return (
     <div className="tour-map-wrapper" style={{ height }}>
       <MapContainer
         center={[centerLat, centerLng]}
         zoom={8}
-        style={{ height: '100%', width: '100%', borderRadius: '12px' }}
+        style={{ height: '100%', width: '100%', borderRadius: '16px' }}
         scrollWheelZoom={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         <ChangeView locations={tourLocations} />
 
@@ -80,9 +88,9 @@ const TourMap = ({ locations, routePath = true, height = '400px' }) => {
         {routePath && tourLocations.length > 1 && (
           <Polyline
             positions={routeCoordinates}
-            color="#d97706"
-            weight={3}
-            opacity={0.7}
+            color="#c5a059"
+            weight={3.5}
+            opacity={0.8}
             dashArray="10, 10"
           />
         )}

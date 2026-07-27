@@ -2,7 +2,7 @@
 
 .booking-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-card);
   padding-top: 7rem;
   padding-bottom: 5rem;
 }
@@ -20,7 +20,7 @@
 .booking-title {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 2rem;
 }
 
@@ -33,7 +33,7 @@
 .booking-step {
   padding: 0.75rem 1.5rem;
   background-color: #e5e7eb;
-  color: #6b7280;
+  color: var(--color-text-muted);
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
@@ -77,16 +77,16 @@
 }
 
 .booking-form-card {
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   padding: 2rem;
   border-radius: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
 }
 
 .booking-form-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -99,7 +99,7 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -110,7 +110,7 @@
 .booking-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: all 0.3s;
@@ -146,10 +146,10 @@
 }
 
 .booking-summary-card {
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   padding: 2rem;
   border-radius: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   position: sticky;
   top: 8rem;
 }
@@ -157,7 +157,7 @@
 .booking-summary-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -178,12 +178,12 @@
 .booking-summary-package-name {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 0.25rem;
 }
 
 .booking-summary-duration {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
 }
@@ -199,7 +199,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .booking-summary-row:last-child {
@@ -209,13 +209,13 @@
 .booking-summary-total {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-top: 1rem;
 }
 
 .booking-summary-amount {
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 /* Loading and Error States */
@@ -227,7 +227,7 @@
 
 .booking-loading p {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .booking-error {

@@ -1,7 +1,21 @@
-
 import { useEffect, useState } from "react";
+import { Star, Loader } from "lucide-react";
+import { motion } from "framer-motion";
 import { reviewAPI } from "../services/api";
 import "./ReviewsList.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 25 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
 
 const ReviewsList = ({ packageId = null, limit = 100 }) => {
   const [reviews, setReviews] = useState([]);
@@ -67,10 +81,20 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
     fetchReviews();
   }, [packageId, limit]);
 
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <span key={index} style={{ color: index < rating ? "#d97706" : "#d1d5db" }}>★</span>
-    ));
+  const renderStars = (rating, size = 16) => {
+    return (
+      <div className="review-stars-wrapper">
+        {Array.from({ length: 5 }, (_, index) => (
+          <Star 
+            key={index} 
+            size={size}
+            fill={index < rating ? "var(--color-accent)" : "none"}
+            color={index < rating ? "var(--color-accent)" : "var(--color-gray-400)"}
+            className="review-star-icon"
+          />
+        ))}
+      </div>
+    );
   };
 
   const filteredReviews = reviews.filter(review => {
@@ -83,20 +107,25 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
   return (
     <div className="reviews-list">
       <div className="reviews-list-header">
-        <h2 className="reviews-list-title">Customer Reviews</h2>
+        <h2 className="reviews-list-title">Customer <span>Reviews</span></h2>
         <p className="reviews-list-subtitle">
           See what our travelers have to say about their experiences
         </p>
         
         {/* Average Rating Summary */}
         {totalReviews > 0 && (
-          <div className="reviews-summary">
+          <motion.div 
+            className="reviews-summary"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <div className="average-rating">
               <span className="average-rating-value">{averageRating}</span>
-              <div className="average-rating-stars">{renderStars(Math.round(parseFloat(averageRating)))}</div>
+              <div className="average-rating-stars">{renderStars(Math.round(parseFloat(averageRating)), 20)}</div>
               <span className="total-reviews">Based on {totalReviews} review{totalReviews !== 1 ? 's' : ''}</span>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Filter Controls (only if not viewing a specific package) */}
@@ -125,15 +154,33 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
       </div>
 
       {loading ? (
-        <div className="reviews-loading">Loading reviews...</div>
+        <div className="reviews-list-loading">
+          <Loader className="animate-spin" size={40} />
+          <p>Gathering feedback...</p>
+        </div>
       ) : error ? (
-        <div className="reviews-error">{error}</div>
+        <div className="reviews-list-error">
+          <p>{error}</p>
+        </div>
       ) : filteredReviews.length === 0 ? (
-        <div className="reviews-empty">No reviews found for this category.</div>
+        <div className="reviews-list-empty">
+          <p>No reviews found for this category.</p>
+        </div>
       ) : (
-        <div className="reviews-grid">
+        <motion.div 
+          className="reviews-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {filteredReviews.map((review) => (
-            <div key={review.review_id} className="review-card">
+            <motion.div 
+              key={review.review_id} 
+              className="review-card"
+              variants={fadeUp}
+              whileHover={{ y: -5, transition: { duration: 0.3 } }}
+            >
               <div className="review-card-header">
                 <div className="review-author-info">
                   <div className="review-author-avatar">
@@ -146,7 +193,7 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
                     </p>
                   </div>
                 </div>
-                <div className="review-rating">{renderStars(review.rating)}</div>
+                <div className="review-rating">{renderStars(review.rating, 14)}</div>
               </div>
               {review.title && <h5 className="review-title">{review.title}</h5>}
               <p className="review-text">{review.comment || ""}</p>
@@ -159,6 +206,8 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
                       <img 
                         src={imageUrl} 
                         alt={`Review photo ${idx + 1}`}
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
@@ -181,9 +230,9 @@ const ReviewsList = ({ packageId = null, limit = 100 }) => {
                 )}
                 <span className="review-rating-label">Rating: {review.rating}/5 ⭐</span>
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

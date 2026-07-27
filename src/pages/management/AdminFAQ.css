@@ -68,7 +68,7 @@
 
 .category-other {
   background: rgba(107, 114, 128, 0.1);
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 /* Form Styles */

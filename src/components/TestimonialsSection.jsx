@@ -10,7 +10,10 @@ const TestimonialsSection = () => {
         const fetchTestimonials = async () => {
             try {
                 // Fetch approved reviews from the public endpoint
-                const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+                const API_BASE_URL = import.meta.env.VITE_API_URL || 
+                  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                    ? "http://localhost:5000/api" 
+                    : "/api");
                 const response = await fetch(`${API_BASE_URL}/reviews?limit=6`);
                 const data = await response.json();
 
@@ -54,7 +57,7 @@ const TestimonialsSection = () => {
         <section className="testimonials-section">
             <div className="testimonials-container">
                 <div className="testimonials-header">
-                    <h2 className="testimonials-title">What Our Travelers Say</h2>
+                    <h2 className="testimonials-title">What <span>Our Travelers Say</span></h2>
                     <p className="testimonials-subtitle">
                         Don't just take our word for it. Read reviews from people who have explored Sri Lanka with us.
                     </p>

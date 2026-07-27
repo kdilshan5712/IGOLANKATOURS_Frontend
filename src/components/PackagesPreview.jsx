@@ -39,7 +39,7 @@ const PackagesPreview = () => {
         <div className="packages-preview-header">
           <div>
             <h2 className="packages-preview-title">
-              Popular tour packages
+              Popular <span>tour packages</span>
             </h2>
             <p className="packages-preview-description">
               Handpicked tours designed to give you the best of Sri Lanka

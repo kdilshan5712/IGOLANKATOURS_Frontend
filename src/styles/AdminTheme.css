@@ -1,43 +1,52 @@
+/* ==========================================================================
+   🎯 I GO LANKA TOURS - Global Admin Dashboard Design System (Premium Dark)
+   ========================================================================== */
+
 :root {
-  /* Premium Light/White Theme Colors */
-  --admin-bg-gradient: radial-gradient(circle at top right, #f8fafc, #f1f5f9);
+  /* Premium Dark Space Gradient */
+  --admin-bg-gradient: radial-gradient(circle at top right, #0a1128 0%, #030812 100%);
   
-  /* Glassmorphism Tokens - Premium Light */
-  --admin-glass-bg: rgba(255, 255, 255, 0.85);
-  --admin-glass-border: rgba(15, 23, 42, 0.08); /* Soft slate border */
-  --admin-glass-blur: blur(20px);
-  --admin-glass-shadow: 0 4px 20px -5px rgba(15, 23, 42, 0.1);
+  /* Frosted Glassmorphism Tokens */
+  --admin-glass-bg: rgba(20, 25, 35, 0.6);
+  --admin-glass-border: rgba(197, 160, 89, 0.2); /* Muted Gold frame */
+  --admin-glass-blur: blur(16px) saturate(180%);
+  --admin-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
-  --admin-text-primary: #0f172a; /* Slate 900 */
-  --admin-text-secondary: #475569; /* Slate 600 */
-  --admin-text-muted: #94a3b8; /* Slate 400 */
+  /* Typography Colors */
+  --admin-text-primary: #f8fafc;
+  --admin-text-secondary: #cbd5e1;
+  --admin-text-muted: #94a3b8;
 
-  /* Polished Accent Colors (Slightly more saturated for light bg) */
-  --admin-primary: #4f46e5; /* Indigo 600 */
-  --admin-primary-hover: #4338ca; /* Indigo 700 */
-  --admin-success: #059669; /* Emerald 600 */
-  --admin-warning: #d97706; /* Amber 600 */
-  --admin-danger: #dc2626; /* Red 600 */
+  /* Signature Accents & Messaging */
+  --admin-primary: #c5a059;       /* Signature Gold */
+  --admin-primary-hover: #fbbf24; /* Amber Glow */
+  --admin-success: #10b981;       /* Emerald */
+  --admin-warning: #f59e0b;       /* Amber */
+  --admin-danger: #ef4444;        /* Crimson */
 
-  /* Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
+  /* Radius System */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
 }
 
-/* Global Admin Background */
+/* Global Admin Body Styling */
 body {
   background: var(--admin-bg-gradient);
   color: var(--admin-text-primary);
   min-height: 100vh;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism Utilities */
+/* ==========================================================================
+   Glassmorphism Utility Elements
+   ========================================================================== */
+
 .glass-panel {
   background: var(--admin-glass-bg);
   backdrop-filter: var(--admin-glass-blur);
@@ -48,51 +57,57 @@ body {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(20, 25, 35, 0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(197, 160, 89, 0.15);
   border-radius: var(--radius-lg);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(20, 25, 35, 0.85);
   border-color: var(--admin-primary);
-  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 30px rgba(197, 160, 89, 0.15);
 }
 
 .glass-input {
-  background: #ffffff;
-  border: 1px solid #e2e8f0; /* Slate 200 */
+  background: rgba(3, 8, 18, 0.45);
+  border: 1px solid rgba(197, 160, 89, 0.2);
   color: var(--admin-text-primary);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   width: 100%;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  font-family: 'Outfit', sans-serif;
 }
 
 .glass-input:focus {
   outline: none;
   border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+  background: rgba(3, 8, 18, 0.6);
 }
 
 .glass-button {
-  background: var(--admin-primary);
-  color: #ffffff;
-  border: none;
+  background: linear-gradient(135deg, var(--admin-primary) 0%, #b08d4b 100%);
+  color: #030812;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .glass-button:hover {
-  background: var(--admin-primary-hover);
+  background: linear-gradient(135deg, #fcd34d 0%, var(--admin-primary) 100%);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
 }
 
 .glass-table {
@@ -104,29 +119,33 @@ body {
 .glass-table th {
   padding: 1rem;
   text-align: left;
+  font-family: 'Outfit', sans-serif;
   font-weight: 700;
   color: var(--admin-text-secondary);
   border-bottom: 1px solid var(--admin-glass-border);
   text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  background: #f8fafc;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  background: rgba(3, 8, 18, 0.6);
 }
 
 .glass-table td {
   padding: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.1);
   color: var(--admin-text-primary);
+  background: transparent;
+  font-size: 0.875rem;
 }
 
 .glass-table tr:hover td {
-  background: #f8fafc;
+  background: rgba(197, 160, 89, 0.05);
 }
 
 /* Notification Badge Pill */
 .badge-pill {
     background: var(--admin-danger);
     color: white;
+    font-family: 'Outfit', sans-serif;
     font-size: 0.7rem;
     font-weight: bold;
     padding: 2px 8px;
@@ -134,12 +153,12 @@ body {
     margin-left: auto;
     min-width: 20px;
     text-align: center;
-    box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
-/* =========================================
-   Global Layout & Components
-   ========================================= */
+/* ==========================================================================
+   Global Layout & Structural Components
+   ========================================================================== */
 
 .admin-page {
   display: flex;
@@ -160,11 +179,14 @@ body {
 }
 
 .admin-page-header h1 {
+  font-family: 'Outfit', sans-serif;
   font-size: 2.25rem;
   font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--admin-text-primary);
   margin: 0;
-  letter-spacing: -0.03em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .admin-page-header p {
@@ -186,15 +208,18 @@ body {
 .section-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--admin-glass-border);
-  background: #f8fafc;
+  background: rgba(3, 8, 18, 0.4);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .section-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--admin-text-primary);
   display: flex;
   align-items: center;
@@ -202,49 +227,58 @@ body {
   margin: 0;
 }
 
-/* Status Badges - Glassy Version */
+/* Status Badges - Glassy Elegant Colors */
 .status-badge {
     padding: 5px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .status-confirmed, .status-success, .status-active, .status-approved {
-    background: rgba(52, 211, 153, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     color: var(--admin-success);
-    border: 1px solid rgba(52, 211, 153, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .status-pending, .status-warning, .status-reviewing, .status-quoted {
-    background: rgba(251, 191, 36, 0.1);
+    background: rgba(245, 158, 11, 0.1);
     color: var(--admin-warning);
-    border: 1px solid rgba(251, 191, 36, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
 }
 
 .status-error, .status-rejected, .status-cancelled {
-    background: rgba(248, 113, 113, 0.1);
+    background: rgba(239, 68, 68, 0.1);
     color: var(--admin-danger);
-    border: 1px solid rgba(248, 113, 113, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
 }
 
 .status-completed, .status-accepted, .status-assigned {
-    background: rgba(129, 140, 248, 0.1);
+    background: rgba(197, 160, 89, 0.1);
     color: var(--admin-primary);
-    border: 1px solid rgba(129, 140, 248, 0.2);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    text-shadow: 0 0 8px rgba(197, 160, 89, 0.4);
 }
 
-/* Modal Styling */
+/* ==========================================================================
+   Modals & Overlays (Premium Dark Glass)
+   ========================================================================== */
+
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(8px);
+    background: rgba(3, 8, 12, 0.7);
+    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -253,12 +287,14 @@ body {
 }
 
 .modal-container {
-    background: #ffffff;
+    background: rgba(12, 20, 36, 0.95);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--admin-glass-border);
-    border-radius: var(--radius-2xl);
+    border-radius: var(--radius-xl);
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                0 1px 0 rgba(255, 255, 255, 0.05) inset;
     color: var(--admin-text-primary);
-}
+}

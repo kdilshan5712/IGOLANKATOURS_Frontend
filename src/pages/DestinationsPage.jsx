@@ -11,10 +11,24 @@
 import { useState, useEffect } from "react";
 import { MapPin, ArrowRight, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import DestinationsMap from "../components/DestinationsMap";
 import { destinationAPI } from "../services/api";
 import SEO from "../components/SEO";
 import "./DestinationsPage.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 }
+  }
+};
 
 /**
  * DestinationsPage Component
@@ -54,36 +68,36 @@ const DestinationsPage = () => {
 
   const getCategoryColor = (category) => {
     const colors = {
-      Cultural: "bg-amber-100 text-amber-800",
-      Nature: "bg-green-100 text-green-800",
-      Beach: "bg-blue-100 text-blue-800",
-      Wildlife: "bg-orange-100 text-orange-800",
+      Cultural: "category-cultural",
+      Nature: "category-nature",
+      Beach: "category-beach",
+      Wildlife: "category-wildlife",
     };
-    return colors[category] || "bg-gray-100 text-gray-800";
+    return colors[category] || "category-default";
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader className="animate-spin text-teal-600" size={48} />
+      <div className="destinations-loading">
+        <Loader className="animate-spin" size={48} />
+        <p>Loading curated hotspots...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen flex-col gap-4">
-        <p className="text-red-500 text-xl">{error}</p>
+      <div className="destinations-error">
+        <p>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+          className="btn-primary"
         >
-          Retry
+          Retry Connection
         </button>
       </div>
     );
   }
-
 
   return (
     <main className="destinations-page">
@@ -94,22 +108,43 @@ const DestinationsPage = () => {
         canonicalUrl="https://www.igolankatours.com/destinations"
         ogImage="https://www.igolankatours.com/og-image.jpg"
       />
+
+      {/* Ambient Effects */}
+      <div className="destinations-ambient-glow-1"></div>
+      <div className="destinations-ambient-glow-2"></div>
+
       <div className="destinations-page-container">
         {/* Hero Header */}
-        <div className="destinations-page-hero">
-          <h1 className="destinations-page-title">
-            Explore Sri Lanka's Most Loved Destinations
-          </h1>
-          <p className="destinations-page-subtitle">
+        <motion.div 
+          className="destinations-page-hero"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          <motion.h1 className="destinations-page-title" variants={fadeUp}>
+            Explore Sri Lanka's <span>Most Loved</span> Destinations
+          </motion.h1>
+          <motion.p className="destinations-page-subtitle" variants={fadeUp}>
             Discover the island's most captivating places, from ancient cities
             and misty mountains to pristine beaches and wildlife sanctuaries.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Destinations Grid */}
-        <div className="destinations-page-grid">
+        <motion.div 
+          className="destinations-page-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {destinations.map((destination, index) => (
-            <div key={index} className="destination-page-card">
+            <motion.div 
+              key={index} 
+              className="destination-page-card"
+              variants={fadeUp}
+              whileHover={{ y: -6, transition: { duration: 0.3 } }}
+            >
               <div className="destination-page-image-wrapper">
                 {/* @ASSETS: Destination images are dynamically sourced from backend API with Unsplash fallback */}
                 <img
@@ -130,7 +165,7 @@ const DestinationsPage = () => {
 
               <div className="destination-page-content">
                 <div className="destination-page-header">
-                  <MapPin className="destination-page-icon" size={20} />
+                  <MapPin className="destination-page-icon" size={18} />
                   <h3 className="destination-page-name">{destination.name}</h3>
                 </div>
 
@@ -143,20 +178,33 @@ const DestinationsPage = () => {
                   className="destination-page-link"
                 >
                   Explore Features
-                  <ArrowRight size={16} />
+                  <ArrowRight className="arrow-icon" size={16} />
                 </Link>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Interactive Map Section */}
-        <DestinationsMap />
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeUp}
+        >
+          <DestinationsMap />
+        </motion.div>
 
         {/* CTA Section */}
-        <div className="destinations-page-cta">
+        <motion.div 
+          className="destinations-page-cta"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeUp}
+        >
           <h2 className="destinations-cta-title">
-            Ready to explore these destinations?
+            Ready to explore these <span>destinations</span>?
           </h2>
           <p className="destinations-cta-text">
             Browse our curated tour packages or contact us to design your
@@ -170,7 +218,7 @@ const DestinationsPage = () => {
               Contact Us
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </main>
   );

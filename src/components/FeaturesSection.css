@@ -1,11 +1,39 @@
-/* FeaturesSection Styles */
+/* FeaturesSection Styles - Premium Dark */
 
 .features-section {
-  padding: 5rem 0;
-  background-color: #f9fafb;
+  position: relative;
+  padding: 8rem 0;
+  background: var(--color-bg-page);
+  overflow: hidden;
+}
+
+/* Ambient glow */
+.features-section::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.05) 0%, transparent 60%);
+  z-index: 0;
+  pointer-events: none;
+}
+.features-section::after {
+  content: '';
+  position: absolute;
+  bottom: 10%;
+  left: -10%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(15, 76, 74, 0.1) 0%, transparent 60%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .features-container {
+  position: relative;
+  z-index: 10;
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
@@ -13,24 +41,31 @@
 
 .features-header {
   max-width: 42rem;
-  margin-bottom: 3.5rem;
+  margin-bottom: 5rem;
+  text-align: center;
+  margin-inline: auto;
 }
 
 .features-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.02em;
+  font-family: 'Outfit', sans-serif;
 }
 
-@media (min-width: 768px) {
-  .features-title {
-    font-size: 2.25rem;
-  }
+.features-title span {
+  color: transparent;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .features-description {
-  color: #4b5563;
+  font-size: 1.15rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
 }
 
 .features-grid {
@@ -52,38 +87,98 @@
 }
 
 .feature-card {
-  background-color: #ffffff;
-  border-radius: 1rem;
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  transition: box-shadow 0.3s;
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 1.5rem;
+  border: 1px solid var(--glass-border);
+  padding: 3rem 2rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  transform: scaleX(0);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .feature-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: rgba(20, 25, 35, 0.8);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(197, 160, 89, 0.1);
+  border-color: rgba(197, 160, 89, 0.3);
+  transform: translateY(-8px);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.feature-icon-wrapper {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.feature-icon-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: scale(0.5);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+
+.feature-card:hover .feature-icon-wrapper::after {
+  transform: scale(1.2);
+  opacity: 1;
 }
 
 .feature-icon {
-  width: 3rem;
-  height: 3rem;
+  position: relative;
+  z-index: 2;
+  width: 4.5rem;
+  height: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
-  background-color: #dbeafe;
-  color: #2563eb;
-  margin-bottom: 1.25rem;
+  border-radius: 1.25rem;
+  background: rgba(197, 160, 89, 0.1);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  color: var(--color-accent);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.5s ease;
+}
+
+.feature-card:hover .feature-icon {
+  color: #030812;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  transform: translateY(-4px) rotate(5deg);
+  box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
 }
 
 .feature-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-family: 'Outfit', sans-serif;
 }
 
 .feature-description {
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
   line-height: 1.6;
 }

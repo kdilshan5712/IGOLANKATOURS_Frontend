@@ -20,7 +20,7 @@
 .packages-page-title {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
 }
@@ -32,7 +32,7 @@
 }
 
 .packages-page-subtitle {
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .packages-page-layout {
@@ -78,7 +78,7 @@
 
 .packages-page-count {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -91,17 +91,17 @@
 
 .packages-sort-label {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
 .packages-sort-select {
   padding: 0.5rem 2rem 0.5rem 1rem;
   font-size: 0.875rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #111827;
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -119,7 +119,7 @@
 
 .packages-page-count-number {
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .packages-page-grid {
@@ -135,8 +135,8 @@
 }
 
 .packages-page-empty {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
   border-radius: 1rem;
   padding: 3rem;
   text-align: center;
@@ -145,12 +145,12 @@
 .packages-page-empty-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .packages-page-empty-text {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   margin-bottom: 1.5rem;
 }
 
@@ -188,7 +188,7 @@
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100;
   text-decoration: none;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .floating-ai-widget:hover {
@@ -256,18 +256,18 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--color-text-muted);
   pointer-events: none;
 }
 
 .packages-search-input {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 3rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: all 0.3s;
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
 }
 
 .packages-search-input:focus {
@@ -277,7 +277,7 @@
 }
 
 .packages-search-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 /* Pagination Styles */
@@ -292,9 +292,9 @@
 
 .pagination-btn {
   padding: 0.5rem 0.875rem;
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  color: #374151;
+  border: 1px solid var(--glass-border);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-secondary);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s;
@@ -346,7 +346,7 @@
 
 .pagination-dots {
   padding: 0 0.5rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   -webkit-user-select: none;
   user-select: none;
 }
@@ -363,14 +363,14 @@
 .packages-error {
   text-align: center;
   padding: 3rem 1.5rem;
-  background-color: #ffffff;
+  background-color: var(--color-bg-card);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .packages-loading p {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .packages-error p {

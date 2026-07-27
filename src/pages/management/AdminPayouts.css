@@ -14,13 +14,13 @@
 .admin-payouts-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--color-text-primary);
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.025em;
 }
 
 .admin-payouts-subtitle {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
   font-size: 1rem;
 }
@@ -34,10 +34,10 @@
 }
 
 .payout-stat-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -61,7 +61,7 @@
 .payout-stat-label {
   display: block;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
@@ -69,7 +69,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 /* Controls */
@@ -91,15 +91,15 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .search-box input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 3rem;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: white;
+  border: 1px solid var(--glass-border);
+  background: var(--color-bg-card);
   font-size: 0.95rem;
   transition: all 0.2s;
 }
@@ -114,26 +114,26 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: white;
+  background: var(--color-bg-card);
   padding: 0.5rem 1rem;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
 }
 
 .filter-group select {
   border: none;
   background: none;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   cursor: pointer;
   outline: none;
 }
 
 /* Table */
 .admin-payouts-table-container {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -146,11 +146,11 @@
 
 .admin-payouts-table th {
   padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--glass-border);
   font-size: 0.85rem;
   font-weight: 700;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -158,7 +158,7 @@
 .admin-payouts-table td {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  color: var(--color-text-secondary);
 }
 
 .guide-info-cell {
@@ -181,18 +181,18 @@
 
 .guide-name {
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .guide-id {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .payout-amount {
   font-family: inherit;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .status-badge {
@@ -216,13 +216,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .no-data-cell {
   padding: 4rem;
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -230,20 +230,20 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .payout-action-btn:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: var(--color-bg-card);
+  border-color: var(--glass-border);
 }
 
 /* Modal */
@@ -263,7 +263,7 @@
 }
 
 .admin-modal {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 20px;
   width: 100%;
   max-width: 650px;
@@ -290,13 +290,13 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .admin-modal-close {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -330,7 +330,7 @@
 .details-section h3 {
   font-size: 0.875rem;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin-bottom: 1rem;
   letter-spacing: 0.05em;
 }
@@ -343,11 +343,11 @@
 }
 
 .detail-row span {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .detail-row strong {
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .full-width {
@@ -356,7 +356,7 @@
 
 .copy-text {
   font-family: monospace;
-  background: #f9fafb;
+  background: var(--color-bg-card);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
@@ -384,7 +384,7 @@
 .admin-notes-section label {
   display: block;
   font-weight: 700;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 0.75rem;
 }
 
@@ -393,7 +393,7 @@
   height: 100px;
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--glass-border);
   font-family: inherit;
   font-size: 0.95rem;
   resize: none;
@@ -439,7 +439,7 @@
   justify-content: center;
   height: 60vh;
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 

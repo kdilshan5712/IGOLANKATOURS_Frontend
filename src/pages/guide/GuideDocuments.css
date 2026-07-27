@@ -30,7 +30,7 @@
 /* Header */
 .guide-documents-header {
   padding: 2rem 2.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--glass-border);
   background: linear-gradient(to bottom, #f8fafc, #ffffff);
 }
 
@@ -38,13 +38,13 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  color: #0f172a;
+  color: var(--color-text-primary);
   letter-spacing: -0.025em;
 }
 
 .guide-documents-subtitle {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--color-text-secondary);
   margin: 0;
   line-height: 1.5;
 }
@@ -101,33 +101,33 @@
 .guide-documents-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--color-text-secondary);
   margin-left: 0.25rem;
 }
 
 .guide-documents-select {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md, 0.5rem);
   font-size: 0.95rem;
   font-family: inherit;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .guide-documents-select:hover {
-  border-color: #cbd5e1;
-  background: #ffffff;
+  border-color: var(--glass-border);
+  background: var(--color-bg-card);
 }
 
 .guide-documents-select:focus {
   outline: none;
   border-color: #4f46e5;
-  background: #ffffff;
+  background: var(--color-bg-card);
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
@@ -175,13 +175,13 @@
 .guide-documents-upload-area p {
   font-size: 0.95rem;
   font-weight: 500;
-  color: #0f172a;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
 .guide-documents-upload-area small {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 /* Submit Button */
@@ -215,14 +215,14 @@
 /* Uploaded Documents Section */
 .guide-documents-uploaded {
   padding: 2.5rem;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-top: 1px solid var(--glass-border);
+  background: var(--color-bg-card);
 }
 
 .guide-documents-uploaded-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text-primary);
   margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
@@ -241,15 +241,15 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md, 0.5rem);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
 .guide-documents-item:hover {
-  border-color: #cbd5e1;
+  border-color: var(--glass-border);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   transform: translateX(4px);
 }
@@ -263,7 +263,7 @@
   flex: 1;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #0f172a;
+  color: var(--color-text-primary);
   text-transform: capitalize;
 }
 

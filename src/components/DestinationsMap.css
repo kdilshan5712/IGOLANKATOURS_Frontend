@@ -1,26 +1,38 @@
 .destinations-map-section {
-  padding: 3rem 0;
+  padding: 4rem 0;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .destinations-map-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .destinations-map-header h2 {
+  font-family: "Outfit", sans-serif;
   font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
+  font-weight: 800;
+  color: var(--color-text-primary);
   margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.destinations-map-header h2 span {
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 50%, var(--color-accent-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .destinations-map-header p {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   max-width: 600px;
   margin: 0 auto;
+  line-height: 1.6;
 }
 
 .destinations-map-footer {
@@ -33,14 +45,26 @@
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-left: 4px solid var(--color-accent);
+  position: relative;
+}
+
+.destinations-map-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(197, 160, 89, 0.03) 0%, transparent 100%);
+  pointer-events: none;
+  border-radius: var(--radius-lg);
 }
 
 .destinations-map-note {
   margin: 0;
   font-size: 0.9375rem;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   line-height: 1.6;
   font-weight: 500;
+  position: relative;
+  z-index: 2;
 }
 
 .destinations-map-note strong {
@@ -50,11 +74,11 @@
 
 @media (max-width: 768px) {
   .destinations-map-section {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
   }
 
   .destinations-map-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.65rem;
   }
 
   .destinations-map-header p {

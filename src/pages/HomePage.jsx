@@ -8,6 +8,7 @@
  * @module HomePage
  */
 
+import PromotionalBanner from "../components/PromotionalBanner";
 import HeroSection from "../components/HeroSection";
 import TrustBadges from "../components/TrustBadges";
 import FeaturesSection from "../components/FeaturesSection";
@@ -85,6 +86,7 @@ const HomePage = () => {
         ogImage="https://www.igolankatours.com/og-image.jpg"
         structuredData={structuredData}
       />
+      <PromotionalBanner />
       <HeroSection />
       <TrustBadges />
       <FeaturesSection />

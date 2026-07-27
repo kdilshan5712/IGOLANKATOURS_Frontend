@@ -1,10 +1,24 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { MapPin, ArrowLeft, Loader } from "lucide-react";
+import { motion } from "framer-motion";
 import { destinationAPI, packageAPI, transformPackages } from "../services/api";
 import PackageCard from "../components/PackageCard";
 import SEO from "../components/SEO";
 import "./DestinationDetailsPage.css";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 35 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
 
 const DestinationDetailsPage = () => {
     const { id } = useParams();
@@ -83,7 +97,7 @@ const DestinationDetailsPage = () => {
         return (
             <div className="destination-details-loading">
                 <Loader className="animate-spin" size={48} />
-                <p>Loading destination details...</p>
+                <p>Curating destination details...</p>
             </div>
         );
     }
@@ -104,16 +118,29 @@ const DestinationDetailsPage = () => {
     return (
         <main className="destination-details-page">
             <SEO 
-                title={destination.name}
+                title={`${destination.name} – Explore Top Sri Lanka Destinations`}
                 description={destination.description}
                 keywords={`${destination.name}, Sri Lanka destination, visit ${destination.name}, ${destination.category} in Sri Lanka`}
                 ogImage={imageUrl}
+                canonicalUrl={`https://www.igolankatours.com/destinations/${id}`}
             />
+
+            {/* Ambient Effects */}
+            <div className="destination-details-ambient-glow-1"></div>
+            <div className="destination-details-ambient-glow-2"></div>
+
             {/* Hero Section */}
             <div className="destination-hero">
                 <div className="destination-hero-image-container">
                     {imageUrl ? (
-                        <img src={imageUrl} alt={destination.name} className="destination-hero-image" />
+                        <motion.img 
+                            initial={{ scale: 1.15, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            src={imageUrl} 
+                            alt={destination.name} 
+                            className="destination-hero-image" 
+                        />
                     ) : (
                         <div className="destination-hero-placeholder">No Image Available</div>
                     )}
@@ -121,59 +148,98 @@ const DestinationDetailsPage = () => {
                 </div>
 
                 <div className="destination-hero-content-wrapper">
-                    <div className="destination-hero-back">
+                    <motion.div 
+                        className="destination-hero-back"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8, delay: 0.1 }}
+                    >
                         <Link to="/destinations" className="back-link">
-                            <ArrowLeft size={20} />
+                            <ArrowLeft size={18} className="arrow-left-icon" />
                             All Destinations
                         </Link>
-                    </div>
-                    <div className="destination-hero-title-area">
-                        <span className="destination-category-badge">{destination.category || "Destination"}</span>
-                        <h1 className="destination-title">{destination.name}</h1>
-                        <div className="destination-location">
-                            <MapPin size={20} />
+                    </motion.div>
+                    <motion.div 
+                        className="destination-hero-title-area"
+                        initial="hidden"
+                        animate="visible"
+                        variants={staggerContainer}
+                    >
+                        <motion.span className="destination-category-badge" variants={fadeUp}>
+                            {destination.category || "Destination"}
+                        </motion.span>
+                        <motion.h1 className="destination-title" variants={fadeUp}>
+                            {destination.name}
+                        </motion.h1>
+                        <motion.div className="destination-location" variants={fadeUp}>
+                            <MapPin size={18} className="location-pin" />
                             <span>Sri Lanka</span>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
             </div>
 
             <div className="destination-content-container">
                 {/* Main Content Area */}
                 <div className="destination-main-content">
-                    <section className="destination-section">
+                    <motion.section 
+                        className="destination-section"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-100px" }}
+                        variants={fadeUp}
+                    >
                         <h2 className="destination-section-title">Overview</h2>
                         <div className="destination-description-box">
                             <p className="destination-description">
                                 {destination.description}
                             </p>
                             {destination.full_description && (
-                                <div className="destination-full-description" dangerouslySetInnerHTML={{ __html: destination.full_description }} />
+                                <div 
+                                    className="destination-full-description" 
+                                    dangerouslySetInnerHTML={{ __html: destination.full_description }} 
+                                />
                             )}
                         </div>
-                    </section>
+                    </motion.section>
 
                     {/* Related Packages Grid */}
-                    <section className="destination-related-packages">
+                    <motion.section 
+                        className="destination-related-packages"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-100px" }}
+                        variants={fadeUp}
+                    >
                         <div className="related-packages-header">
                             <h2 className="destination-section-title">Tours Visiting {destination.name}</h2>
                             <span className="related-count">{relatedPackages.length} Packages Found</span>
                         </div>
 
                         {relatedPackages.length > 0 ? (
-                            <div className="related-packages-grid">
+                            <motion.div 
+                                className="related-packages-grid"
+                                variants={staggerContainer}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                            >
                                 {relatedPackages.map(pkg => (
-                                    <PackageCard key={pkg.id} pkg={pkg} />
+                                    <motion.div key={pkg.id} variants={fadeUp}>
+                                        <PackageCard pkg={pkg} />
+                                    </motion.div>
                                 ))}
-                            </div>
+                            </motion.div>
                         ) : (
                             <div className="related-packages-empty">
                                 <p>We're currently updating our tours for this destination.</p>
-                                <Link to="/packages" className="btn-secondary">View All Tours</Link>
-                                <Link to="/contact" className="btn-primary" style={{ marginLeft: '1rem' }}>Request Custom Tour</Link>
+                                <div className="empty-packages-buttons">
+                                    <Link to="/packages" className="btn-secondary">View All Tours</Link>
+                                    <Link to="/contact" className="btn-primary">Request Custom Tour</Link>
+                                </div>
                             </div>
                         )}
-                    </section>
+                    </motion.section>
                 </div>
             </div>
         </main>

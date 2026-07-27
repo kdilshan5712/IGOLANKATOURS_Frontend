@@ -11,6 +11,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Menu, X, LogOut, User, Heart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { authAPI } from "../services/api";
 import { useWishlist } from "../hooks/useWishlist";
 import NotificationBell from "./NotificationBell";
@@ -112,52 +113,60 @@ const Navbar = () => {
                     <User size={18} />
                     <span>{currentUser?.name || "Account"}</span>
                   </button>
-                  {showUserMenu && (
-                    <div className="user-dropdown">
-                      {userRole === "tourist" && (
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="user-dropdown-item"
-                        >
-                          Dashboard
-                        </Link>
-                      )}
-                      {userRole === "guide" && (
-                        <Link
-                          to={
-                            currentUser?.status === 'active' 
-                              ? "/guide/dashboard" 
-                              : currentUser?.hasUploadedDocuments === false 
-                                ? "/guide/documents" 
-                                : currentUser?.isRejected 
-                                  ? "/guide/rejected"
-                                  : "/guide/pending"
-                          }
-                          onClick={() => setShowUserMenu(false)}
-                          className="user-dropdown-item"
-                        >
-                          {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
-                        </Link>
-                      )}
-                      {(userRole === "admin" || userRole === "superadmin") && (
-                        <Link
-                          to="/admin/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="user-dropdown-item"
-                        >
-                          Admin Dashboard
-                        </Link>
-                      )}
-                      <button
-                        onClick={handleLogout}
-                        className="user-dropdown-item logout"
+                  <AnimatePresence>
+                    {showUserMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="user-dropdown"
                       >
-                        <LogOut size={16} />
-                        Logout
-                      </button>
-                    </div>
-                  )}
+                        {userRole === "tourist" && (
+                          <Link
+                            to="/dashboard"
+                            onClick={() => setShowUserMenu(false)}
+                            className="user-dropdown-item"
+                          >
+                            Dashboard
+                          </Link>
+                        )}
+                        {userRole === "guide" && (
+                          <Link
+                            to={
+                              currentUser?.status === 'active' 
+                                ? "/guide/dashboard" 
+                                : currentUser?.hasUploadedDocuments === false 
+                                  ? "/guide/documents" 
+                                  : currentUser?.isRejected 
+                                    ? "/guide/rejected"
+                                    : "/guide/pending"
+                            }
+                            onClick={() => setShowUserMenu(false)}
+                            className="user-dropdown-item"
+                          >
+                            {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
+                          </Link>
+                        )}
+                        {(userRole === "admin" || userRole === "superadmin") && (
+                          <Link
+                            to="/admin/dashboard"
+                            onClick={() => setShowUserMenu(false)}
+                            className="user-dropdown-item"
+                          >
+                            Admin Dashboard
+                          </Link>
+                        )}
+                        <button
+                          onClick={handleLogout}
+                          className="user-dropdown-item logout"
+                        >
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </>
             ) : (
@@ -181,93 +190,102 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="mobile-menu">
-          <div className="mobile-menu-content">
-            <div className="mobile-nav-links">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.name}
-                  to={link.to}
-                  onClick={() => setMobileOpen(false)}
-                  className={({ isActive }) =>
-                    `mobile-nav-link ${isActive ? "nav-item-active" : ""}`
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
-
-              <Link
-                to="/wishlist"
-                onClick={() => setMobileOpen(false)}
-                className="mobile-nav-link"
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                Wishlist
-                {wishlistCount > 0 && (
-                  <span className="mobile-wishlist-badge">{wishlistCount}</span>
-                )}
-              </Link>
-            </div>
-
-            {isLoggedIn ? (
-              <>
-                {userRole === "tourist" && (
-                  <Link
-                    to="/dashboard"
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+            className="mobile-menu"
+            style={{ overflow: "hidden" }}
+          >
+            <div className="mobile-menu-content">
+              <div className="mobile-nav-links">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.name}
+                    to={link.to}
                     onClick={() => setMobileOpen(false)}
-                    className="mobile-cta"
-                  >
-                    Dashboard
-                  </Link>
-                )}
-                {userRole === "guide" && (
-                  <Link
-                    to={
-                      currentUser?.status === 'active' 
-                        ? "/guide/dashboard" 
-                        : currentUser?.hasUploadedDocuments === false 
-                          ? "/guide/documents" 
-                          : currentUser?.isRejected 
-                            ? "/guide/rejected"
-                            : "/guide/pending"
+                    className={({ isActive }) =>
+                      `mobile-nav-link ${isActive ? "nav-item-active" : ""}`
                     }
-                    onClick={() => setMobileOpen(false)}
-                    className="mobile-cta"
                   >
-                    {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
-                  </Link>
-                )}
-                {(userRole === "admin" || userRole === "superadmin") && (
-                  <Link
-                    to="/admin/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="mobile-cta"
-                  >
-                    Admin Dashboard
-                  </Link>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="mobile-cta mobile-logout"
+                    {link.name}
+                  </NavLink>
+                ))}
+
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMobileOpen(false)}
+                  className="mobile-nav-link"
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="mobile-cta"
-              >
-                Login
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+                  Wishlist
+                  {wishlistCount > 0 && (
+                    <span className="mobile-wishlist-badge">{wishlistCount}</span>
+                  )}
+                </Link>
+              </div>
+
+              {isLoggedIn ? (
+                <>
+                  {userRole === "tourist" && (
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="mobile-cta"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  {userRole === "guide" && (
+                    <Link
+                      to={
+                        currentUser?.status === 'active' 
+                          ? "/guide/dashboard" 
+                          : currentUser?.hasUploadedDocuments === false 
+                            ? "/guide/documents" 
+                            : currentUser?.isRejected 
+                              ? "/guide/rejected"
+                              : "/guide/pending"
+                      }
+                      onClick={() => setMobileOpen(false)}
+                      className="mobile-cta"
+                    >
+                      {currentUser?.status === 'active' ? "Guide Dashboard" : "Application Status"}
+                    </Link>
+                  )}
+                  {(userRole === "admin" || userRole === "superadmin") && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="mobile-cta"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="mobile-cta mobile-logout"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="mobile-cta"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

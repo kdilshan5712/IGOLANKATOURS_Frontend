@@ -1,22 +1,28 @@
-/* BookingSuccessPage.css */
+/* ============================================================
+   I GO LANKA TOURS — Booking Success Page
+   Design system: Premium Dark Glassmorphism
+   Deep space backgrounds, gold accents, readable dark labels
+   ============================================================ */
+
 .booking-success-container {
   min-height: 80vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background: radial-gradient(circle at top right, rgba(13, 148, 136, 0.05), transparent 40%),
-    radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.05), transparent 40%);
+  font-family: 'Inter', system-ui, sans-serif;
+  background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.05), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.05), transparent 40%);
 }
 
 .booking-success-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   padding: 3rem;
   border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--glass-shadow);
   max-width: 800px;
   width: 100%;
   text-align: center;
@@ -28,7 +34,6 @@
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -59,7 +64,6 @@
     opacity: 0;
     transform: scale(0.5);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -70,24 +74,24 @@
   font-family: 'Outfit', sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #111827;
   margin-bottom: 1rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: var(--color-accent);
 }
 
 .success-message {
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 2.5rem;
   line-height: 1.6;
 }
 
 .booking-details-card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-card);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2.5rem;
@@ -98,10 +102,10 @@
   font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .detail-row {
@@ -112,12 +116,12 @@
 }
 
 .detail-label {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }
 
 .detail-value {
-  color: #111827;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 1rem;
 }
@@ -125,17 +129,17 @@
 .detail-row.total {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px dashed #e5e7eb;
+  border-top: 2px dashed var(--glass-border);
 }
 
 .detail-row.total .detail-label {
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
 }
 
 .detail-row.total .detail-value {
-  color: #0d9488;
+  color: var(--color-success);
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -156,38 +160,37 @@
   transition: all 0.3s ease;
   cursor: pointer;
   font-family: 'Outfit', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-dashboard {
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
   color: white;
   border: none;
-  box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 
 .btn-dashboard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px -1px rgba(13, 148, 136, 0.4);
+  box-shadow: 0 8px 12px -1px rgba(16, 185, 129, 0.4);
 }
 
 .btn-secondary {
-  background: white;
-  color: #0d9488;
-  border: 2px solid #0d9488;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  letter-spacing: 0.01em;
-  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover {
-  background: #f0fdfa;
-  border-color: #0f766e;
-  color: #0f766e;
+  background: var(--color-primary-light);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(13, 148, 136, 0.2);
+  box-shadow: 0 6px 14px rgba(197, 160, 89, 0.2);
 }
 
 .btn-secondary:disabled {
@@ -198,14 +201,15 @@
 }
 
 .btn-home {
-  background: white;
-  color: #374151;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-home:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: var(--color-primary-light);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
   transform: translateY(-2px);
 }
 
@@ -216,10 +220,12 @@
 
   .action-buttons {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
   .btn-dashboard,
-  .btn-home {
+  .btn-home,
+  .btn-secondary {
     width: 100%;
   }
 }

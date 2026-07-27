@@ -1,13 +1,13 @@
 .social-share-container {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--glass-border);
 }
 
 .social-share-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-text-secondary);
     margin-bottom: 0.75rem;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .share-twitter {
-    background-color: #000000;
+    background-color: var(--color-text-primary);
 }
 
 .share-whatsapp {
@@ -53,7 +53,7 @@
 }
 
 .share-copy {
-    background-color: #6b7280;
+    background-color: var(--color-text-muted);
     color: white;
 }
 
@@ -67,7 +67,7 @@
     bottom: -30px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1f2937;
+    background-color: var(--color-text-primary);
     color: white;
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;

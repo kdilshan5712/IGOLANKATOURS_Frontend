@@ -10,7 +10,10 @@
 // ============================================
 // API Configuration & Secure Fetch Helper
 // ============================================
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? "http://localhost:5000/api" 
+    : "/api");
 
 /**
  * Enhanced fetch wrapper that ensures credentials (cookies) are sent
@@ -415,7 +418,9 @@ export const bookingAPI = {
         try {
           const data = await res.json();
           errorMsg = data.message || errorMsg;
-        } catch (e) { }
+        } catch (e) { 
+          console.error("Failed to parse invoice error response:", e);
+        }
         return { success: false, message: errorMsg };
       }
 
@@ -711,7 +716,6 @@ export const transformPackage = (pkg) => {
     budget: pkg.budget,
     hotel: pkg.hotel,
     rating: pkg.rating || 4.5,
-    image: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
     image: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
     image_url: pkg.image || "https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=2070",
     currentPrice: pkg.currentPrice || parseFloat(pkg.price),
@@ -1489,6 +1493,70 @@ export const adminAPI = {
     }
   },
 
+  // === COUPONS MANAGEMENT ===
+  getAllCoupons: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, coupons: [] }
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
+      return { success: false, coupons: [] };
+    }
+  },
+
+  createCoupon: async (couponData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(couponData)
+      });
+      const data = await res.json();
+      return data; // { success, coupon }
+    } catch (error) {
+      console.error('Error creating coupon:', error);
+      return { success: false, message: 'Failed to create coupon' };
+    }
+  },
+
+  updateCoupon: async (couponId, couponData, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons/${couponId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(couponData)
+      });
+      const data = await res.json();
+      return data; // { success, coupon }
+    } catch (error) {
+      console.error('Error updating coupon:', error);
+      return { success: false, message: 'Failed to update coupon' };
+    }
+  },
+
+  deleteCoupon: async (couponId, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/coupons/${couponId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data; // { success, message }
+    } catch (error) {
+      console.error('Error deleting coupon:', error);
+      return { success: false, message: 'Failed to delete coupon' };
+    }
+  },
+
   // === TOUR GUIDE APPROVAL SYSTEM ===
   // Get all guides with documents (NEW ENDPOINT - includes documents array)
   getGuidesWithDocuments: async (token, status = null) => {
@@ -1876,41 +1944,6 @@ export const availabilityAPI = {
 
 // 🎓 GUIDE MANAGEMENT (Auth Required)
 export const guideAPI = {
-  // Upload Profile Photo
-  uploadProfilePhoto: async (file, token) => {
-    const formData = new FormData();
-    formData.append('profile_photo', file);
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-      return await res.json();
-    } catch (error) {
-      console.error("Error uploading profile photo:", error);
-      return { success: false, message: "Network error during upload" };
-    }
-  },
-
-  // Delete Profile Photo
-  deleteProfilePhoto: async (token) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/guides/profile-photo`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      return await res.json();
-    } catch (error) {
-      console.error("Error deleting profile photo:", error);
-      return { success: false, message: "Network error during deletion" };
-    }
-  },
 
   // Register as a tour guide
   register: async (guideData) => {
@@ -3088,6 +3121,82 @@ export const aiAPI = {
       return await res.json();
     } catch (error) {
       console.error("Error syncing chat history:", error);
+      return { success: false, message: "Network error" };
+    }
+  }
+};
+
+// ==========================================
+// PROMOTIONS & BANNERS (Admin & Public)
+// ==========================================
+export const promotionsAPI = {
+  // Admin Methods
+  getAllPromotions: async (token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/promotions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching promotions:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  createPromotion: async (data, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/promotions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error creating promotion:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  updatePromotion: async (id, data, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/promotions/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error updating promotion:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  deletePromotion: async (id, token) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/promotions/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } catch (error) {
+      console.error("Error deleting promotion:", error);
+      return { success: false, message: "Network error" };
+    }
+  },
+
+  // Public Methods
+  getActivePromotions: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/promotions`);
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching active promotions:", error);
       return { success: false, message: "Network error" };
     }
   }
